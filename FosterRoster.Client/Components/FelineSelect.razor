@@ -1,0 +1,37 @@
+@inject IFelineRepository FelineRepository;
+
+@if (names is null)
+{
+  <p>Loading...</p>
+}
+else
+{
+  <MudSelect Label="Name" Value="@Value" ValueChanged="@ValueChanged">
+    <MudSelectItem Value="0">Select a name...</MudSelectItem>
+    @foreach (var name in names)
+    {
+      <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
+    }
+  </MudSelect>
+}
+
+@code {
+  [Parameter]
+  public int Value { get; set; }
+
+  [Parameter]
+  public EventCallback<int> ValueChanged { get; set; } = EventCallback<int>.Empty;
+
+  private List<ListItem<int>> names = [];
+
+  protected override async Task OnInitializedAsync()
+  {
+    Value = 0;
+    names = await FelineRepository.GetAllNamesAsync();
+    await base.OnInitializedAsync();
+  }
+
+
+
+}
+

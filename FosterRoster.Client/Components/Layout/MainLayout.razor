@@ -1,0 +1,35 @@
+﻿@inherits LayoutComponentBase
+<MudThemeProvider @rendermode="InteractiveWebAssembly" />
+<MudPopoverProvider @rendermode="InteractiveWebAssembly" />
+<MudDialogProvider @rendermode="InteractiveWebAssembly" />
+<MudSnackbarProvider @rendermode="InteractiveWebAssembly" />
+<MudLayout>
+    <MudAppBar Dense
+               Elevation="3">
+        <MudText Typo="Typo.h6">Foster Roster</MudText>
+        <MudStack Row="true" Justify="Justify.FlexStart" Spacing="0">
+            <MudNavLink Href="/">
+                <MudText>Dashboard</MudText>
+            </MudNavLink>
+            <MudNavLink Href="/intake">
+                <MudText>Intake</MudText>
+            </MudNavLink>
+            <MudNavLink Href="/weights">
+                <MudText>Weights</MudText>
+            </MudNavLink>
+        </MudStack>
+
+    </MudAppBar>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Medium" Class="pt-2">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>

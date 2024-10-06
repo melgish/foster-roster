@@ -1,0 +1,171 @@
+@page "/intake"
+@rendermode InteractiveWebAssembly
+@using FosterRoster.Domain
+@inject IFelineRepository FelineRepository
+@inject ILogger<Intake> Logger;
+@inject TimeProvider TimeProvider;
+@inject NavigationManager NavigationManager;
+@inject ISnackbar Snackbar;
+
+<PageTitle>Intake</PageTitle>
+@if (model is null)
+{
+  <p>Loading...</p>
+}
+else
+{
+  <MudStack>
+    <MudPaper Elevation="3"
+              Class="pa-2">
+      <EditForm FormName="intakeForm"
+                Model="model"
+                OnValidSubmit="@SaveFelineAsync">
+        <FluentValidationValidator />
+        <MudGrid Spacing="3">
+          <MudItem xs="12">
+            <h1>Intake</h1>
+          </MudItem>
+          <MudItem sm="4">
+            <MudFileUpload T="IBrowserFile"
+                           FilesChanged="@OnFilesChangedAsync"
+                           Accept="image/*">
+              <ActivatorContent>
+                <MudImage Alt="Thumbnail"
+                          Src="@model.Thumbnail.GetUrl()"
+                          Width="256"
+                          Height="256" />
+                <MudIconButton Icon="@Icons.Material.Rounded.CameraAlt"
+                               Color="Color.Default" />
+              </ActivatorContent>
+            </MudFileUpload>
+          </MudItem>
+          <MudItem sm="8">
+            <MudGrid Spacing="3">
+              <MudItem xs="12">
+                <MudDatePicker @bind-Date="model.IntakeDate"
+                               Editable="true"
+                               Label="Intake Date" />
+                <ValidationMessage For="@(() => model.IntakeDate)" />
+              </MudItem>
+              <MudItem xs="12">
+                <MudTextField @bind-Value="model.Name"
+                              Label="Name" />
+                <ValidationMessage For="@(() => model.Name)" />
+              </MudItem>
+              <MudItem xs="12">
+                <MudField Label="Gender">
+                  <MudRadioGroup T="Gender"
+                                 @bind-Value="model.Gender"
+                                 Class="ps-2">
+                    <MudRadio Value="@Gender.Female"
+                              Dense>Female</MudRadio>
+                    <MudRadio Value="@Gender.Male"
+                              Dense>Male</MudRadio>
+                  </MudRadioGroup>
+                  <ValidationMessage For="@(() => model.Gender)" />
+                </MudField>
+              </MudItem>
+              <MudItem xs="12">
+                <MudNumericField @bind-Value="model.IntakeAgeInWeeks"
+                                 Label="Age at Intake (weeks)"
+                                 Min="0"
+                                 HideSpinButtons />
+                <ValidationMessage For="@(() => model.IntakeAgeInWeeks)" />
+              </MudItem>
+            </MudGrid>
+          </MudItem>
+          <MudItem xs="12">
+            <MudTextField @bind-Value="model.Breed"
+                          Label="Breed" />
+            <ValidationMessage For="@(() => model.Breed)" />
+          </MudItem>
+          <MudItem xs="12">
+            <MudSelect @bind-Value="model.Category"
+                       Label="Category">
+              <MudSelectItem Value="@Category.Kitten">Kitten</MudSelectItem>
+              <MudSelectItem Value="@Category.NursingKitten">Nursing Kitten</MudSelectItem>
+              <MudSelectItem Value="@Category.Cat">Cat</MudSelectItem>
+              <MudSelectItem Value="@Category.NursingCat">Nursing Cat</MudSelectItem>
+            </MudSelect>
+            <ValidationMessage For="@(() => model.Category)" />
+          </MudItem>
+          <MudItem xs="12">
+            <MudField Label="Weaned">
+              <MudRadioGroup @bind-Value="model.Weaned"
+                             Class="ps-2">
+                <MudRadio Value="@Weaned.No"
+                          Dense>No</MudRadio>
+                <MudRadio Value="@Weaned.InProgress"
+                          Dense>In Progress</MudRadio>
+                <MudRadio Value="@Weaned.Yes"
+                          Dense>Yes</MudRadio>
+              </MudRadioGroup>
+            </MudField>
+            <ValidationMessage For="@(() => model.Weaned)" />
+          </MudItem>
+          <MudItem xs="12">
+            <MudDatePicker @bind-Date="model.RegistrationDate"
+                           Clearable="true"
+                           Editable="true"
+                           Label="Registration Date" />
+            <ValidationMessage For="@(() => model.RegistrationDate)" />
+          </MudItem>
+          <MudItem xs="12">
+            <MudStack Row="true">
+              <MudSpacer />
+              <MudButton Variant="Variant.Outlined"
+                         ButtonType="ButtonType.Submit"
+                         Color="Color.Primary"
+                         Disabled="isSaving">Save</MudButton>
+              <MudButton Variant="Variant.Outlined"
+                         OnClick="@Reset"
+                         Color="Color.Secondary"
+                         Disabled="isSaving">Reset</MudButton>
+            </MudStack>
+          </MudItem>
+        </MudGrid>
+      </EditForm>
+    </MudPaper>
+  </MudStack>
+}
+
+@code {
+  private bool isSaving = false;
+  private FelineEditModel model = null!;
+  protected override void OnInitialized()
+  {
+    Reset();
+  }
+
+  private void Reset()
+  {
+    model = new()
+      {
+
+        IntakeDate = TimeProvider.GetLocalNow().DateTime.Date,
+        Category = Category.Kitten,
+        Gender = Gender.Female,
+        Thumbnail = null,
+        Weaned = Weaned.Yes
+      };
+    StateHasChanged();
+  }
+
+  private async Task SaveFelineAsync()
+  {
+    isSaving = true;
+    var feline = await FelineRepository.AddAsync(model.ToFeline());
+    isSaving = false;
+    if (feline is not null)
+    {
+      Snackbar.Add("Saved", Severity.Success, config => config.VisibleStateDuration = 2500);
+      NavigationManager.NavigateTo($"/details/{feline.Id}");
+    }
+  }
+
+  private async Task OnFilesChangedAsync(IBrowserFile file)
+  {
+    model.Thumbnail = await file.ToThumbnailAsync(0);
+    StateHasChanged();
+  }
+}

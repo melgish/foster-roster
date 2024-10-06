@@ -1,0 +1,49 @@
+﻿@page "/"
+@rendermode InteractiveWebAssembly
+@using FosterRoster.Domain
+@inject IFelineRepository FelineRepository
+@inject PersistentComponentState ComponentState;
+
+<PageTitle>Dashboard</PageTitle>
+@if (felines is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <div class="deck">
+        @foreach (var feline in felines)
+        {
+            <FelineCard @key="feline.Id"
+                        Feline="@feline"
+                        FelineChanged="@OnFelineChanged" />
+        }
+    </div>
+}
+
+@code {
+    private ICollection<Feline>? felines;
+    private IDisposable? stateSubscription;
+
+    private void Dispose() => stateSubscription?.Dispose();
+
+    private void OnFelineChanged(Feline feline)
+    {
+        felines = felines!.Select(f => f.Id == feline.Id ? feline : f).ToList();
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+        ComponentState.TryTakeFromJson<ICollection<Feline>>("felines", out felines);
+        felines ??= await FelineRepository.GetAllAsync();
+    }
+
+    private Task PersistStateAsync()
+    {
+        ComponentState.PersistAsJson("felines", felines);
+        return Task.CompletedTask;
+    }
+
+}

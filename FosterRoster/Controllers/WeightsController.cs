@@ -1,0 +1,52 @@
+namespace FosterRoster.Controllers;
+
+using FluentValidation;
+
+using FosterRoster.Domain;
+
+using Microsoft.AspNetCore.Mvc;
+
+[ApiController]
+[Route("api/weights")]
+public sealed class WeightsController(
+    IValidator<WeightEditModel> weightEditModelValidator,
+    IWeightRepository weightRepository
+) : ControllerBase
+{
+    [HttpPost]
+    public async Task<Weight> AddAsync(WeightEditModel model)
+    {
+        await weightEditModelValidator.ValidateAndThrowAsync(model);
+        return await weightRepository.AddAsync(model.ToWeight());
+    }
+
+    [HttpDelete("{felineId:int}/{dateTime}")]
+    public async Task<bool> DeleteByKeyAsync(int felineId, DateTimeOffset dateTime)
+        => await weightRepository.DeleteByKeyAsync(felineId, dateTime);
+
+    /// <summary>
+    /// Get list of all weights in the database.
+    /// </summary>
+    /// <returns>List of weights, or empty list if no weights exist.</returns>
+    [HttpGet]
+    public async Task<List<Weight>> GetAllAsync()
+        => await weightRepository.GetAllAsync();
+
+    [HttpPost("import")]
+    public async Task ImportAsync()
+    {
+        var data = await System.IO.File.ReadAllLinesAsync(@"D:\longshot.csv");
+        foreach (var line in data.Skip(1))
+        {
+            var parts = line.Split(',');
+            var weight = new Weight
+            {
+                FelineId = 9,
+                DateTime = DateTimeOffset.Parse(parts[1]),
+                Value = float.Parse(parts[2]),
+                Units = WeightUnit.lbs
+            };
+            await weightRepository.AddAsync(weight);
+        }
+    }
+}

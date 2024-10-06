@@ -1,0 +1,207 @@
+@page "/details/{FelineId:int}"
+@rendermode InteractiveWebAssembly
+@inject IFelineRepository FelineRepository
+@inject TimeProvider TimeProvider
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject PersistentComponentState ComponentState;
+@inject ISnackbar Snackbar
+
+<PageTitle>Details: @Name</PageTitle>
+@if (model is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <MudPaper Elevation="3"
+              Class="pa-2">
+        <EditForm FormName="editFelineForm"
+                  Model="model"
+                  OnValidSubmit="@SaveFelineAsync">
+            <FluentValidationValidator />
+            <MudStack>
+                <h1>@Name</h1>
+                <MudStack Row>
+                    <MudFileUpload T="IBrowserFile"
+                                   FilesChanged="@OnFilesChangedAsync"
+                                   Accept="image/png">
+                        <ActivatorContent>
+                            <MudImage Alt="Thumbnail"
+                                      Src="@model.Thumbnail.GetUrl()"
+                                      Width="256"
+                                      Height="256" />
+                            <MudIconButton Icon="@Icons.Material.Rounded.CameraAlt"
+                                           Color="Color.Default" />
+                        </ActivatorContent>
+                    </MudFileUpload>
+                    <MudStack Style="min-width: 60ch">
+                        <div>
+                            <MudDatePicker @bind-Date="model.IntakeDate"
+                                           Editable="true"
+                                           Label="Intake Date"
+                                           Required
+                                           RequiredError="" />
+                            <ValidationMessage For="@(() => model.IntakeDate)" />
+                        </div>
+                        <div>
+                            <MudTextField @bind-Value="model.Name"
+                                          Label="Name" />
+                            <ValidationMessage For="@(() => model.Name)" />
+                        </div>
+                        <div>
+                            <MudField Label="Gender">
+                                <MudRadioGroup T="Gender"
+                                               @bind-Value="model.Gender"
+                                               Class="ps-2">
+                                    <MudRadio Value="@Gender.Female"
+                                              Dense>Female</MudRadio>
+                                    <MudRadio Value="@Gender.Male"
+                                              Dense>Male</MudRadio>
+                                </MudRadioGroup>
+                                <ValidationMessage For="@(() => model.Gender)" />
+                            </MudField>
+                        </div>
+                        <div>
+                            <MudNumericField @bind-Value="model.IntakeAgeInWeeks"
+                                             Label="Age at Intake (weeks)"
+                                             Min="0"
+                                             HideSpinButtons />
+                            <ValidationMessage For="@(() => model.IntakeAgeInWeeks)" />
+                        </div>
+                    </MudStack>
+                </MudStack>
+                <div>
+                    <MudTextField @bind-Value="model.Breed"
+                                  Label="Breed" />
+                    <ValidationMessage For="@(() => model.Breed)" />
+                </div>
+                <div>
+                    <MudSelect @bind-Value="model.Category"
+                               Label="Category"
+                               Required>
+                        <MudSelectItem Value="@Category.Kitten">Kitten</MudSelectItem>
+                        <MudSelectItem Value="@Category.NursingKitten">Nursing Kitten
+                        </MudSelectItem>
+                        <MudSelectItem Value="@Category.Cat">Cat</MudSelectItem>
+                        <MudSelectItem Value="@Category.NursingCat">Nursing Cat</MudSelectItem>
+                    </MudSelect>
+                    <ValidationMessage For="@(() => model.Category)" />
+                </div>
+                <div>
+                    <MudField Label="Weaned">
+                        <MudRadioGroup @bind-Value="model.Weaned"
+                                       Class="ps-2">
+                            <MudRadio Value="@Weaned.No"
+                                      Dense>No</MudRadio>
+                            <MudRadio Value="@Weaned.InProgress"
+                                      Dense>In Progress</MudRadio>
+                            <MudRadio Value="@Weaned.Yes"
+                                      Dense>Yes</MudRadio>
+                        </MudRadioGroup>
+                    </MudField>
+                    <ValidationMessage For="@(() => model.Weaned)" />
+                </div>
+                <div>
+                    <MudDatePicker @bind-Date="model.RegistrationDate"
+                                   Clearable="true"
+                                   Editable="true"
+                                   Label="Registration Date" />
+                    <ValidationMessage For="@(() => model.RegistrationDate)" />
+                </div>
+                <div>
+                    <MudStack Row="true">
+                        <MudSpacer />
+                        <MudButton Variant="Variant.Outlined"
+                                   ButtonType="ButtonType.Button"
+                                   Color="Color.Error"
+                                   OnClick="@DeleteFelineAsync">Delete</MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   ButtonType="ButtonType.Submit"
+                                   Color="Color.Primary"
+                                   Disabled="isSaving">Save</MudButton>
+                        <MudButton Variant="Variant.Outlined"
+                                   OnClick="@ResetAsync"
+                                   Color="Color.Secondary"
+                                   Disabled="isSaving">Reset</MudButton>
+                    </MudStack>
+                </div>
+
+            </MudStack>
+        </EditForm>
+    </MudPaper>
+}
+
+@code {
+    private FelineEditModel? model = null!;
+    private IDisposable? stateSubscription;
+    private bool isSaving = false;
+    private string Name => model?.Name ?? string.Empty;
+
+    [Parameter]
+    public int FelineId { get; set; }
+    private async Task DeleteFelineAsync()
+    {
+        var parameters = new DialogParameters
+{
+{ nameof(ConfirmDeleteFelineDialog.Model), model },
+};
+
+        var dialog = await DialogService
+        .ShowAsync<ConfirmDeleteFelineDialog>("Confirm Delete", parameters);
+
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return;
+        }
+
+        if (await FelineRepository.DeleteByKeyAsync(FelineId))
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private async Task OnFilesChangedAsync(IBrowserFile file)
+    {
+        if (model is not null)
+        {
+            model.Thumbnail = await file.ToThumbnailAsync(model.Id);
+            StateHasChanged();
+        }
+    }
+
+    private Task<FelineEditModel?> LoadAsync(int felineId)
+    => FelineRepository
+    .GetByIdAsync(felineId)
+    .ContinueWith(t => t.Result is null ? null : new FelineEditModel(t.Result));
+
+    protected override async Task OnInitializedAsync()
+    {
+        stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+        ComponentState.TryTakeFromJson<FelineEditModel>("model", out model);
+        model ??= await LoadAsync(FelineId);
+    }
+
+    private async Task ResetAsync()
+    {
+        model = await LoadAsync(FelineId);
+        StateHasChanged();
+    }
+
+    private Task PersistStateAsync()
+    {
+        ComponentState.PersistAsJson("model", model);
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveFelineAsync()
+    {
+        isSaving = true;
+        var feline = await FelineRepository.UpdateAsync(FelineId, model!.ToFeline());
+        if (feline is not null) {
+            Snackbar.Add("Saved", Severity.Success, config => config.VisibleStateDuration = 2500);
+        }
+        isSaving = false;
+    }
+}

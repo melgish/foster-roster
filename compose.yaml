@@ -1,0 +1,16 @@
+volumes:
+  data:
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      # localhost devleopment settings. change these in the real world.
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    ports:
+      - "5432:5432"
+    shm_size: 128mb
+    volumes:
+      - data:/var/lib/postgresql/data
