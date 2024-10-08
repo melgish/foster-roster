@@ -5,7 +5,7 @@
 else
 {
   <MudTimeSeriesChart ChartSeries="@series"
-                      Options="@options"
+                      Options="@Options"
                       Height="2in"
                       Width="100%" />
 }
@@ -13,7 +13,7 @@ else
 @code {
   private List<TimeSeriesChartSeries> series = new();
 
-  private static ChartOptions options = new()
+  private static ChartOptions Options = new()
   {
     YAxisLines = true,
     YAxisFormat = "F2",
