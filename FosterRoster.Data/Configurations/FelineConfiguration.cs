@@ -70,5 +70,20 @@ internal class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .HasConstraintName("FK_Weights_Felines")
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder
+            .Property(e => e.IsInactive)
+            .IsRequired(true)
+            .HasDefaultValue(false);
+
+        builder
+            .Property(e => e.InactivatedAtUtc)
+            .IsRequired(false);
+
+        builder.HasQueryFilter(e => !e.IsInactive);
+
+        builder
+            .HasIndex(e => e.IsInactive)
+            .HasFilter("\"IsInactive\" = false");
     }
 }
