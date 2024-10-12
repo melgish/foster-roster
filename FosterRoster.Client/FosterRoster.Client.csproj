@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
     <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+    <RuntimeFrameworkVersion>8.0.8</RuntimeFrameworkVersion>
   </PropertyGroup>
 
   <ItemGroup>
