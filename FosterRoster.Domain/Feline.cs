@@ -1,6 +1,6 @@
 namespace FosterRoster.Domain;
 
-public class Feline
+public class Feline: IInactivatable
 {
     public string? Breed { get; set;}
     public Category Category { get; set; }
@@ -13,5 +13,8 @@ public class Feline
     public virtual Thumbnail? Thumbnail { get; set; }
     public Weaned Weaned { get; set; }
     public virtual ICollection<Weight> Weights { get; set; } = [];
+
+    public bool IsInactive { get; set; }
+    public DateTimeOffset? InactivatedAtUtc { get; set; }
 }
 

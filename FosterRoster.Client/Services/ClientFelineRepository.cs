@@ -4,12 +4,20 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Net.Http.Json;
 using FosterRoster.Domain;
+using System;
 
 public sealed class ClientFelineRepository(
     HttpClient httpClient
 ) : IFelineRepository
 {
     const string route = "api/felines";
+
+    public async Task<bool> Activate(int felineId)
+    {
+        var rs = await httpClient.PutAsync($"{route}/{felineId}/activate", null);
+        return await rs.Content.ReadFromJsonAsync<bool>();
+    }
+
     /// <summary>
     /// Adds a new cat to the database.
     /// </summary>
@@ -63,6 +71,19 @@ public sealed class ClientFelineRepository(
        => await httpClient.GetFromJsonAsync<Thumbnail>($"{route}/{felineId}/thumbnail");
 
     /// <summary>
+    /// Sets a cat as inactive in the database.
+    /// </summary>
+    /// <param name="felineId">id of cat to update</param>
+    /// <param name="dateTimeUtc">date time to assign to inactivation</param>
+    /// <returns>true if cat was modified, otherwise false</returns>
+    public async Task<bool> Inactivate(int felineId, DateTimeOffset dateTimeUtc)
+    {
+        var model = new DateTimeEditModel(dateTimeUtc.DateTime);
+        var rs = await httpClient.PutAsJsonAsync($"{route}/{felineId}/inactivate", model);
+        return await rs.Content.ReadFromJsonAsync<bool>();
+    }
+
+    /// <summary>
     /// Sets the thumbnail for a cat.
     /// </summary>
     /// <param name="felineId">Id of cat to change</param>
@@ -82,7 +103,8 @@ public sealed class ClientFelineRepository(
     /// <returns>Updated cat if found, otherwise null</returns>
     public async Task<Feline?> UpdateAsync(int felineId, Feline feline)
     {
-        var rs = await httpClient.PutAsJsonAsync($"{route}/{felineId}", new FelineEditModel(feline));
+        var model = new FelineEditModel(feline);
+        var rs = await httpClient.PutAsJsonAsync($"{route}/{felineId}", model);
         return await rs.Content.ReadFromJsonAsync<Feline>();
     }
 }

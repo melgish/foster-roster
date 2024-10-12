@@ -1,6 +1,7 @@
 {
   "ignoreWords": [
     "bitea",
-    "blazor"
+    "blazor",
+    "inactivatable"
   ]
 }

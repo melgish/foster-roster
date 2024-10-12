@@ -31,22 +31,22 @@ else
             </MudItem>
             <MudItem xs="12"
                      sm="6">
-              <MudDatePicker @bind-Date="model.Date"
+              <MudDatePicker @bind-Date="model.DateTime.Date"
                              Clearable="true"
                              Editable="true"
                              HelperText="MM/DD/YYYY"
                              Label="Date" />
-              <ValidationMessage For="@(() => model.Date)" />
+              <ValidationMessage For="@(() => model.DateTime.Date)" />
             </MudItem>
             <MudItem xs="12"
                      sm="6">
-              <MudTimePicker @bind-Time="model.Time"
+              <MudTimePicker @bind-Time="model.DateTime.Time"
                              AmPm="true"
                              Clearable="true"
                              HelperText="HH:MM (use 24 hour time for now, working on it)"
                              Editable="true"
                              Label="Time" />
-              <ValidationMessage For="@(() => model.Time)" />
+              <ValidationMessage For="@(() => model.DateTime.Time)" />
             </MudItem>
             <MudItem xs="12">
               <FelineAutoComplete Value="@model.FelineId"
@@ -187,7 +187,7 @@ else
     var weight = await WeightRepository.AddAsync(model.ToWeight());
     if (weight is not null)
     {
-      Snackbar.Add("Weight saved", Severity.Success, config => config.VisibleStateDuration = 2500);
+      Snackbar.Add("Weight saved", Severity.Success);
       // insert the weight as the most recent regardless of date and time
       allWeights = (allWeights ?? new()).Prepend(weight).ToList();
       OnFelineSelected(model.FelineId);
@@ -199,7 +199,7 @@ else
   {
     if (await WeightRepository.DeleteByKeyAsync(weight.FelineId, weight.DateTime))
     {
-      Snackbar.Add("Weight deleted", Severity.Success, config => config.VisibleStateDuration = 2500);
+      Snackbar.Add("Weight deleted", Severity.Success);
       allWeights = allWeights?.Where(x => x.FelineId != weight.FelineId || x.DateTime != weight.DateTime).ToList() ?? [];
       OnFelineSelected(model.FelineId);
     }

@@ -3,6 +3,13 @@ namespace FosterRoster.Domain;
 public interface IFelineRepository
 {
     /// <summary>
+    /// Restores identified cat to active status.
+    /// </summary>
+    /// <param name="felineId">Id of cat to update</param>
+    /// <returns>true if a cat was updated, otherwise false</returns>
+    public Task<bool> Activate(int felineId);
+
+    /// <summary>
     /// Adds a new cat to the database.
     /// </summary>
     /// <param name="feline">Feline instance to add.</param>
@@ -36,6 +43,14 @@ public interface IFelineRepository
     public Task<Feline?> GetByIdAsync(int felineId);
 
     /// <summary>
+    /// Sets a cat as inactive in the database.
+    /// </summary>
+    /// <param name="felineId"></param>
+    /// <param name="dateInactive"></param>
+    /// <returns></returns>
+    public Task<bool> Inactivate(int felineId, DateTimeOffset dateTimeUtc);
+
+    /// <summary>
     /// Gets the thumbnail for a single cat.
     /// </summary>
     /// <param name="felineId">Id of the cat</param>
@@ -57,4 +72,6 @@ public interface IFelineRepository
     /// <param name="feline">Data to assign to cat</param>
     /// <returns>Updated cat if found, otherwise null</returns>
     public Task<Feline?> UpdateAsync(int felineId, Feline feline);
+
+
 }

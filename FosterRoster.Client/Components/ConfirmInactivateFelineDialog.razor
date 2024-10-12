@@ -1,0 +1,73 @@
+@inject TimeProvider TimeProvider
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Confirm Inactivate</MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm @ref="form"
+                  Model="@model"
+                  FormName="inactivate">
+            <FluentValidationValidator />
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudText Typo="Typo.body1">
+                        If you click Yes, you will inactivate @Feline.Name and hide all
+                        @Feline.Gender.PossessivePronoun() data from view.
+                        <br /><br />
+                        NOTE: @Feline.Name will not be harmed.
+                    </MudText>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudDatePicker @bind-Date="model.Date"
+                                   Editable="true"
+                                   HelperText="MM/DD/YYYY"
+                                   Label="Date" />
+                    <ValidationMessage For="@(() => model.Date)" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudTimePicker @bind-Time="model.Time"
+                                   AmPm="true"
+                                   HelperText="HH:MM (use 24 hour time for now, working on it)"
+                                   Editable="true"
+                                   Label="Time" />
+                    <ValidationMessage For="@(() => model.Time)" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default"
+                   OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error"
+                   OnClick="Submit">Yes</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    private EditForm form = null!;
+
+    private DateTimeEditModel model = new();
+
+    [CascadingParameter]
+    public MudDialogInstance MudDialog { get; set; } = null!;
+
+    [Parameter]
+    public FelineEditModel Feline { get; set; } = null!;
+
+    private void Cancel() => MudDialog.Cancel();
+
+    protected override void OnInitialized()
+    {
+        model.Value = TimeProvider.GetUtcNow().DateTime;
+    }
+    private void Submit()
+    {
+        // Need to validate manually because buttons are not inside the EditForm.
+        if (form.EditContext!.Validate())
+        {
+            DateTimeOffset value = model.Value!.Value.ToUniversalTime();
+            MudDialog.Close(DialogResult.Ok(value));
+        }
+    }
+}

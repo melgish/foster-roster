@@ -9,6 +9,8 @@ public sealed class FelineEditModel()
     public Gender Gender { get; set; }
     public int Id { get; set; }
     public int? IntakeAgeInWeeks { get; set; }
+    public bool IsInactive { get; init; }
+    public DateTimeOffset? InactivatedAtUtc { get; init; }
     public DateTime? IntakeDate { get; set; }
     public string Name { get; set; } = string.Empty;
     public DateTime? RegistrationDate { get; set; }
@@ -31,6 +33,9 @@ public sealed class FelineEditModel()
         };
         Thumbnail = feline.Thumbnail;
         Weaned = feline.Weaned;
+
+        IsInactive = feline.IsInactive;
+        InactivatedAtUtc = feline.InactivatedAtUtc;
     }
 
     public Feline ToFeline()
@@ -50,6 +55,8 @@ public sealed class FelineEditModel()
             },
             Thumbnail = Thumbnail,
             Weaned = Weaned,
+            IsInactive = IsInactive,
+            InactivatedAtUtc = InactivatedAtUtc
         };
     }
 }
