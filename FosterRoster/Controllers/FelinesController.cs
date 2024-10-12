@@ -10,9 +10,14 @@ using Microsoft.AspNetCore.Mvc;
 [Route("api/felines")]
 public sealed class FelinesController(
     IValidator<FelineEditModel> felineEditModelValidator,
+    IValidator<DateTimeEditModel> dateTimeEditModelValidator,
     IFelineRepository felineRepository
 ) : ControllerBase
 {
+    [HttpPut("{felineId:int}/activate")]
+    public async Task<bool> ActivateAsync(int felineId)
+        => await felineRepository.Activate(felineId);
+
     /// <summary>
     /// Adds a new cat to the database.
     /// </summary>
@@ -67,6 +72,13 @@ public sealed class FelinesController(
     [HttpGet("{felineId:int}/thumbnail")]
     public async Task<Thumbnail?> GetThumbnailAsync(int felineId)
         => await felineRepository.GetThumbnailAsync(felineId);
+
+    [HttpPut("{felineId:int}/inactivate")]
+    public async Task<bool> InactivateAsync(int felineId, DateTimeEditModel model)
+    {
+        await dateTimeEditModelValidator.ValidateAndThrowAsync(model);
+        return await felineRepository.Inactivate(felineId, model.Value!.Value);
+    }
 
     /// <summary>
     /// Sets the thumbnail for a cat.

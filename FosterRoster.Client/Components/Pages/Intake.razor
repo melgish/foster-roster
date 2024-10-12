@@ -158,7 +158,7 @@ else
     isSaving = false;
     if (feline is not null)
     {
-      Snackbar.Add("Saved", Severity.Success, config => config.VisibleStateDuration = 2500);
+      Snackbar.Add("Saved", Severity.Success);
       NavigationManager.NavigateTo($"/details/{feline.Id}");
     }
   }

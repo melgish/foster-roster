@@ -16,28 +16,32 @@ else
 {
     <MudPaper Elevation="3"
               Class="pa-2">
-        <EditForm FormName="editFelineForm"
+        <EditForm Context="details"
+                  FormName="editFelineForm"
                   Model="model"
                   OnValidSubmit="@SaveFelineAsync">
             <FluentValidationValidator />
             <MudStack>
                 <h1>@Name</h1>
                 <MudStack Row>
-                    <MudFileUpload T="IBrowserFile"
+                    <MudFileUpload Accept="image/png"
+                                   Disabled="@model.IsInactive"
                                    FilesChanged="@OnFilesChangedAsync"
-                                   Accept="image/png">
+                                   T="IBrowserFile">
                         <ActivatorContent>
                             <MudImage Alt="Thumbnail"
                                       Src="@model.Thumbnail.GetUrl()"
-                                      Width="256"
-                                      Height="256" />
-                            <MudIconButton Icon="@Icons.Material.Rounded.CameraAlt"
-                                           Color="Color.Default" />
+                                      Height="256"
+                                      Width="256" />
+                            <MudIconButton Color="Color.Default"
+                                           Disabled="@model.IsInactive"
+                                           Icon="@Icons.Material.Rounded.CameraAlt"/>
                         </ActivatorContent>
                     </MudFileUpload>
                     <MudStack Style="min-width: 60ch">
                         <div>
                             <MudDatePicker @bind-Date="model.IntakeDate"
+                                           Disabled="@model.IsInactive"
                                            Editable="true"
                                            Label="Intake Date"
                                            Required
@@ -46,6 +50,7 @@ else
                         </div>
                         <div>
                             <MudTextField @bind-Value="model.Name"
+                                          Disabled="@model.IsInactive"
                                           Label="Name" />
                             <ValidationMessage For="@(() => model.Name)" />
                         </div>
@@ -53,7 +58,8 @@ else
                             <MudField Label="Gender">
                                 <MudRadioGroup T="Gender"
                                                @bind-Value="model.Gender"
-                                               Class="ps-2">
+                                               Class="ps-2"
+                                               Disabled="@model.IsInactive">
                                     <MudRadio Value="@Gender.Female"
                                               Dense>Female</MudRadio>
                                     <MudRadio Value="@Gender.Male"
@@ -64,20 +70,23 @@ else
                         </div>
                         <div>
                             <MudNumericField @bind-Value="model.IntakeAgeInWeeks"
+                                             Disabled="@model.IsInactive"
+                                             HideSpinButtons
                                              Label="Age at Intake (weeks)"
-                                             Min="0"
-                                             HideSpinButtons />
+                                             Min="0" />
                             <ValidationMessage For="@(() => model.IntakeAgeInWeeks)" />
                         </div>
                     </MudStack>
                 </MudStack>
                 <div>
                     <MudTextField @bind-Value="model.Breed"
+                                  Disabled="@model.IsInactive"
                                   Label="Breed" />
                     <ValidationMessage For="@(() => model.Breed)" />
                 </div>
                 <div>
                     <MudSelect @bind-Value="model.Category"
+                               Disabled="@model.IsInactive"
                                Label="Category"
                                Required>
                         <MudSelectItem Value="@Category.Kitten">Kitten</MudSelectItem>
@@ -91,7 +100,8 @@ else
                 <div>
                     <MudField Label="Weaned">
                         <MudRadioGroup @bind-Value="model.Weaned"
-                                       Class="ps-2">
+                                       Class="ps-2"
+                                       Disabled="@model.IsInactive">
                             <MudRadio Value="@Weaned.No"
                                       Dense>No</MudRadio>
                             <MudRadio Value="@Weaned.InProgress"
@@ -105,28 +115,52 @@ else
                 <div>
                     <MudDatePicker @bind-Date="model.RegistrationDate"
                                    Clearable="true"
+                                   Disabled="@model.IsInactive"
                                    Editable="true"
                                    Label="Registration Date" />
                     <ValidationMessage For="@(() => model.RegistrationDate)" />
                 </div>
                 <div>
-                    <MudStack Row="true">
+                    <MudStack Row="true" AlignItems="AlignItems.Center">
+                        @if (model.IsInactive) {
+                            <MudText>
+                                Inactive as of @model.InactivatedAtUtc
+                            </MudText>
+                        }
                         <MudSpacer />
-                        <MudButton Variant="Variant.Outlined"
-                                   ButtonType="ButtonType.Button"
+                        @if (model.IsInactive)
+                        {
+                            <MudButton ButtonType="ButtonType.Button"
+                                       Color="Color.Info"
+                                       Disabled="@(!model.IsInactive)"
+                                       OnClick="@ActivateAsync"
+                                       Variant="Variant.Outlined">Activate</MudButton>
+                        }
+                        else
+                        {
+                            <MudButton ButtonType="ButtonType.Button"
+                                       Color="Color.Info"
+                                       Disabled="@model.IsInactive"
+                                       OnClick="@InactivateFelineAsync"
+                                       Variant="Variant.Outlined">Inactivate</MudButton>
+                        }
+
+                        <MudButton ButtonType="ButtonType.Button"
                                    Color="Color.Error"
-                                   OnClick="@DeleteFelineAsync">Delete</MudButton>
-                        <MudButton Variant="Variant.Outlined"
-                                   ButtonType="ButtonType.Submit"
+                                   OnClick="@DeleteFelineAsync"
+                                   Variant="Variant.Outlined">Delete</MudButton>
+
+                        <MudButton ButtonType="ButtonType.Submit"
                                    Color="Color.Primary"
-                                   Disabled="isSaving">Save</MudButton>
-                        <MudButton Variant="Variant.Outlined"
+                                   Disabled="@(isSaving || model.IsInactive)"
+                                   Variant="Variant.Outlined">Save</MudButton>
+
+                        <MudButton Color="Color.Secondary"
+                                   Disabled="@(isSaving || model.IsInactive)"
                                    OnClick="@ResetAsync"
-                                   Color="Color.Secondary"
-                                   Disabled="isSaving">Reset</MudButton>
+                                   Variant="Variant.Outlined">Reset</MudButton>
                     </MudStack>
                 </div>
-
             </MudStack>
         </EditForm>
     </MudPaper>
@@ -140,12 +174,27 @@ else
 
     [Parameter]
     public int FelineId { get; set; }
+
+
+    /// <summary>
+    /// Re-activates an inactive cat.
+    /// </summary>
+    private async Task ActivateAsync() {
+        if (await FelineRepository.Activate(FelineId)) {
+            await ResetAsync();
+            Snackbar.Add("Activated", Severity.Success);
+        } else {
+            Snackbar.Add("Failed to activate", Severity.Error);
+        }
+    }
+
+    /// <summary>
+    /// Deletes the current cat.
+    /// </summary>
     private async Task DeleteFelineAsync()
     {
-        var parameters = new DialogParameters
-{
-{ nameof(ConfirmDeleteFelineDialog.Model), model },
-};
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(ConfirmDeleteFelineDialog.Model), model);
 
         var dialog = await DialogService
         .ShowAsync<ConfirmDeleteFelineDialog>("Confirm Delete", parameters);
@@ -159,6 +208,31 @@ else
         if (await FelineRepository.DeleteByKeyAsync(FelineId))
         {
             NavigationManager.NavigateTo("/");
+        }
+    }
+
+    /// <summary>
+    /// Inactivates the current cat.
+    /// </summary>
+    private async Task InactivateFelineAsync()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(ConfirmInactivateFelineDialog.Feline), model);
+
+        var dialog = await DialogService
+        .ShowAsync<ConfirmInactivateFelineDialog>("Confirm Inactivate", parameters);
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return;
+        }
+        // Response is the date time
+        var inactivateDate = (DateTimeOffset)result.Data!;
+        if (await FelineRepository.Inactivate(FelineId, inactivateDate)) {
+            await ResetAsync();
+            Snackbar.Add("Inactivated", Severity.Success);
+        } else {
+            Snackbar.Add("Failed to inactivate", Severity.Error);
         }
     }
 
@@ -199,8 +273,9 @@ else
     {
         isSaving = true;
         var feline = await FelineRepository.UpdateAsync(FelineId, model!.ToFeline());
-        if (feline is not null) {
-            Snackbar.Add("Saved", Severity.Success, config => config.VisibleStateDuration = 2500);
+        if (feline is not null)
+        {
+            Snackbar.Add("Saved", Severity.Success);
         }
         isSaving = false;
     }

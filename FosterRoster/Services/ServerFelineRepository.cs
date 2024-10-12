@@ -36,7 +36,29 @@ public sealed class ServerFelineRepository(
             },
             Weaned = f.Weaned,
             Weights = f.Weights.Take(7).ToList(),
+
+            InactivatedAtUtc = f.InactivatedAtUtc,
+            IsInactive = f.IsInactive,
         };
+
+    /// <summary>
+    /// Restores identified cat to active status.
+    /// </summary>
+    /// <param name="felineId">Id of cat to update</param>
+    /// <returns>true if a cat was updated, otherwise false</returns>
+    public async Task<bool> Activate(int felineId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context
+            .Felines
+            .IgnoreQueryFilters()
+            .Where(f => f.Id == felineId)
+            .Where(f => f.IsInactive)
+            .ExecuteUpdateAsync(u => u
+                .SetProperty(f => f.IsInactive, false)
+                .SetProperty(f => f.InactivatedAtUtc, default(DateTimeOffset?))
+            ) > 0;
+    }
 
     /// <summary>
     /// Adds a new cat to the database.
@@ -100,6 +122,7 @@ public sealed class ServerFelineRepository(
         await using var context = contextFactory.CreateDbContext();
         return await context
             .Felines
+            .IgnoreQueryFilters()
             .Include(f => f.Thumbnail)
             .Where(f => f.Id == felineId)
             .Select(FelineProjection)
@@ -118,6 +141,25 @@ public sealed class ServerFelineRepository(
             .Thumbnails
             .Where(t => t.FelineId == felineId)
             .SingleOrDefaultAsync();
+    }
+
+    /// <summary>
+    /// Marks a cat as being inactive in the database.
+    /// </summary>
+    /// <param name="felineId"></param>
+    /// <param name="dateTimeUtc"></param>
+    /// <returns></returns>
+    public async Task<bool> Inactivate(int felineId, DateTimeOffset dateTimeUtc)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context
+            .Felines
+            .Where(f => f.Id == felineId)
+            .ExecuteUpdateAsync(f => f
+                // Postgres needs +00:00
+                .SetProperty(f => f.InactivatedAtUtc, dateTimeUtc.ToUniversalTime())
+                .SetProperty(f => f.IsInactive, true)
+            ) > 0;
     }
 
     /// <summary>

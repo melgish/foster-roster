@@ -187,7 +187,7 @@ else
     var weight = await WeightRepository.AddAsync(model.ToWeight());
     if (weight is not null)
     {
-      Snackbar.Add("Weight saved", Severity.Success, config => config.VisibleStateDuration = 2500);
+      Snackbar.Add("Weight saved", Severity.Success);
       // insert the weight as the most recent regardless of date and time
       allWeights = (allWeights ?? new()).Prepend(weight).ToList();
       OnFelineSelected(model.FelineId);
@@ -199,7 +199,7 @@ else
   {
     if (await WeightRepository.DeleteByKeyAsync(weight.FelineId, weight.DateTime))
     {
-      Snackbar.Add("Weight deleted", Severity.Success, config => config.VisibleStateDuration = 2500);
+      Snackbar.Add("Weight deleted", Severity.Success);
       allWeights = allWeights?.Where(x => x.FelineId != weight.FelineId || x.DateTime != weight.DateTime).ToList() ?? [];
       OnFelineSelected(model.FelineId);
     }
