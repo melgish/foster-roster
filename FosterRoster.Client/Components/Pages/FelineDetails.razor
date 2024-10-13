@@ -23,7 +23,7 @@ else
                 <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded" />
                 @foreach (var comment in feline.Comments)
                 {
-                    <div @key="comment.Id">
+                    <div @key="comment.Id" style="border: 1px solid silver;padding:0.25rem;margin-bottom:0.5rem">
                         <div>@comment.TimeStamp.ToLocalTime().DateTime.ToString()</div>
                         <pre>@comment.Text</pre>
                     </div>
