@@ -4,8 +4,7 @@
 @inject TimeProvider TimeProvider
 @inject NavigationManager NavigationManager
 
-<EditForm Model="@model"
-          OnValidSubmit="@SaveAsync">
+<EditForm Model="@model" OnValidSubmit="@SaveAsync" FormName="editFeline">
     <FluentValidationValidator />
     <MudStack>
         <h1>@name</h1>

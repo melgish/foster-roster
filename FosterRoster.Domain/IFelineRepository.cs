@@ -73,5 +73,4 @@ public interface IFelineRepository
     /// <returns>Updated cat if found, otherwise null</returns>
     public Task<Feline?> UpdateAsync(int felineId, Feline feline);
 
-
 }

@@ -19,8 +19,15 @@ else
             <FelineEditForm Feline="@feline" />
         </MudPaper>
         <MudTabs Elevation="3" ApplyEffectsToContainer="true" PanelClass="pa-2">
-            <MudTabPanel Text="Journal" Icon="@Icons.Material.Filled.Edit">
-                <MudText>TBD</MudText>
+            <MudTabPanel Text="Journal" Icon="@Icons.Material.Filled.NoteAlt">
+                <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded" />
+                @foreach (var comment in feline.Comments)
+                {
+                    <div @key="comment.Id">
+                        <div>@comment.TimeStamp.ToLocalTime().DateTime.ToString()</div>
+                        <pre>@comment.Text</pre>
+                    </div>
+                }
             </MudTabPanel>
             <MudTabPanel Text="Medical" Icon="@Icons.Material.Filled.HealthAndSafety">
                 <MudText>TBD</MudText>
@@ -50,6 +57,12 @@ else
     {
         feline = await LoadAsync();
         await InvokeAsync(StateHasChanged);
+    }
+
+    void OnCommentAdded(Comment comment)
+    {
+        feline!.Comments = feline.Comments.Prepend(comment).ToArray();
+        StateHasChanged();
     }
 
     protected override async Task OnInitializedAsync()

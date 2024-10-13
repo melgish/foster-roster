@@ -1,7 +1,6 @@
-using FluentValidation;
-
 namespace FosterRoster.Domain;
 
+using FluentValidation;
 
 /// <summary>
 /// A model for dealing with MudBlazor Date / Time picker quirks.

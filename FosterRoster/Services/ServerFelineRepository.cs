@@ -22,6 +22,7 @@ public sealed class ServerFelineRepository(
             Id = f.Id,
             Breed = f.Breed,
             Category = f.Category,
+            Comments = f.Comments.OrderByDescending(c=> c.TimeStamp).ToList(),
             Gender = f.Gender,
             IntakeAgeInWeeks = f.IntakeAgeInWeeks,
             IntakeDate = f.IntakeDate,
@@ -124,6 +125,7 @@ public sealed class ServerFelineRepository(
             .Felines
             .IgnoreQueryFilters()
             .Include(f => f.Thumbnail)
+            .Include(f => f.Comments)
             .Where(f => f.Id == felineId)
             .Select(FelineProjection)
             .SingleOrDefaultAsync();

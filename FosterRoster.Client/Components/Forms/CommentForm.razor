@@ -1,0 +1,60 @@
+@inject ISnackbar Snackbar
+@inject ICommentRepository CommentRepository
+
+<EditForm Model="@model" OnValidSubmit="SaveAsync" FormName="newComment">
+    <FluentValidationValidator />
+    <MudStack Row AlignItems="AlignItems.Start">
+        <MudStack Style="width: 100%">
+            <MudTextField
+                @bind-Value="model.Text"
+                Clearable
+                Immediate
+                Adornment="Adornment.Start"
+                Label="@Label"
+                Variant="Variant.Outlined" Lines="3" MaxLines="10" AutoGrow />
+            <ValidationMessage For="@(() => model.Text)" />
+        </MudStack>
+        <MudIconButton
+            ButtonType="@ButtonType.Submit"
+            Color="Color.Primary"
+            Class="mt-2"
+            Icon="@Icons.Material.Filled.Save"
+            Variant="Variant.Outlined"
+            />
+    </MudStack>
+</EditForm>
+
+@code
+{
+    private CommentEditModel model = null!;
+
+    private string Label => $"New Comment ({model?.Text.Length ?? 0}/2000)";
+
+    [Parameter]
+    public int FelineId { get; set; }
+
+    [Parameter]
+    public EventCallback<Comment> CommentAdded { get; set; }
+
+    protected override void OnInitialized()
+    {
+        model = new CommentEditModel
+        {
+            FelineId = FelineId
+        };
+    }
+
+    private async Task SaveAsync()
+    {
+        Snackbar.Add("Comment saved", Severity.Success);
+        var comment = await CommentRepository.AddAsync(model.ToComment());
+        if (comment is not null)
+        {
+            await CommentAdded.InvokeAsync(comment);
+            model = new CommentEditModel
+            {
+                FelineId = FelineId
+            };
+        }
+    }
+}
