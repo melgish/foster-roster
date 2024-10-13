@@ -1,0 +1,76 @@
+@page "/details/{FelineId:int}"
+@rendermode InteractiveWebAssembly
+@inject IFelineRepository FelineRepository
+@inject TimeProvider TimeProvider
+@inject NavigationManager NavigationManager
+@inject IDialogService DialogService
+@inject PersistentComponentState ComponentState;
+@inject ISnackbar Snackbar
+
+<PageTitle>Details: @Name</PageTitle>
+@if (feline is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <MudStack>
+        <MudPaper Elevation="3" Class="pa-2">
+            <FelineEditForm Feline="@feline" />
+        </MudPaper>
+        <MudTabs Elevation="3" ApplyEffectsToContainer="true" PanelClass="pa-2">
+            <MudTabPanel Text="Journal" Icon="@Icons.Material.Filled.Edit">
+                <MudText>TBD</MudText>
+            </MudTabPanel>
+            <MudTabPanel Text="Medical" Icon="@Icons.Material.Filled.HealthAndSafety">
+                <MudText>TBD</MudText>
+            </MudTabPanel>
+            <MudTabPanel Text="TBD" Icon="@Icons.Material.Filled.QuestionMark">
+                <MudText>TBD</MudText>
+            </MudTabPanel>
+        </MudTabs>
+    </MudStack>
+}
+
+@code {
+    private IDisposable? stateSubscription;
+    private string Name => feline?.Name ?? string.Empty;
+    private Feline? feline;
+
+    [Parameter]
+    public int FelineId { get; set; }
+
+
+    private async Task<Feline?> LoadAsync()
+    {
+        return await FelineRepository.GetByIdAsync(FelineId);
+    }
+
+    private async Task RefreshAsync()
+    {
+        feline = await LoadAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+        ComponentState.TryTakeFromJson<Feline>("feline", out feline);
+        feline ??= await LoadAsync();
+        if (feline is null) {
+            NavigationManager.NavigateTo("/not-found");
+        }
+    }
+
+    private Task PersistStateAsync()
+    {
+        ComponentState.PersistAsJson("feline", feline);
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        stateSubscription?.Dispose();
+        stateSubscription = null;
+    }
+}

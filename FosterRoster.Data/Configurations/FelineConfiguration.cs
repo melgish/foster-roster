@@ -24,6 +24,14 @@ internal class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .HasMaxLength(16);
 
         builder
+            .HasMany(e => e.Comments)
+            .WithOne(e => e.Feline)
+            .HasForeignKey(e => e.FelineId)
+            .HasConstraintName("FK_Comments_Felines")
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder
             .Property(e => e.Gender)
             .HasConversion<string>()
             .HasMaxLength(16);
