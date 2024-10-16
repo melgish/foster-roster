@@ -1,17 +1,15 @@
 @inject ISnackbar Snackbar
 @inject ICommentRepository CommentRepository
 
+
 <EditForm Model="@model" OnValidSubmit="SaveAsync" FormName="newComment">
     <FluentValidationValidator />
     <MudStack Row AlignItems="AlignItems.Start">
         <MudStack Style="width: 100%">
-            <MudTextField
-                @bind-Value="model.Text"
-                Clearable
-                Immediate
-                Adornment="Adornment.Start"
-                Label="@Label"
-                Variant="Variant.Outlined" Lines="3" MaxLines="10" AutoGrow />
+            <TinyMCE.Blazor.Editor @bind-Value="model.Text"
+                                   ScriptSrc="./tinymce/tinymce.min.js"
+                                   Field="@(() => model.Text)"
+                                   Conf="@Conf" />
             <ValidationMessage For="@(() => model.Text)" />
         </MudStack>
         <MudIconButton
@@ -23,9 +21,16 @@
             />
     </MudStack>
 </EditForm>
-
 @code
 {
+    private Dictionary<string, object> Conf = new Dictionary<string, object>
+    {
+      { "promotion", false },
+      { "plugins", "lists" },
+      { "max_height", "400" },
+      { "max_chars", 2000 }
+    };
+
     private CommentEditModel model = null!;
 
     private string Label => $"New Comment ({model?.Text.Length ?? 0}/2000)";

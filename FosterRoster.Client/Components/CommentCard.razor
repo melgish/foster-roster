@@ -1,0 +1,20 @@
+@using Ganss.Xss
+@if (Comment is not null) {
+    <div style="border: 1px solid silver;padding:0.25rem;margin-bottom:0.5rem">
+        <div>@Comment.TimeStamp.ToLocalTime().DateTime.ToString()</div>
+        <div>@html</div>
+    </div>
+}
+@code {
+    [Parameter]
+    public Comment Comment { get; set; } = null!;
+    private MarkupString? html = null;
+
+    override protected void OnInitialized()
+    {
+        if (Comment is not null)
+        {
+            html = new(new HtmlSanitizer().Sanitize(Comment.Text));
+        }
+    }
+}
