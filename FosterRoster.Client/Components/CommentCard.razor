@@ -1,0 +1,32 @@
+@if (Comment is not null) {
+    <MudPaper Elevation="2">
+        <MudStack>
+            <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Style="border-bottom: 1px solid silver">
+                <MudText>@Comment.TimeStamp.ToLocalTime().DateTime.ToString()</MudText>
+                <MudIconButton Color="Color.Error"
+                               Icon="@Icons.Material.Filled.Delete"
+                               OnClick="() => OnDelete.InvokeAsync(Comment)"
+                               Size="Size.Small"
+                               Variant="Variant.Text" />
+            </MudStack>
+            <div style="padding: 0.25rem;">@html</div>
+        </MudStack>
+    </MudPaper>
+}
+
+@code {
+    [Parameter]
+    public Comment Comment { get; set; } = null!;
+
+    [Parameter]
+    public EventCallback<Comment> OnDelete { get; set; }
+
+    private MarkupString? html = null;
+    override protected void OnInitialized()
+    {
+        if (Comment is not null)
+        {
+            html = new(Comment.Text);
+        }
+    }
+}

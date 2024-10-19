@@ -31,22 +31,4 @@ public sealed class WeightsController(
     [HttpGet]
     public async Task<List<Weight>> GetAllAsync()
         => await weightRepository.GetAllAsync();
-
-    [HttpPost("import")]
-    public async Task ImportAsync()
-    {
-        var data = await System.IO.File.ReadAllLinesAsync(@"D:\longshot.csv");
-        foreach (var line in data.Skip(1))
-        {
-            var parts = line.Split(',');
-            var weight = new Weight
-            {
-                FelineId = 9,
-                DateTime = DateTimeOffset.Parse(parts[1]),
-                Value = float.Parse(parts[2]),
-                Units = WeightUnit.lbs
-            };
-            await weightRepository.AddAsync(weight);
-        }
-    }
 }

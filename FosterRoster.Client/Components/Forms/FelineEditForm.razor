@@ -1,0 +1,272 @@
+@inject IDialogService DialogService
+@inject IFelineRepository FelineRepository
+@inject ISnackbar Snackbar
+@inject TimeProvider TimeProvider
+@inject NavigationManager NavigationManager
+
+<EditForm Model="@model" OnValidSubmit="@SaveAsync" FormName="editFeline">
+    <FluentValidationValidator />
+    <MudStack>
+        <h1>@name</h1>
+        <MudStack Row>
+            <MudFileUpload Accept="image/png"
+                           Disabled="@model.IsInactive"
+                           FilesChanged="@OnFilesChangedAsync"
+                           T="IBrowserFile">
+                <ActivatorContent>
+                    <MudImage Alt="Thumbnail"
+                              Src="@model.Thumbnail.GetUrl()"
+                              Height="256"
+                              Width="256" />
+                    <MudIconButton Color="Color.Default"
+                                   Disabled="@model.IsInactive"
+                                   Icon="@Icons.Material.Rounded.CameraAlt" />
+                </ActivatorContent>
+            </MudFileUpload>
+            <MudStack Style="min-width: 60ch">
+                <div>
+                    <MudDatePicker @bind-Date="model.IntakeDate"
+                                   Disabled="@model.IsInactive"
+                                   Editable="true"
+                                   Label="Intake Date"
+                                   Required
+                                   RequiredError="" />
+                    <ValidationMessage For="@(() => model.IntakeDate)" />
+                </div>
+                <div>
+                    <MudTextField @bind-Value="model.Name"
+                                  Disabled="@model.IsInactive"
+                                  Label="Name" />
+                    <ValidationMessage For="@(() => model.Name)" />
+                </div>
+                <div>
+                    <MudField Label="Gender">
+                        <MudRadioGroup T="Gender"
+                                       @bind-Value="model.Gender"
+                                       Class="ps-2"
+                                       Disabled="@model.IsInactive">
+                            <MudRadio Value="@Gender.Female"
+                                      Dense>Female</MudRadio>
+                            <MudRadio Value="@Gender.Male"
+                                      Dense>Male</MudRadio>
+                        </MudRadioGroup>
+                        <ValidationMessage For="@(() => model.Gender)" />
+                    </MudField>
+                </div>
+                <div>
+                    <MudNumericField @bind-Value="model.IntakeAgeInWeeks"
+                                     Disabled="@model.IsInactive"
+                                     HideSpinButtons
+                                     Label="Age at Intake (weeks)"
+                                     Min="0" />
+                    <ValidationMessage For="@(() => model.IntakeAgeInWeeks)" />
+                </div>
+            </MudStack>
+        </MudStack>
+        <div>
+            <MudTextField @bind-Value="model.Breed"
+                          Disabled="@model.IsInactive"
+                          Label="Breed" />
+            <ValidationMessage For="@(() => model.Breed)" />
+        </div>
+        <div>
+            <MudSelect @bind-Value="model.Category"
+                       Disabled="@model.IsInactive"
+                       Label="Category"
+                       Required>
+                <MudSelectItem Value="@Category.Kitten">Kitten</MudSelectItem>
+                <MudSelectItem Value="@Category.NursingKitten">Nursing Kitten
+                </MudSelectItem>
+                <MudSelectItem Value="@Category.Cat">Cat</MudSelectItem>
+                <MudSelectItem Value="@Category.NursingCat">Nursing Cat</MudSelectItem>
+            </MudSelect>
+            <ValidationMessage For="@(() => model.Category)" />
+        </div>
+        <div>
+            <MudField Label="Weaned">
+                <MudRadioGroup @bind-Value="model.Weaned"
+                               Class="ps-2"
+                               Disabled="@model.IsInactive">
+                    <MudRadio Value="@Weaned.No"
+                              Dense>No</MudRadio>
+                    <MudRadio Value="@Weaned.InProgress"
+                              Dense>In Progress</MudRadio>
+                    <MudRadio Value="@Weaned.Yes"
+                              Dense>Yes</MudRadio>
+                </MudRadioGroup>
+            </MudField>
+            <ValidationMessage For="@(() => model.Weaned)" />
+        </div>
+        <div>
+            <MudDatePicker @bind-Date="model.RegistrationDate"
+                           Clearable="true"
+                           Disabled="@model.IsInactive"
+                           Editable="true"
+                           Label="Registration Date" />
+            <ValidationMessage For="@(() => model.RegistrationDate)" />
+        </div>
+        <div>
+            <MudStack Row="true" AlignItems="AlignItems.Center">
+                @if (model.IsInactive)
+                {
+                    <MudText>
+                        Inactive as of @model.InactivatedAtUtc
+                    </MudText>
+                }
+                <MudSpacer />
+                @if (isSaving)
+                {
+                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" StrokeWidth="4" />
+                }
+                @if (!IsNew)
+                {
+                    @if (model.IsInactive)
+                    {
+                        <MudButton ButtonType="ButtonType.Button"
+                                   Color="Color.Info"
+                                   Disabled="@(isSaving || !model.IsInactive)"
+                                   OnClick="@ActivateAsync"
+                                   Variant="Variant.Outlined">Activate</MudButton>
+                    }
+                    else
+                    {
+                        <MudButton ButtonType="ButtonType.Button"
+                                Color="Color.Info"
+                                Disabled="@(isSaving || model.IsInactive)"
+                                OnClick="@InactivateFelineAsync"
+                                Variant="Variant.Outlined">Inactivate</MudButton>
+                    }
+                    <MudButton ButtonType="ButtonType.Button"
+                               Color="Color.Error"
+                               Disabled="@(isSaving || model.IsInactive)"
+                               OnClick="@DeleteFelineAsync"
+                               Variant="Variant.Outlined">Delete</MudButton>
+                }
+                <MudButton ButtonType="ButtonType.Submit"
+                           Color="Color.Primary"
+                           Disabled="@(isSaving || model.IsInactive)"
+                           Variant="Variant.Outlined">Save</MudButton>
+
+                <MudButton Color="Color.Secondary"
+                           Disabled="@(isSaving || model.IsInactive)"
+                           OnClick="@ResetAsync"
+                           Variant="Variant.Outlined">Reset</MudButton>
+            </MudStack>
+        </div>
+    </MudStack>
+
+</EditForm>
+
+@code {
+    private bool isSaving = false;
+    private string name = string.Empty;
+    private FelineEditModel model = null!;
+
+    [Parameter]
+    public Feline Feline { get; set; } = null!;
+
+    [Parameter]
+    public bool IsNew { get; set; } = false;
+
+    /// <summary>
+    /// Re-activates an inactive cat.
+    /// </summary>
+    private async Task ActivateAsync()
+    {
+        if (await FelineRepository.Activate(Feline.Id))
+        {
+            await ResetAsync();
+            Snackbar.Add("Activated", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Failed to activate", Severity.Error);
+        }
+    }
+
+    /// <summary>
+    /// Deletes the current cat.
+    /// </summary>
+    private async Task DeleteFelineAsync()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(ConfirmDeleteFelineDialog.Model), model);
+
+        var dialog = await DialogService
+        .ShowAsync<ConfirmDeleteFelineDialog>("Confirm Delete", parameters);
+
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return;
+        }
+
+        if (await FelineRepository.DeleteByKeyAsync(Feline.Id))
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    /// <summary>
+    /// Inactivates the current cat.
+    /// </summary>
+    private async Task InactivateFelineAsync()
+    {
+        var parameters = new DialogParameters();
+        parameters.Add(nameof(ConfirmInactivateFelineDialog.Feline), model);
+
+        var dialog = await DialogService
+        .ShowAsync<ConfirmInactivateFelineDialog>("Confirm Inactivate", parameters);
+        var result = await dialog.Result;
+        if (result is null || result.Canceled)
+        {
+            return;
+        }
+        // Response is the date time
+        var inactivateDate = (DateTimeOffset)result.Data!;
+        if (await FelineRepository.Inactivate(Feline.Id, inactivateDate))
+        {
+            await ResetAsync();
+            Snackbar.Add("Inactivated", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add("Failed to inactivate", Severity.Error);
+        }
+    }
+
+    private async Task OnFilesChangedAsync(IBrowserFile file)
+    {
+        if (model is not null)
+        {
+            model.Thumbnail = await file.ToThumbnailAsync(model.Id);
+            StateHasChanged();
+        }
+    }
+
+    protected override Task OnInitializedAsync() => ResetAsync();
+
+    private Task ResetAsync()
+    {
+        model = new FelineEditModel(Feline);
+        name = IsNew ? "Intake" : model.Name;
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveAsync()
+    {
+        isSaving = true;
+        var feline = IsNew
+            ? await FelineRepository.AddAsync(model.ToFeline())
+            : await FelineRepository.UpdateAsync(Feline.Id, model.ToFeline());
+        if (feline is null) {
+            Snackbar.Add("Failed to save", Severity.Error);
+        }
+        else
+        {
+            isSaving = false;
+            Snackbar.Add("Saved", Severity.Success);
+            NavigationManager.NavigateTo($"/details/{feline.Id}");
+        }
+    }
+}

@@ -10,11 +10,11 @@ public sealed class ClientFelineRepository(
     HttpClient httpClient
 ) : IFelineRepository
 {
-    const string route = "api/felines";
+    const string Route = "api/felines";
 
     public async Task<bool> Activate(int felineId)
     {
-        var rs = await httpClient.PutAsync($"{route}/{felineId}/activate", null);
+        var rs = await httpClient.PutAsync($"{Route}/{felineId}/activate", null);
         return await rs.Content.ReadFromJsonAsync<bool>();
     }
 
@@ -25,7 +25,7 @@ public sealed class ClientFelineRepository(
     /// <returns>Updated feline instance after add.</returns>
     public async Task<Feline> AddAsync(Feline feline)
     {
-        var rs = await httpClient.PostAsJsonAsync<FelineEditModel>(route, new(feline));
+        var rs = await httpClient.PostAsJsonAsync<FelineEditModel>(Route, new(feline));
         return await rs.Content.ReadFromJsonAsync<Feline>() ?? feline;
     }
 
@@ -36,7 +36,7 @@ public sealed class ClientFelineRepository(
     /// <returns>True if a cat was removed otherwise false.</returns>
     public async Task<bool> DeleteByKeyAsync(int felineId)
     {
-        var rs = await httpClient.DeleteAsync($"{route}/{felineId}");
+        var rs = await httpClient.DeleteAsync($"{Route}/{felineId}");
         return await rs.Content.ReadFromJsonAsync<bool>();
     }
 
@@ -45,14 +45,14 @@ public sealed class ClientFelineRepository(
     /// </summary>
     /// <returns>List of cats, or empty list if no cats exist.</returns>
     public async Task<List<Feline>> GetAllAsync()
-        => await httpClient.GetFromJsonAsync<List<Feline>>(route) ?? [];
+        => await httpClient.GetFromJsonAsync<List<Feline>>(Route) ?? [];
 
     /// <summary>
     /// Get list of all cats in the database.
     /// </summary>
     /// <returns>List of cats, or empty list if no cats exist.</returns>
     public async Task<List<ListItem<int>>> GetAllNamesAsync()
-        => await httpClient.GetFromJsonAsync<List<ListItem<int>>>($"{route}/names") ?? [];
+        => await httpClient.GetFromJsonAsync<List<ListItem<int>>>($"{Route}/names") ?? [];
 
     /// <summary>
     /// Gets a single cat by ID.
@@ -60,7 +60,7 @@ public sealed class ClientFelineRepository(
     /// <param name="felineId"></param>
     /// <returns>A single cat if found, otherwise null</returns>
     public async Task<Feline?> GetByIdAsync(int felineId)
-        => await httpClient.GetFromJsonAsync<Feline>($"{route}/{felineId}");
+        => await httpClient.GetFromJsonAsync<Feline>($"{Route}/{felineId}");
 
     /// <summary>
     /// Gets the thumbnail for a single cat.
@@ -68,7 +68,7 @@ public sealed class ClientFelineRepository(
     /// <param name="felineId">Id of the cat</param>
     /// <returns>Thumbnail if found, otherwise null</returns>
     public async Task<Thumbnail?> GetThumbnailAsync(int felineId)
-       => await httpClient.GetFromJsonAsync<Thumbnail>($"{route}/{felineId}/thumbnail");
+       => await httpClient.GetFromJsonAsync<Thumbnail>($"{Route}/{felineId}/thumbnail");
 
     /// <summary>
     /// Sets a cat as inactive in the database.
@@ -79,7 +79,7 @@ public sealed class ClientFelineRepository(
     public async Task<bool> Inactivate(int felineId, DateTimeOffset dateTimeUtc)
     {
         var model = new DateTimeEditModel(dateTimeUtc.DateTime);
-        var rs = await httpClient.PutAsJsonAsync($"{route}/{felineId}/inactivate", model);
+        var rs = await httpClient.PutAsJsonAsync($"{Route}/{felineId}/inactivate", model);
         return await rs.Content.ReadFromJsonAsync<bool>();
     }
 
@@ -91,7 +91,7 @@ public sealed class ClientFelineRepository(
     /// <returns>Updated cat, or null if cat was not found</returns>
     public async Task<Feline?> SetThumbnailAsync(int felineId, Thumbnail thumbnail)
     {
-        var rs = await httpClient.PostAsJsonAsync($"{route}/{felineId}/thumbnail", thumbnail);
+        var rs = await httpClient.PostAsJsonAsync($"{Route}/{felineId}/thumbnail", thumbnail);
         return await rs.Content.ReadFromJsonAsync<Feline>();
     }
 
@@ -104,7 +104,7 @@ public sealed class ClientFelineRepository(
     public async Task<Feline?> UpdateAsync(int felineId, Feline feline)
     {
         var model = new FelineEditModel(feline);
-        var rs = await httpClient.PutAsJsonAsync($"{route}/{felineId}", model);
+        var rs = await httpClient.PutAsJsonAsync($"{Route}/{felineId}", model);
         return await rs.Content.ReadFromJsonAsync<Feline>();
     }
 }

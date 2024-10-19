@@ -29,6 +29,8 @@ builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
 
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
 builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
+builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
+
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddValidatorsFromAssemblyContaining<FelineEditModelValidator>();
 

@@ -22,6 +22,31 @@ namespace FosterRoster.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("FosterRoster.Domain.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FelineId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("TimeStamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FelineId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("FosterRoster.Domain.Feline", b =>
                 {
                     b.Property<int>("Id")
@@ -124,6 +149,17 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("Weights", (string)null);
                 });
 
+            modelBuilder.Entity("FosterRoster.Domain.Comment", b =>
+                {
+                    b.HasOne("FosterRoster.Domain.Feline", "Feline")
+                        .WithMany("Comments")
+                        .HasForeignKey("FelineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("FK_Comments_Felines");
+
+                    b.Navigation("Feline");
+                });
+
             modelBuilder.Entity("FosterRoster.Domain.Thumbnail", b =>
                 {
                     b.HasOne("FosterRoster.Domain.Feline", null)
@@ -145,6 +181,8 @@ namespace FosterRoster.Data.Migrations
 
             modelBuilder.Entity("FosterRoster.Domain.Feline", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Thumbnail");
 
                     b.Navigation("Weights");
