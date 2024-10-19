@@ -17,4 +17,10 @@ public sealed class ClientCommentRepository(
         var rs = await httpClient.PostAsJsonAsync<CommentEditModel>(Route, new(comment));
         return await rs.Content.ReadFromJsonAsync<Comment>() ?? comment;
     }
+
+    public async Task<bool> DeleteByKeyAsync(int commentId)
+    {
+        var rs = await httpClient.DeleteAsync($"{Route}/{commentId}");
+        return await rs.Content.ReadFromJsonAsync<bool>();
+    }
 }

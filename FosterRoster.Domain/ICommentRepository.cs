@@ -8,4 +8,6 @@ public interface ICommentRepository
     /// <param name="comment">Comment instance to add.</param>
     /// <returns>Updated comment instance after add.</returns>
     public Task<Comment> AddAsync(Comment comment);
+
+    public Task<bool> DeleteByKeyAsync(int commentId);
 }

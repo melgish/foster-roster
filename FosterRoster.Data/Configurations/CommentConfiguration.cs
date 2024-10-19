@@ -4,8 +4,12 @@ using FosterRoster.Domain;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Ganss.Xss;
 
-internal class Commentonfiguration : IEntityTypeConfiguration<Comment>
+
+internal class CommentConfiguration(
+    IHtmlSanitizer htmlSanitizer
+) : IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
@@ -21,7 +25,11 @@ internal class Commentonfiguration : IEntityTypeConfiguration<Comment>
             .Property(e => e.Text)
             .IsRequired(true)
             .HasColumnType("text")
-            .HasMaxLength(2048);
+            .HasMaxLength(4096)
+            .HasConversion(
+                v => htmlSanitizer.Sanitize(v.Trim(), string.Empty, null),
+                v => htmlSanitizer.Sanitize(v.Trim(), string.Empty, null)
+            );
 
         builder
             .Property(e => e.TimeStamp)

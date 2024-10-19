@@ -1,7 +1,5 @@
 namespace FosterRoster.Services;
 
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 using FosterRoster.Data;
@@ -19,5 +17,14 @@ public sealed class ServerCommentRepository(
         var entry = await context.Comments.AddAsync(comment);
         await context.SaveChangesAsync();
         return entry.Entity;
+    }
+
+    public async Task<bool> DeleteByKeyAsync(int commentId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return (await context
+            .Comments
+            .Where(c => c.Id == commentId)
+            .ExecuteDeleteAsync()) > 0;
     }
 }

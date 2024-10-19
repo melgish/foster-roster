@@ -33,4 +33,5 @@ html, body {
 }
 
 
-@import "_content/FosterRoster.Client/FosterRoster.Client.bundle.scp.css';
+@import "_content/FosterRoster.Client/FosterRoster.Client.bundle.scp.css";
+@import "_content/FosterRoster.Client/tinymce/skins/content/default/content.min.css";

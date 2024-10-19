@@ -3,10 +3,7 @@ namespace FosterRoster.Controllers;
 using FluentValidation;
 using FosterRoster.Domain;
 
-using Ganss.Xss;
-
 using Microsoft.AspNetCore.Mvc;
-
 
 [ApiController]
 [Route("api/comments")]
@@ -19,9 +16,10 @@ public sealed class CommentsController(
     public async Task<Comment> AddAsync(CommentEditModel model)
     {
         await commentEditModelValidator.ValidateAndThrowAsync(model);
-        // Sanitize the incoming HTML
-        model.Text = new HtmlSanitizer().Sanitize(model.Text);
         return await commentRepository.AddAsync(model.ToComment());
     }
 
+    [HttpDelete("{commentId:int}")]
+    public async Task<bool> DeleteByKeyAsync(int commentId)
+        => await commentRepository.DeleteByKeyAsync(commentId);
 }

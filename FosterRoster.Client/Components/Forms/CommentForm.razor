@@ -2,20 +2,23 @@
 @inject ICommentRepository CommentRepository
 
 
+
 <EditForm Model="@model" OnValidSubmit="SaveAsync" FormName="newComment">
     <FluentValidationValidator />
-    <MudStack Row AlignItems="AlignItems.Start">
+    <MudStack Row AlignItems="AlignItems.Start" Spacing="1">
         <MudStack Style="width: 100%">
-            <TinyMCE.Blazor.Editor @bind-Value="model.Text"
-                                   ScriptSrc="./tinymce/tinymce.min.js"
-                                   Field="@(() => model.Text)"
-                                   Conf="@Conf" />
+            <TinyMCE.Blazor.Editor
+                @bind-Value="model.Text"
+                Conf="@Conf"
+                Field="@(() => model.Text)"
+                ScriptSrc="/tinymce/tinymce.min.js"
+                ValidateOnInput="@false"
+                />
             <ValidationMessage For="@(() => model.Text)" />
         </MudStack>
         <MudIconButton
             ButtonType="@ButtonType.Submit"
             Color="Color.Primary"
-            Class="mt-2"
             Icon="@Icons.Material.Filled.Save"
             Variant="Variant.Outlined"
             />
@@ -26,14 +29,13 @@
     private Dictionary<string, object> Conf = new Dictionary<string, object>
     {
       { "promotion", false },
-      { "plugins", "lists" },
-      { "max_height", "400" },
-      { "max_chars", 2000 }
+      { "plugins", "" },
+      { "removed_menuitems", "newdocument print fontfamily codeformat" },
+      { "statusbar", true },
+      { "height", "240" }
     };
 
     private CommentEditModel model = null!;
-
-    private string Label => $"New Comment ({model?.Text.Length ?? 0}/2000)";
 
     [Parameter]
     public int FelineId { get; set; }
