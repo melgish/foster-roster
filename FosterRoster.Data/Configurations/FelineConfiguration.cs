@@ -1,7 +1,6 @@
 namespace FosterRoster.Data.Configurations;
 
 using FosterRoster.Domain;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

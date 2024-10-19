@@ -6,9 +6,11 @@
 
 <EditForm Model="@model" OnValidSubmit="@SaveAsync" FormName="editFeline">
     <FluentValidationValidator />
-    <MudStack>
-        <h1>@name</h1>
-        <MudStack Row>
+    <MudGrid Spacing="3">
+        <MudItem xs="12">
+            <h1>@name</h1>
+        </MudItem>
+        <MudItem xs="4">
             <MudFileUpload Accept="image/png"
                            Disabled="@model.IsInactive"
                            FilesChanged="@OnFilesChangedAsync"
@@ -23,53 +25,53 @@
                                    Icon="@Icons.Material.Rounded.CameraAlt" />
                 </ActivatorContent>
             </MudFileUpload>
-            <MudStack Style="min-width: 60ch">
-                <div>
-                    <MudDatePicker @bind-Date="model.IntakeDate"
-                                   Disabled="@model.IsInactive"
-                                   Editable="true"
-                                   Label="Intake Date"
-                                   Required
-                                   RequiredError="" />
-                    <ValidationMessage For="@(() => model.IntakeDate)" />
-                </div>
-                <div>
-                    <MudTextField @bind-Value="model.Name"
-                                  Disabled="@model.IsInactive"
-                                  Label="Name" />
-                    <ValidationMessage For="@(() => model.Name)" />
-                </div>
-                <div>
-                    <MudField Label="Gender">
-                        <MudRadioGroup T="Gender"
-                                       @bind-Value="model.Gender"
-                                       Class="ps-2"
-                                       Disabled="@model.IsInactive">
-                            <MudRadio Value="@Gender.Female"
-                                      Dense>Female</MudRadio>
-                            <MudRadio Value="@Gender.Male"
-                                      Dense>Male</MudRadio>
-                        </MudRadioGroup>
-                        <ValidationMessage For="@(() => model.Gender)" />
-                    </MudField>
-                </div>
-                <div>
-                    <MudNumericField @bind-Value="model.IntakeAgeInWeeks"
-                                     Disabled="@model.IsInactive"
-                                     HideSpinButtons
-                                     Label="Age at Intake (weeks)"
-                                     Min="0" />
-                    <ValidationMessage For="@(() => model.IntakeAgeInWeeks)" />
-                </div>
+        </MudItem>
+        <MudItem xs="8">
+            <MudStack>
+                <MudDatePicker @bind-Date="model.IntakeDate"
+                                Disabled="@model.IsInactive"
+                                Editable="true"
+                                Label="Intake Date"
+                                Required
+                                RequiredError="" />
+                <ValidationMessage For="@(() => model.IntakeDate)" />
+                <MudTextField @bind-Value="model.Name"
+                                Disabled="@model.IsInactive"
+                                Label="Name" />
+                <ValidationMessage For="@(() => model.Name)" />
+                <MudField Label="Gender">
+                    <MudRadioGroup T="Gender"
+                                    @bind-Value="model.Gender"
+                                    Class="ps-2"
+                                    Disabled="@model.IsInactive">
+                        <MudRadio Value="@Gender.Female"
+                                    Dense>Female</MudRadio>
+                        <MudRadio Value="@Gender.Male"
+                                    Dense>Male</MudRadio>
+                    </MudRadioGroup>
+                    <ValidationMessage For="@(() => model.Gender)" />
+                </MudField>
+                <MudNumericField @bind-Value="model.IntakeAgeInWeeks"
+                                    Disabled="@model.IsInactive"
+                                    HideSpinButtons
+                                    Label="Age at Intake (weeks)"
+                                    Min="0" />
+                <ValidationMessage For="@(() => model.IntakeAgeInWeeks)" />
             </MudStack>
-        </MudStack>
-        <div>
+        </MudItem>
+        <MudItem xs="6">
             <MudTextField @bind-Value="model.Breed"
                           Disabled="@model.IsInactive"
                           Label="Breed" />
             <ValidationMessage For="@(() => model.Breed)" />
-        </div>
-        <div>
+        </MudItem>
+        <MudItem xs="6">
+            <MudTextField @bind-Value="model.Color"
+                          Disabled="@model.IsInactive"
+                          Label="Color" />
+            <ValidationMessage For="@(() => model.Color)" />
+        </MudItem>
+        <MudItem xs="6">
             <MudSelect @bind-Value="model.Category"
                        Disabled="@model.IsInactive"
                        Label="Category"
@@ -81,8 +83,16 @@
                 <MudSelectItem Value="@Category.NursingCat">Nursing Cat</MudSelectItem>
             </MudSelect>
             <ValidationMessage For="@(() => model.Category)" />
-        </div>
-        <div>
+        </MudItem>
+        <MudItem xs="6">
+            <MudDatePicker @bind-Date="model.RegistrationDate"
+                           Clearable="true"
+                           Disabled="@model.IsInactive"
+                           Editable="true"
+                           Label="Registration Date" />
+            <ValidationMessage For="@(() => model.RegistrationDate)" />
+        </MudItem>
+        <MudItem xs="6">
             <MudField Label="Weaned">
                 <MudRadioGroup @bind-Value="model.Weaned"
                                Class="ps-2"
@@ -96,17 +106,10 @@
                 </MudRadioGroup>
             </MudField>
             <ValidationMessage For="@(() => model.Weaned)" />
-        </div>
-        <div>
-            <MudDatePicker @bind-Date="model.RegistrationDate"
-                           Clearable="true"
-                           Disabled="@model.IsInactive"
-                           Editable="true"
-                           Label="Registration Date" />
-            <ValidationMessage For="@(() => model.RegistrationDate)" />
-        </div>
-        <div>
-            <MudStack Row="true" AlignItems="AlignItems.Center">
+        </MudItem>
+        <MudItem xs="12">
+            <MudStack Row="true"
+                      AlignItems="AlignItems.Center">
                 @if (model.IsInactive)
                 {
                     <MudText>
@@ -116,7 +119,9 @@
                 <MudSpacer />
                 @if (isSaving)
                 {
-                    <MudProgressCircular Color="Color.Primary" Indeterminate="true" StrokeWidth="4" />
+                    <MudProgressCircular Color="Color.Primary"
+                                         Indeterminate="true"
+                                         StrokeWidth="4" />
                 }
                 @if (!IsNew)
                 {
@@ -131,10 +136,10 @@
                     else
                     {
                         <MudButton ButtonType="ButtonType.Button"
-                                Color="Color.Info"
-                                Disabled="@(isSaving || model.IsInactive)"
-                                OnClick="@InactivateFelineAsync"
-                                Variant="Variant.Outlined">Inactivate</MudButton>
+                                   Color="Color.Info"
+                                   Disabled="@(isSaving || model.IsInactive)"
+                                   OnClick="@InactivateFelineAsync"
+                                   Variant="Variant.Outlined">Inactivate</MudButton>
                     }
                     <MudButton ButtonType="ButtonType.Button"
                                Color="Color.Error"
@@ -152,9 +157,8 @@
                            OnClick="@ResetAsync"
                            Variant="Variant.Outlined">Reset</MudButton>
             </MudStack>
-        </div>
-    </MudStack>
-
+        </MudItem>
+    </MudGrid>
 </EditForm>
 
 @code {

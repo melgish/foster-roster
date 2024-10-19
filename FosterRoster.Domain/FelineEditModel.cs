@@ -6,7 +6,7 @@ public sealed class FelineEditModel()
 {
     public string? Breed { get; set; }
     public Category Category { get; set; }
-    public string Color { get; set; } = string.Empty;
+    public string? Color { get; set; } = string.Empty;
     public Gender Gender { get; set; }
     public int Id { get; set; }
     public int? IntakeAgeInWeeks { get; set; }
@@ -73,6 +73,9 @@ public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel
             .MaximumLength(48);
 
         RuleFor(feline => feline.Category).IsInEnum();
+
+        RuleFor(feline => feline.Color)
+            .MaximumLength(96);
 
         RuleFor(feline => feline.Gender).IsInEnum();
 
