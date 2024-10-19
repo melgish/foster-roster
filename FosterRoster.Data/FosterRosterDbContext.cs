@@ -1,11 +1,13 @@
 ﻿namespace FosterRoster.Data;
 
 using FosterRoster.Domain;
+
 using Microsoft.EntityFrameworkCore;
+
 
 public class FosterRosterDbContext : DbContext
 {
-    public FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options): base(options) {}
+    public FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options) : base(options) { }
 
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<Feline> Felines { get; set; } = null!;
@@ -14,7 +16,11 @@ public class FosterRosterDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FosterRosterDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FosterRosterDbContext).Assembly, t =>
+        {
+            Console.WriteLine($"Applying configuration for \"{t.Name}\"");
+            return true;
+        });
         base.OnModelCreating(modelBuilder);
     }
 }

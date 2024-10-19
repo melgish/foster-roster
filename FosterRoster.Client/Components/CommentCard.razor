@@ -2,7 +2,7 @@
     <MudPaper Elevation="2">
         <MudStack>
             <MudStack Row AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Style="border-bottom: 1px solid silver">
-                <MudText>@Comment.TimeStamp.ToLocalTime().DateTime.ToString()</MudText>
+                <MudText>@Comment.TimeStamp.ToString()</MudText>
                 <MudIconButton Color="Color.Error"
                                Icon="@Icons.Material.Filled.Delete"
                                OnClick="() => OnDelete.InvokeAsync(Comment)"

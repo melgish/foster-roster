@@ -1,11 +1,11 @@
-namespace FosterRoster.Data;
+namespace FosterRoster.Data.Configurations;
 
 using FosterRoster.Domain;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-internal class FelineConfiguration : IEntityTypeConfiguration<Feline>
+internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
 {
     public void Configure(EntityTypeBuilder<Feline> builder)
     {
@@ -22,6 +22,11 @@ internal class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .Property(e => e.Category)
             .HasConversion<string>()
             .HasMaxLength(16);
+
+        builder
+            .Property(e => e.Color)
+            .HasMaxLength(96)
+            .IsRequired(false);
 
         builder
             .HasMany(e => e.Comments)

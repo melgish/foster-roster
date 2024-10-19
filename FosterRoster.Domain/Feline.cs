@@ -1,9 +1,10 @@
 namespace FosterRoster.Domain;
 
-public class Feline: IInactivatable
+public class Feline : IInactivatable
 {
-    public string? Breed { get; set;}
+    public string? Breed { get; set; }
     public Category Category { get; set; }
+    public string? Color { get; set; }
     public virtual ICollection<Comment> Comments { get; set; } = [];
     public Gender Gender { get; set; }
     public int Id { get; set; }

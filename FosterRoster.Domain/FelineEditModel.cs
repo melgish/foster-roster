@@ -6,6 +6,7 @@ public sealed class FelineEditModel()
 {
     public string? Breed { get; set; }
     public Category Category { get; set; }
+    public string Color { get; set; } = string.Empty;
     public Gender Gender { get; set; }
     public int Id { get; set; }
     public int? IntakeAgeInWeeks { get; set; }
@@ -17,10 +18,11 @@ public sealed class FelineEditModel()
     public Thumbnail? Thumbnail { get; set; }
     public Weaned Weaned { get; set; }
 
-    public FelineEditModel(Feline feline): this()
+    public FelineEditModel(Feline feline) : this()
     {
         Breed = feline.Breed;
         Category = feline.Category;
+        Color = feline.Color;
         Gender = feline.Gender;
         Id = feline.Id;
         IntakeAgeInWeeks = feline.IntakeAgeInWeeks;
@@ -42,14 +44,16 @@ public sealed class FelineEditModel()
     {
         return new()
         {
-            Breed = Breed?.Trim(),
+            Breed = string.IsNullOrWhiteSpace(Breed) ? null : Breed.Trim(),
             Category = Category,
+            Color = string.IsNullOrWhiteSpace(Color) ? null : Color.Trim(),
             Gender = Gender,
             Id = Id,
             IntakeAgeInWeeks = IntakeAgeInWeeks,
             IntakeDate = DateOnly.FromDateTime(IntakeDate!.Value),
             Name = Name.Trim(),
-            RegistrationDate = RegistrationDate switch {
+            RegistrationDate = RegistrationDate switch
+            {
                 var date when date.HasValue => DateOnly.FromDateTime(date.Value),
                 _ => null
             },
@@ -88,5 +92,6 @@ public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel
 
         RuleFor(feline => feline.RegistrationDate)
             .LessThanOrEqualTo(p => timeProvider.GetUtcNow().DateTime)
-            .WithMessage("Registration date must be in the past.");}
+            .WithMessage("Registration date must be in the past.");
+    }
 }

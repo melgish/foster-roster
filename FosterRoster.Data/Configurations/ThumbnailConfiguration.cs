@@ -1,4 +1,4 @@
-namespace FosterRoster.Data;
+namespace FosterRoster.Data.Configurations;
 
 using FosterRoster.Domain;
 

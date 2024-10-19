@@ -1,6 +1,7 @@
 namespace FosterRoster.Domain;
 
-public interface IWeightRepository {
+public interface IWeightRepository
+{
     /// <summary>
     /// Adds a new weight to the database for a given cat.
     /// </summary>

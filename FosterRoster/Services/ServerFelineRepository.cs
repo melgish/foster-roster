@@ -1,13 +1,11 @@
 namespace FosterRoster.Services;
 
+using FosterRoster.Data;
+using FosterRoster.Domain;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-
-using FosterRoster.Data;
-using FosterRoster.Domain;
-
-using Microsoft.EntityFrameworkCore;
 
 public sealed class ServerFelineRepository(
     IDbContextFactory<FosterRosterDbContext> contextFactory
@@ -22,7 +20,7 @@ public sealed class ServerFelineRepository(
             Id = f.Id,
             Breed = f.Breed,
             Category = f.Category,
-            Comments = f.Comments.OrderByDescending(c=> c.TimeStamp).ToList(),
+            Comments = f.Comments.OrderByDescending(c => c.TimeStamp).ToList(),
             Gender = f.Gender,
             IntakeAgeInWeeks = f.IntakeAgeInWeeks,
             IntakeDate = f.IntakeDate,

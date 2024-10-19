@@ -1,17 +1,16 @@
 namespace FosterRoster.Services;
 
+using FosterRoster.Data;
+using FosterRoster.Domain;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-using FosterRoster.Data;
-using FosterRoster.Domain;
-
-using Microsoft.EntityFrameworkCore;
-
 public sealed class ServerWeightRepository(
     IDbContextFactory<FosterRosterDbContext> contextFactory
-) : IWeightRepository {
+) : IWeightRepository
+{
 
     private static readonly Expression<Func<Weight, Weight>> WeightProjection =
         w => new()
@@ -20,7 +19,8 @@ public sealed class ServerWeightRepository(
             DateTime = w.DateTime,
             Value = w.Value,
             Units = w.Units,
-            Feline = new() {
+            Feline = new()
+            {
                 Name = w.Feline.Name
             }
         };
@@ -44,7 +44,8 @@ public sealed class ServerWeightRepository(
         return count > 0;
     }
 
-    public async Task<List<Weight>> GetAllAsync() {
+    public async Task<List<Weight>> GetAllAsync()
+    {
         await using var context = await contextFactory.CreateDbContextAsync();
         return await context
             .Felines

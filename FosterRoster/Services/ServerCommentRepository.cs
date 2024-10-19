@@ -1,11 +1,9 @@
 namespace FosterRoster.Services;
 
-using System.Threading.Tasks;
-
 using FosterRoster.Data;
 using FosterRoster.Domain;
-
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 public sealed class ServerCommentRepository(
     IDbContextFactory<FosterRosterDbContext> contextFactory,
@@ -15,9 +13,8 @@ public sealed class ServerCommentRepository(
     public async Task<Comment> AddAsync(Comment comment)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
-        // Work around because Npgsql is adding TimeStamp column to the
-        // INSERT statement even though it is configured to be generated on add.
-        comment.TimeStamp = timeProvider.GetUtcNow();
+        // Workaround because of issues getting ValueGeneratedOnAdd() to work.
+        comment.TimeStamp = timeProvider.GetUtcNow().UtcDateTime;
         var entry = await context.Comments.AddAsync(comment);
         await context.SaveChangesAsync();
         return entry.Entity;
