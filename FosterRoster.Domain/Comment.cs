@@ -6,5 +6,5 @@ public class Comment
     public int FelineId { get; set; }
     public int Id { get; set; }
     public string Text { get; set; } = string.Empty;
-    public DateTimeOffset TimeStamp { get; set; }
+    public DateTimeOffset TimeStamp { get; set; } = default!;
 }

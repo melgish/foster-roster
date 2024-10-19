@@ -42,6 +42,6 @@ public sealed class CommentEditModelValidator : AbstractValidator<CommentEditMod
 
         RuleFor(model => model.Text)
             .NotEmpty()
-            .MaximumLength(2000);
+            .MaximumLength(4000);
     }
 }

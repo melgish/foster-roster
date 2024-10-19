@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Ganss.Xss;
 
 
-internal class CommentConfiguration(
+internal sealed class CommentConfiguration(
     IHtmlSanitizer htmlSanitizer
 ) : IEntityTypeConfiguration<Comment>
 {
@@ -33,8 +33,9 @@ internal class CommentConfiguration(
 
         builder
             .Property(e => e.TimeStamp)
+            .HasColumnType("timestamp with time zone")
             .HasDefaultValueSql("now()")
-            .ValueGeneratedOnAdd();
+            .ValueGeneratedOnAddOrUpdate();
 
         builder
             .HasIndex(e => new { e.FelineId, e.TimeStamp })

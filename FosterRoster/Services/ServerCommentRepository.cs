@@ -8,12 +8,16 @@ using FosterRoster.Domain;
 using Microsoft.EntityFrameworkCore;
 
 public sealed class ServerCommentRepository(
-    IDbContextFactory<FosterRosterDbContext> contextFactory
+    IDbContextFactory<FosterRosterDbContext> contextFactory,
+    TimeProvider timeProvider
 ) : ICommentRepository
 {
     public async Task<Comment> AddAsync(Comment comment)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
+        // Work around because Npgsql is adding TimeStamp column to the
+        // INSERT statement even though it is configured to be generated on add.
+        comment.TimeStamp = timeProvider.GetUtcNow();
         var entry = await context.Comments.AddAsync(comment);
         await context.SaveChangesAsync();
         return entry.Entity;
