@@ -2,7 +2,6 @@ namespace FosterRoster.Controllers;
 
 using FluentValidation;
 using FosterRoster.Domain;
-
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -10,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 public sealed class CommentsController(
     IValidator<CommentEditModel> commentEditModelValidator,
     ICommentRepository commentRepository
-): ControllerBase
+) : ControllerBase
 {
     [HttpPost]
     public async Task<Comment> AddAsync(CommentEditModel model)

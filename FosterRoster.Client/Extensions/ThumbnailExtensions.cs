@@ -1,10 +1,8 @@
 namespace FosterRoster.Client.Extensions;
 
-using System.Net.Mime;
-
 using FosterRoster.Domain;
-
 using Microsoft.AspNetCore.Components.Forms;
+using System.Net.Mime;
 
 static class ThumbnailExtensions
 {
@@ -19,7 +17,8 @@ static class ThumbnailExtensions
     /// <returns></returns>
     public static async Task<Thumbnail?> ToThumbnailAsync(this IBrowserFile? file, int felineId = 0)
     {
-        if (file is null) {
+        if (file is null)
+        {
             return null;
         }
         // Request a resized image as a PNG

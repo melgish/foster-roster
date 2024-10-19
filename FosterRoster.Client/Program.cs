@@ -12,7 +12,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Logging.SetMinimumLevel(LogLevel.Information);
 builder.Services.AddMudServices(config =>
 {
-  config.SnackbarConfiguration.VisibleStateDuration = 2500;
+    config.SnackbarConfiguration.VisibleStateDuration = 2500;
 });
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });

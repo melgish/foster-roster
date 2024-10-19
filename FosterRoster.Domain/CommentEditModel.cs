@@ -13,7 +13,7 @@ public sealed class CommentEditModel()
     public DateTimeOffset TimeStamp { get; init; }
 
 
-    public CommentEditModel(Comment comment): this()
+    public CommentEditModel(Comment comment) : this()
     {
         FelineId = comment.FelineId;
         Id = comment.Id;

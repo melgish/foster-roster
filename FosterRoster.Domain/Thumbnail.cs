@@ -5,7 +5,7 @@ public sealed class Thumbnail
     /// <summary>
     /// The ID of the feline this thumbnail is associated with.
     /// </summary>
-    public int FelineId { get; set;}
+    public int FelineId { get; set; }
     /// <summary>
     /// The image data for the thumbnail.
     /// </summary>

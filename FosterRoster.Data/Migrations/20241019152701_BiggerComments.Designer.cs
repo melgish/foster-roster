@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FosterRoster.Data.Migrations
 {
     [DbContext(typeof(FosterRosterDbContext))]
-    [Migration("20241019140522_BiggerComments")]
+    [Migration("20241019152701_BiggerComments")]
     partial class BiggerComments
     {
         /// <inheritdoc />
@@ -31,23 +31,28 @@ namespace FosterRoster.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("Id"));
 
                     b.Property<int>("FelineId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Text")
                         .IsRequired()
+                        .HasMaxLength(4096)
                         .HasColumnType("text");
 
                     b.Property<DateTimeOffset>("TimeStamp")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("FelineId");
+                    b.HasIndex("FelineId", "TimeStamp")
+                        .IsDescending(false, true)
+                        .HasDatabaseName("IX_Comments_FelineId_TimeStamp");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("FosterRoster.Domain.Feline", b =>
@@ -66,6 +71,10 @@ namespace FosterRoster.Data.Migrations
                         .IsRequired()
                         .HasMaxLength(16)
                         .HasColumnType("character varying(16)");
+
+                    b.Property<string>("Color")
+                        .HasMaxLength(96)
+                        .HasColumnType("character varying(96)");
 
                     b.Property<string>("Gender")
                         .IsRequired()

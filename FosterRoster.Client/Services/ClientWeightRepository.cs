@@ -1,10 +1,10 @@
 namespace FosterRoster.Services;
 
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Net.Http.Json;
 using FosterRoster.Domain;
 using System;
+using System.Collections.Generic;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 public sealed class ClientWeightRepository(
     HttpClient httpClient

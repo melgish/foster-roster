@@ -1,13 +1,14 @@
 namespace FosterRoster.Controllers;
 
 using FosterRoster.Domain;
+
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
 [Route("api/thumbnails")]
 public sealed class ThumbnailsController(
     IFelineRepository felineRepository
-): ControllerBase
+) : ControllerBase
 {
     [HttpGet("{felineId}")]
     public async Task<IActionResult> GetThumbnailAsync(int felineId)

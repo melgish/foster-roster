@@ -1,15 +1,10 @@
-namespace FosterRoster.Data;
+namespace FosterRoster.Data.Configurations;
 
 using FosterRoster.Domain;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Ganss.Xss;
 
-
-internal sealed class CommentConfiguration(
-    IHtmlSanitizer htmlSanitizer
-) : IEntityTypeConfiguration<Comment>
+internal sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
@@ -26,16 +21,15 @@ internal sealed class CommentConfiguration(
             .IsRequired(true)
             .HasColumnType("text")
             .HasMaxLength(4096)
-            .HasConversion(
-                v => htmlSanitizer.Sanitize(v.Trim(), string.Empty, null),
-                v => htmlSanitizer.Sanitize(v.Trim(), string.Empty, null)
-            );
+            .HasConversion(new SanitizingValueConverter());
 
+        // Intentionally not using ValueGeneratedOnAdd variants because
+        // Postgres 17 INSERT is not working unless TimeStamp is included
+        // and set to a value.
         builder
             .Property(e => e.TimeStamp)
             .HasColumnType("timestamp with time zone")
-            .HasDefaultValueSql("now()")
-            .ValueGeneratedOnAddOrUpdate();
+            .HasDefaultValueSql("now()");
 
         builder
             .HasIndex(e => new { e.FelineId, e.TimeStamp })

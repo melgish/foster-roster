@@ -13,7 +13,8 @@ using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMudServices(config => {
+builder.Services.AddMudServices(config =>
+{
     config.SnackbarConfiguration.VisibleStateDuration = 2500;
 });
 
