@@ -1,10 +1,7 @@
-namespace FosterRoster.Services;
-
 using FosterRoster.Domain;
-using System;
-using System.Collections.Generic;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
+
+namespace FosterRoster.Client.Services;
 
 public sealed class ClientCommentRepository(
     HttpClient httpClient

@@ -6,6 +6,8 @@ public class Feline : IInactivatable
     public Category Category { get; set; }
     public string? Color { get; set; }
     public virtual ICollection<Comment> Comments { get; set; } = [];
+    public virtual Fosterer? Fosterer { get; set; }
+    public int? FostererId { get; set; }
     public Gender Gender { get; set; }
     public int Id { get; set; }
     public DateTimeOffset? InactivatedAtUtc { get; set; }

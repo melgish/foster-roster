@@ -1,10 +1,7 @@
 using FluentValidation;
-
 using FosterRoster.Domain;
-using FosterRoster.Services;
-
+using FosterRoster.Client.Services;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-
 using MudBlazor.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -22,6 +19,6 @@ builder.Services.AddScoped<IWeightRepository, ClientWeightRepository>();
 builder.Services.AddScoped<ICommentRepository, ClientCommentRepository>();
 
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddValidatorsFromAssemblyContaining<FelineEditModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
 
 await builder.Build().RunAsync();

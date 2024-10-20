@@ -35,6 +35,13 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.HasOne(e => e.Fosterer)
+            .WithMany(e => e!.Felines)
+            .HasForeignKey(e => e.FostererId)
+            .HasConstraintName("FK_Fosterers_Felines")
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder
             .Property(e => e.Gender)
             .HasConversion<string>()

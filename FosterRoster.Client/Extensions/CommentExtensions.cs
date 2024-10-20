@@ -1,6 +1,6 @@
-namespace FosterRoster.Client.Extensions;
-
 using FosterRoster.Domain;
+
+namespace FosterRoster.Client.Extensions;
 
 public static class CommentExtensions
 {

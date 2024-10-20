@@ -1,13 +1,10 @@
 // spell-checker: ignore npgsql
 using FluentValidation;
-
 using FosterRoster.Client.Components;
 using FosterRoster.Data;
 using FosterRoster.Domain;
 using FosterRoster.Services;
-
 using Microsoft.EntityFrameworkCore;
-
 using MudBlazor.Services;
 
 
@@ -33,26 +30,24 @@ builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 
 builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddValidatorsFromAssemblyContaining<FelineEditModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
 
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment() || builder.Configuration.GetValue("AutoMigrate", false))
+// Apply database migrations when requested by configuration.
+if (builder.Configuration.GetValue("AutoMigrate", false))
 {
-    // always apply database migrations in development mode.
     using var scope = app.Services.CreateScope();
-    var contextFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<FosterRosterDbContext>>();
-    using var context = contextFactory.CreateDbContext();
+    var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<FosterRosterDbContext>>();
+    using var context = factory.CreateDbContext();
     context.Database.MigrateAsync().Wait();
-    FosterRosterDbContextSeedData.SeedAsync(context).Wait();
 }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
-
 }
 else
 {

@@ -1,10 +1,7 @@
-namespace FosterRoster.Services;
-
 using FosterRoster.Domain;
-using System;
-using System.Collections.Generic;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
+
+namespace FosterRoster.Client.Services;
 
 public sealed class ClientWeightRepository(
     HttpClient httpClient
@@ -31,5 +28,4 @@ public sealed class ClientWeightRepository(
     /// <returns>List of cats, or empty list if no cats exist.</returns>
     public async Task<List<Weight>> GetAllAsync()
         => await httpClient.GetFromJsonAsync<List<Weight>>(route) ?? [];
-
 }

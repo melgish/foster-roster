@@ -22,5 +22,4 @@ public interface IWeightRepository
     /// </summary>
     /// <returns>Array of weights or null if there are none.</returns>
     public Task<List<Weight>> GetAllAsync();
-
 }

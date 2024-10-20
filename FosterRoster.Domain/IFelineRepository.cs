@@ -72,5 +72,4 @@ public interface IFelineRepository
     /// <param name="feline">Data to assign to cat</param>
     /// <returns>Updated cat if found, otherwise null</returns>
     public Task<Feline?> UpdateAsync(int felineId, Feline feline);
-
 }
