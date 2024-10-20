@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RuntimeFrameworkVersion>8.0.8</RuntimeFrameworkVersion>
+    <Version>1.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
