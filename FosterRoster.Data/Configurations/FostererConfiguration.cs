@@ -18,6 +18,11 @@ internal sealed class FostererConfiguration : IEntityTypeConfiguration<Fosterer>
             .IsRequired(false);
 
         builder
+            .Property(e => e.ContactMethod)
+            .HasMaxLength(16)
+            .HasConversion<string>();
+
+        builder
             .Property(e => e.Email)
             .HasMaxLength(64);
 

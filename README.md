@@ -23,3 +23,8 @@ dotnet ef migrations add {Migration Name} --project FosterRoster.Data
 ```sh
 dotnet publish -c Release --os linux --arch x64 /t:PublishContainer
 ```
+
+### check for outdated packages
+```sh
+dotnet list package --outdated
+```

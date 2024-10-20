@@ -9,6 +9,11 @@ public class Fosterer : IInactivatable
     public string? Address { get; set; }
 
     /// <summary>
+    /// Gets / Sets the preferred contact method for the Fosterer
+    /// </summary>
+    public ContactMethod? ContactMethod { get; set; }
+
+    /// <summary>
     /// Email address of the Fosterer
     /// </summary>
     public string? Email { get; set; }

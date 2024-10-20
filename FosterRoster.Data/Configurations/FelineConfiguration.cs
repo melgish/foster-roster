@@ -70,6 +70,13 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .HasColumnType("date")
             .IsRequired(false);
 
+        builder.HasOne(e => e.Source)
+            .WithMany()
+            .HasForeignKey(e => e.SourceId)
+            .HasConstraintName("FK_Sources_Felines")
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder
             .HasOne(e => e.Thumbnail)
             .WithOne()
