@@ -17,7 +17,7 @@ else
 
 @code {
   [Parameter]
-  public int Value { get; set; }
+  public int Value { get; set; } = 0;
 
   [Parameter]
   public EventCallback<int> ValueChanged { get; set; } = EventCallback<int>.Empty;
@@ -26,12 +26,9 @@ else
 
   protected override async Task OnInitializedAsync()
   {
-    Value = 0;
     names = await FelineRepository.GetAllNamesAsync();
     await base.OnInitializedAsync();
+    StateHasChanged();
   }
-
-
-
 }
 

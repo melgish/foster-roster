@@ -1,8 +1,8 @@
-namespace FosterRoster.Client.Extensions;
-
 using FosterRoster.Domain;
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Mime;
+
+namespace FosterRoster.Client.Extensions;
 
 static class ThumbnailExtensions
 {

@@ -8,6 +8,13 @@
         "dotnet-ef"
       ],
       "rollForward": false
+    },
+    "dotnet-version-cli": {
+      "version": "3.0.3",
+      "commands": [
+        "dotnet-version"
+      ],
+      "rollForward": false
     }
   }
 }
