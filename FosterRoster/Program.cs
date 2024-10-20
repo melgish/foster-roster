@@ -25,9 +25,10 @@ builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
 );
 
-builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
-builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
+builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
+builder.Services.AddScoped<ISourceRepository, ServerSourceRepository>();
+builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddValidatorsFromAssemblyContaining<Feline>();

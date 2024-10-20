@@ -13,6 +13,7 @@ public sealed class FelineEditModel()
     public DateTime? IntakeDate { get; set; }
     public string Name { get; set; } = string.Empty;
     public DateTime? RegistrationDate { get; set; }
+    public int? SourceId { get; set; }
     public Thumbnail? Thumbnail { get; set; }
     public Weaned Weaned { get; set; }
 
@@ -31,6 +32,7 @@ public sealed class FelineEditModel()
             var date when date.HasValue => date.Value.ToDateTime(TimeOnly.MinValue),
             _ => null
         };
+        SourceId = feline.SourceId;
         Thumbnail = feline.Thumbnail;
         Weaned = feline.Weaned;
 
@@ -55,6 +57,7 @@ public sealed class FelineEditModel()
                 var date when date.HasValue => DateOnly.FromDateTime(date.Value),
                 _ => null
             },
+            SourceId = SourceId,
             Thumbnail = Thumbnail,
             Weaned = Weaned,
             IsInactive = IsInactive,

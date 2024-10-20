@@ -1,11 +1,9 @@
-namespace FosterRoster.Services;
-
 using FosterRoster.Data;
 using FosterRoster.Domain;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+
+namespace FosterRoster.Services;
 
 public sealed class ServerFelineRepository(
     IDbContextFactory<FosterRosterDbContext> contextFactory
@@ -26,6 +24,7 @@ public sealed class ServerFelineRepository(
             IntakeDate = f.IntakeDate,
             Name = f.Name,
             RegistrationDate = f.RegistrationDate,
+            SourceId = f.SourceId,
             // Don't include the data, just enough to generate the thumbnail URL
             Thumbnail = f.Thumbnail == null ? null : new()
             {
@@ -212,6 +211,7 @@ public sealed class ServerFelineRepository(
         existing.IntakeDate = feline.IntakeDate;
         existing.Name = feline.Name;
         existing.RegistrationDate = feline.RegistrationDate;
+        existing.SourceId = feline.SourceId;
         if (existing.Thumbnail is not null && feline.Thumbnail is null)
         {
             context.Remove(existing.Thumbnail);

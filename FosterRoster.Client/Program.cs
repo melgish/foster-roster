@@ -14,9 +14,10 @@ builder.Services.AddMudServices(config =>
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-builder.Services.AddScoped<IFelineRepository, ClientFelineRepository>();
-builder.Services.AddScoped<IWeightRepository, ClientWeightRepository>();
 builder.Services.AddScoped<ICommentRepository, ClientCommentRepository>();
+builder.Services.AddScoped<IFelineRepository, ClientFelineRepository>();
+builder.Services.AddScoped<ISourceRepository, ClientSourceRepository>();
+builder.Services.AddScoped<IWeightRepository, ClientWeightRepository>();
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddValidatorsFromAssemblyContaining<Feline>();

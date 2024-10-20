@@ -4,7 +4,9 @@
 @inject TimeProvider TimeProvider
 @inject NavigationManager NavigationManager
 
-<EditForm Model="@model" OnValidSubmit="@SaveAsync" FormName="editFeline">
+<EditForm Model="@model"
+          OnValidSubmit="@SaveAsync"
+          FormName="editFeline">
     <FluentValidationValidator />
     <MudGrid Spacing="3">
         <MudItem xs="12">
@@ -29,33 +31,32 @@
         <MudItem xs="8">
             <MudStack>
                 <MudDatePicker @bind-Date="model.IntakeDate"
-                                Disabled="@model.IsInactive"
-                                Editable="true"
-                                Label="Intake Date"
-                                Required
-                                RequiredError="" />
+                               Disabled="@model.IsInactive"
+                               Editable="true"
+                               Label="Intake Date"
+                               Required
+                               RequiredError="" />
                 <ValidationMessage For="@(() => model.IntakeDate)" />
                 <MudTextField @bind-Value="model.Name"
-                                Disabled="@model.IsInactive"
-                                Label="Name" />
+                              Disabled="@model.IsInactive"
+                              Label="Name" />
                 <ValidationMessage For="@(() => model.Name)" />
                 <MudField Label="Gender">
                     <MudRadioGroup T="Gender"
-                                    @bind-Value="model.Gender"
-                                    Class="ps-2"
-                                    Disabled="@model.IsInactive">
-                        <MudRadio Value="@Gender.Female"
-                                    Dense>Female</MudRadio>
-                        <MudRadio Value="@Gender.Male"
-                                    Dense>Male</MudRadio>
+                                   @bind-Value="model.Gender"
+                                   Class="ps-2"
+                                   Disabled="@model.IsInactive"
+                                   Style="margin-top:-0.5rem">
+                        <MudRadio Dense Size="Size.Small" Value="@Gender.Female">Female</MudRadio>
+                        <MudRadio Dense Size="Size.Small" Value="@Gender.Male">Male</MudRadio>
                     </MudRadioGroup>
                     <ValidationMessage For="@(() => model.Gender)" />
                 </MudField>
                 <MudNumericField @bind-Value="model.IntakeAgeInWeeks"
-                                    Disabled="@model.IsInactive"
-                                    HideSpinButtons
-                                    Label="Age at Intake (weeks)"
-                                    Min="0" />
+                                 Disabled="@model.IsInactive"
+                                 HideSpinButtons
+                                 Label="Age at Intake (weeks)"
+                                 Min="0" />
                 <ValidationMessage For="@(() => model.IntakeAgeInWeeks)" />
             </MudStack>
         </MudItem>
@@ -70,6 +71,11 @@
                           Disabled="@model.IsInactive"
                           Label="Color" />
             <ValidationMessage For="@(() => model.Color)" />
+        </MudItem>
+        <MudItem xs="6">
+            <SourceSelect @bind-Value="model.SourceId"
+                          Disabled="@model.IsInactive" />
+            <ValidationMessage For="@(() => model.SourceId)" />
         </MudItem>
         <MudItem xs="6">
             <MudSelect @bind-Value="model.Category"
@@ -96,13 +102,17 @@
             <MudField Label="Weaned">
                 <MudRadioGroup @bind-Value="model.Weaned"
                                Class="ps-2"
+                               Style="margin-top:-0.5rem"
                                Disabled="@model.IsInactive">
-                    <MudRadio Value="@Weaned.No"
-                              Dense>No</MudRadio>
-                    <MudRadio Value="@Weaned.InProgress"
-                              Dense>In Progress</MudRadio>
-                    <MudRadio Value="@Weaned.Yes"
-                              Dense>Yes</MudRadio>
+                    <MudRadio Dense
+                              Size="Size.Small"
+                              Value="@Weaned.No">No</MudRadio>
+                    <MudRadio Dense
+                              Size="Size.Small"
+                              Value="@Weaned.InProgress">In Progress</MudRadio>
+                    <MudRadio Dense
+                              Size="Size.Small"
+                              Value="@Weaned.Yes">Yes</MudRadio>
                 </MudRadioGroup>
             </MudField>
             <ValidationMessage For="@(() => model.Weaned)" />
@@ -261,9 +271,10 @@
     {
         isSaving = true;
         var feline = IsNew
-            ? await FelineRepository.AddAsync(model.ToFeline())
-            : await FelineRepository.UpdateAsync(Feline.Id, model.ToFeline());
-        if (feline is null) {
+        ? await FelineRepository.AddAsync(model.ToFeline())
+        : await FelineRepository.UpdateAsync(Feline.Id, model.ToFeline());
+        if (feline is null)
+        {
             Snackbar.Add("Failed to save", Severity.Error);
         }
         else

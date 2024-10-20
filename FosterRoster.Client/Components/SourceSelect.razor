@@ -1,0 +1,49 @@
+@inject ISourceRepository SourceRepository;
+
+@if (sources is null)
+{
+
+}
+else
+{
+<MudSelect T="int" Label="Source" Value="@_value" ValueChanged="@OnValueChanged" @attributes="@Attributes">
+    <MudSelectItem Value="0">Select a source...</MudSelectItem>
+    @foreach (var name in sources)
+    {
+        <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
+    }
+</MudSelect>
+}
+
+@code {
+    private int _value = 0;
+
+    private List<ListItem<int>> sources = [];
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; } = [];
+
+    [Parameter]
+    public EventCallback<int?> ValueChanged { get; set; }
+
+    [Parameter]
+    public int? Value {get; set;}
+
+    protected override async Task OnInitializedAsync()
+    {
+        sources = await SourceRepository.GetAllNamesAsync();
+        await base.OnInitializedAsync();
+        StateHasChanged();
+    }
+
+    private void OnValueChanged(int value)
+    {
+        ValueChanged.InvokeAsync(value == 0 ?  null : (int?)value);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _value = Value ?? 0;
+    }
+}
+
