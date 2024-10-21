@@ -1,6 +1,9 @@
 @page "/intake"
 @rendermode InteractiveWebAssembly
-@inject TimeProvider TimeProvider;
+@inject TimeProvider TimeProvider
+@inject NavigationManager NavigationManager
+@inject IFelineRepository FelineRepository
+@inject ISnackbar Snackbar
 
 <PageTitle>Intake</PageTitle>
 @if (feline is null)
@@ -11,7 +14,7 @@ else
 {
     <MudStack>
         <MudPaper Class="pa-2" Elevation="3">
-            <FelineEditForm Feline="@feline" IsNew />
+            <FelineEditForm Feline="@feline" IsNew OnSave="OnSaveAsync" />
         </MudPaper>
     </MudStack>
 }
@@ -28,5 +31,19 @@ else
             Thumbnail = null,
             Weaned = Weaned.Yes
         };
+    }
+
+    /// <summary>
+    /// Save event handler for the FelineEditForm
+    /// </summary>
+    private async Task OnSaveAsync(FelineEditModel model)
+    {
+        var added = await FelineRepository.AddAsync(model.ToFeline());
+        if (added is null)
+        {
+            Snackbar.Add("Failed to save", Severity.Error);
+            return;
+        }
+        NavigationManager.NavigateTo($"/details/{added.Id}");
     }
 }

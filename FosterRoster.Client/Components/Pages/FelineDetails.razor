@@ -17,7 +17,11 @@ else
 {
     <MudStack>
         <MudPaper Elevation="3" Class="pa-2">
-            <FelineEditForm Feline="@feline" />
+            <FelineEditForm Feline="@feline"
+                            OnActivate="OnActivateAsync"
+                            OnDelete="OnDeleteAsync"
+                            OnInactivate="OnInactivateAsync"
+                            OnSave="OnSaveAsync" />
         </MudPaper>
         <MudTabs Elevation="3" ApplyEffectsToContainer="true" PanelClass="pa-2">
             <MudTabPanel Text="Journal" Icon="@Icons.Material.Filled.NoteAlt">
@@ -47,7 +51,6 @@ else
     [Parameter]
     public int FelineId { get; set; }
 
-
     private async Task<Feline?> LoadAsync()
     {
         return await FelineRepository.GetByIdAsync(FelineId);
@@ -56,7 +59,6 @@ else
     private async Task RefreshAsync()
     {
         feline = await LoadAsync();
-        await InvokeAsync(StateHasChanged);
     }
 
     void OnCommentAdded(Comment comment)
@@ -92,5 +94,56 @@ else
     {
         stateSubscription?.Dispose();
         stateSubscription = null;
+    }
+
+    private async Task OnActivateAsync()
+    {
+        if (!await FelineRepository.Activate(FelineId))
+        {
+            Snackbar.Add("Failed to activate", Severity.Error);
+            return;
+        }
+        Snackbar.Add("Activated", Severity.Success);
+        await RefreshAsync();
+    }
+
+    private async Task OnDeleteAsync()
+    {
+        if (await FelineRepository.DeleteByKeyAsync(FelineId))
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+        Snackbar.Add("Failed to delete", Severity.Error);
+    }
+
+    private async Task OnInactivateAsync(DateTimeOffset asOf)
+    {
+        if (!await FelineRepository.Inactivate(FelineId, asOf))
+        {
+            Snackbar.Add("Failed to inactivate", Severity.Error);
+            return;
+        }
+
+        Snackbar.Add("Inactivated", Severity.Success);
+        await RefreshAsync();
+    }
+
+    /// <summary>
+    /// Save event handler for the FelineEditForm
+    /// </summary>
+    private async Task OnSaveAsync(FelineEditModel model)
+    {
+        var updated = await FelineRepository.UpdateAsync(FelineId, model.ToFeline());
+        if (updated is null)
+        {
+            Snackbar.Add("Failed to save", Severity.Error);
+        }
+        else
+        {
+            feline = updated;
+            Snackbar.Add("Saved", Severity.Success);
+        }
+        await RefreshAsync();
     }
 }
