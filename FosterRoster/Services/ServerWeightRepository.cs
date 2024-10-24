@@ -1,17 +1,11 @@
-namespace FosterRoster.Services;
-
-using FosterRoster.Data;
-using FosterRoster.Domain;
-using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+
+namespace FosterRoster.Services;
 
 public sealed class ServerWeightRepository(
     IDbContextFactory<FosterRosterDbContext> contextFactory
 ) : IWeightRepository
 {
-
     private static readonly Expression<Func<Weight, Weight>> WeightProjection =
         w => new()
         {

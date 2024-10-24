@@ -1,9 +1,5 @@
 namespace FosterRoster.Controllers;
 
-using FosterRoster.Domain;
-
-using Microsoft.AspNetCore.Mvc;
-
 [ApiController]
 [Route("api/thumbnails")]
 public sealed class ThumbnailsController(

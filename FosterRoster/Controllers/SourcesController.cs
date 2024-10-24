@@ -1,6 +1,3 @@
-using FosterRoster.Domain;
-using Microsoft.AspNetCore.Mvc;
-
 namespace FosterRoster.Controllers;
 
 [ApiController]

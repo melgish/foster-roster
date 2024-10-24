@@ -1,4 +1,4 @@
-namespace FosterRoster.Domain;
+namespace FosterRoster.Domain.Repositories;
 
 public interface ICommentRepository
 {

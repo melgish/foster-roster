@@ -1,11 +1,5 @@
 namespace FosterRoster.Controllers;
 
-using FluentValidation;
-
-using FosterRoster.Domain;
-
-using Microsoft.AspNetCore.Mvc;
-
 [ApiController]
 [Route("api/weights")]
 public sealed class WeightsController(

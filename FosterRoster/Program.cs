@@ -1,12 +1,7 @@
 // spell-checker: ignore npgsql
-using FluentValidation;
 using FosterRoster.Client.Components;
-using FosterRoster.Data;
-using FosterRoster.Domain;
 using FosterRoster.Services;
-using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
-
 
 var builder = WebApplication.CreateBuilder(args);
 

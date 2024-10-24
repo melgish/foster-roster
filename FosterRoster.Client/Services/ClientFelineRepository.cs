@@ -1,6 +1,3 @@
-using FosterRoster.Domain;
-using System.Net.Http.Json;
-
 namespace FosterRoster.Client.Services;
 
 public sealed class ClientFelineRepository(
