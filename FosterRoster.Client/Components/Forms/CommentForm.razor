@@ -3,18 +3,18 @@
 
 
 
-<EditForm Model="@model" OnValidSubmit="SaveAsync" FormName="newComment">
+<EditForm Model="@_model" OnValidSubmit="SaveAsync" FormName="newComment">
     <FluentValidationValidator />
     <MudStack Row AlignItems="AlignItems.Start" Spacing="1">
         <MudStack Style="width: 100%">
             <TinyMCE.Blazor.Editor
-                @bind-Value="model.Text"
-                Conf="@Conf"
-                Field="@(() => model.Text)"
+                @bind-Value="_model.Text"
+                Conf="@_conf"
+                Field="@(() => _model.Text)"
                 ScriptSrc="/tinymce/tinymce.min.js"
                 ValidateOnInput="@false"
                 />
-            <ValidationMessage For="@(() => model.Text)" />
+            <ValidationMessage For="@(() => _model.Text)" />
         </MudStack>
         <MudIconButton
             ButtonType="@ButtonType.Submit"
@@ -26,7 +26,7 @@
 </EditForm>
 @code
 {
-    private Dictionary<string, object> Conf = new Dictionary<string, object>
+    private Dictionary<string, object> _conf = new Dictionary<string, object>
     {
       { "promotion", false },
       { "plugins", "" },
@@ -36,7 +36,7 @@
       { "licence_key", "gpl"}
     };
 
-    private CommentEditModel model = null!;
+    private CommentEditModel _model = null!;
 
     [Parameter]
     public int FelineId { get; set; }
@@ -46,7 +46,7 @@
 
     protected override void OnInitialized()
     {
-        model = new CommentEditModel
+        _model = new CommentEditModel
         {
             FelineId = FelineId
         };
@@ -55,14 +55,11 @@
     private async Task SaveAsync()
     {
         Snackbar.Add("Comment saved", Severity.Success);
-        var comment = await CommentRepository.AddAsync(model.ToComment());
-        if (comment is not null)
+        var comment = await CommentRepository.AddAsync(_model.ToComment());
+        await CommentAdded.InvokeAsync(comment);
+        _model = new CommentEditModel
         {
-            await CommentAdded.InvokeAsync(comment);
-            model = new CommentEditModel
-            {
-                FelineId = FelineId
-            };
-        }
+            FelineId = FelineId
+        };
     }
 }

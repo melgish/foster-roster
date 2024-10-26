@@ -1,5 +1,48 @@
 @page "/fosterers"
+@page "/fosterers/{FostererId:int}"
+@rendermode InteractiveWebAssembly
+@inject IFostererRepository FostererRepository
+
+@inject NavigationManager NavigationManager
 
 <PageTitle>Fosterers</PageTitle>
+<FostererForm 
+    Fosterer="_fosterer"
+    IsNew="@(FostererId==0)"
+    OnSave="SaveAsync"
+    />
 
-<h1>TBD</h1>
+@code {
+    private Fosterer _fosterer = new();
+
+    [Parameter]
+    public int FostererId { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var fetched = FostererId == 0 ? new() : await FostererRepository.GetByKeyAsync(FostererId);
+        if (fetched is null)
+        {
+            NavigationManager.NavigateTo("/not-found");
+            return;
+        }
+        _fosterer = fetched;
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task SaveAsync(FostererEditModel model)
+    {
+        var updated = model.Id == 0
+            ? await FostererRepository.AddAsync(model.ToFosterer())
+            : await FostererRepository.UpdateAsync(model.Id, model.ToFosterer());
+        if (updated is not null)
+        {
+            FostererId = updated.Id;
+            _fosterer = updated;
+            if (updated.Id != model.Id)
+            {
+                NavigationManager.NavigateTo($"/fosterers/{updated.Id}");
+            }
+        }
+    }
+}

@@ -1,23 +1,22 @@
 @page "/details/{FelineId:int}"
 @rendermode InteractiveWebAssembly
-@inject IFelineRepository FelineRepository
+@implements IDisposable
 @inject ICommentRepository CommentRepository
-@inject TimeProvider TimeProvider
-@inject NavigationManager NavigationManager
-@inject IDialogService DialogService
-@inject PersistentComponentState ComponentState;
+@inject IFelineRepository FelineRepository
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject PersistentComponentState ComponentState;
 
 <PageTitle>Details: @Name</PageTitle>
-@if (feline is null)
+@if (_feline is null)
 {
-    <p>Loading...</p>
+    <Loading />
 }
 else
 {
     <MudStack>
         <MudPaper Elevation="3" Class="pa-2">
-            <FelineEditForm Feline="@feline"
+            <FelineEditForm Feline="@_feline"
                             OnActivate="OnActivateAsync"
                             OnDelete="OnDeleteAsync"
                             OnInactivate="OnInactivateAsync"
@@ -27,7 +26,7 @@ else
             <MudTabPanel Text="Journal" Icon="@Icons.Material.Filled.NoteAlt">
                 <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded" />
                 <MudStack Spacing="3">
-                @foreach (var comment in feline.Comments)
+                @foreach (var comment in _feline.Comments)
                 {
                     <CommentCard @key="comment.Id" Comment="comment" OnDelete="OnDeleteCommentAsync" />
                 }
@@ -44,57 +43,49 @@ else
 }
 
 @code {
-    private IDisposable? stateSubscription;
-    private string Name => feline?.Name ?? string.Empty;
-    private Feline? feline;
-
+    private IDisposable? _stateSubscription;
+    private Feline? _feline;
+    
+    private string Name => _feline?.Name ?? string.Empty;
+    
     [Parameter]
     public int FelineId { get; set; }
 
     private async Task<Feline?> LoadAsync()
-    {
-        return await FelineRepository.GetByIdAsync(FelineId);
-    }
-
-    private async Task RefreshAsync()
-    {
-        feline = await LoadAsync();
-    }
+        => await FelineRepository.GetByKeyAsync(FelineId);
 
     void OnCommentAdded(Comment comment)
     {
-        feline!.Comments = feline.Comments.Prepend(comment).ToArray();
-        StateHasChanged();
+        _feline!.Comments = _feline.Comments.Prepend(comment).ToArray();
     }
 
     async Task OnDeleteCommentAsync(Comment comment)
     {
         if (await CommentRepository.DeleteByKeyAsync(comment.Id)) {
-            feline!.Comments = feline.Comments.Where(c => c.Id != comment.Id).ToArray();
+            _feline!.Comments = _feline.Comments.Where(c => c.Id != comment.Id).ToArray();
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-        stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
-        ComponentState.TryTakeFromJson<Feline>("feline", out feline);
-        feline ??= await LoadAsync();
-        if (feline is null) {
+        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+        ComponentState.TryTakeFromJson("feline", out _feline);
+        _feline ??= await LoadAsync();
+        if (_feline is null) {
             NavigationManager.NavigateTo("/not-found");
         }
     }
 
     private Task PersistStateAsync()
     {
-        ComponentState.PersistAsJson("feline", feline);
+        ComponentState.PersistAsJson("feline", _feline);
         return Task.CompletedTask;
     }
 
-    public void Dispose()
-    {
-        stateSubscription?.Dispose();
-        stateSubscription = null;
-    }
+    private async Task RefreshAsync()
+        => _feline = await LoadAsync();
+
+    public void Dispose() => _stateSubscription?.Dispose();
 
     private async Task OnActivateAsync()
     {
@@ -141,7 +132,7 @@ else
         }
         else
         {
-            feline = updated;
+            _feline = updated;
             Snackbar.Add("Saved", Severity.Success);
         }
         await RefreshAsync();

@@ -1,20 +1,16 @@
 @page "/weights"
 @rendermode InteractiveWebAssembly
-@using FosterRoster.Domain
-@inject IFelineRepository FelineRepository
-@inject IWeightRepository WeightRepository
-@inject ILogger<Intake> Logger
-@inject TimeProvider TimeProvider
-@inject NavigationManager NavigationManager
-@inject WeightEditModelValidator Validator
+@implements IDisposable
 @inject ISnackbar Snackbar
+@inject IWeightRepository WeightRepository
 @inject PersistentComponentState ComponentState;
+@inject TimeProvider TimeProvider
 
 <PageTitle>Weights</PageTitle>
 
-@if (allWeights is null)
+@if (_allWeights is null)
 {
-  <p>Loading...</p>
+    <Loading />
 }
 else
 {
@@ -22,7 +18,7 @@ else
     <MudPaper Elevation="3"
               Class="pa-2">
       <EditForm FormName="weightForm"
-                Model="model"
+                Model="_model"
                 OnValidSubmit="OnSaveAsync">
         <FluentValidationValidator />
           <MudGrid Spacing="3">
@@ -31,42 +27,42 @@ else
             </MudItem>
             <MudItem xs="12"
                      sm="6">
-              <MudDatePicker @bind-Date="model.DateTime.Date"
+              <MudDatePicker @bind-Date="_model.DateTime.Date"
                              Clearable="true"
                              Editable="true"
                              HelperText="MM/DD/YYYY"
                              Label="Date" />
-              <ValidationMessage For="@(() => model.DateTime.Date)" />
+              <ValidationMessage For="@(() => _model.DateTime.Date)" />
             </MudItem>
             <MudItem xs="12"
                      sm="6">
-              <MudTimePicker @bind-Time="model.DateTime.Time"
+              <MudTimePicker @bind-Time="_model.DateTime.Time"
                              AmPm="true"
                              Clearable="true"
                              HelperText="HH:MM (use 24 hour time for now, working on it)"
                              Editable="true"
                              Label="Time" />
-              <ValidationMessage For="@(() => model.DateTime.Time)" />
+              <ValidationMessage For="@(() => _model.DateTime.Time)" />
             </MudItem>
             <MudItem xs="12">
-              <FelineAutoComplete Value="@model.FelineId"
+              <FelineAutoComplete Value="@_model.FelineId"
                                   ValueChanged="@OnFelineSelected" />
-              <ValidationMessage For="@(() => model.FelineId)" />
+              <ValidationMessage For="@(() => _model.FelineId)" />
             </MudItem>
             <MudItem xs="12"
                      sm="6">
-              <MudNumericField @bind-Value="model.Value"
+              <MudNumericField @bind-Value="_model.Value"
                                T="float"
                                Label="Weight"
                                Step="0.1f"
                                Min="0.0f"
                                HideSpinButtons />
-              <ValidationMessage For="@(() => model.Value)" />
+              <ValidationMessage For="@(() => _model.Value)" />
             </MudItem>
             <MudItem xs="12"
                      sm="6">
               <MudSelect Label="Units"
-                         Value="@model.Units"
+                         Value="@_model.Units"
                          T="WeightUnit"
                          ValueChanged="@OnUnitsSelected">
                 <MudSelectItem Value="WeightUnit.g">Grams</MudSelectItem>
@@ -81,29 +77,27 @@ else
                 <MudButton Variant="Variant.Outlined"
                            ButtonType="ButtonType.Submit"
                            Color="Color.Primary"
-                           Disabled="isSaving">Save</MudButton>
+                           Disabled="_isSaving">Save</MudButton>
                 <MudButton Variant="Variant.Outlined"
                            OnClick="@Reset"
                            Color="Color.Secondary"
-                           Disabled="isSaving">Reset</MudButton>
+                           Disabled="_isSaving">Reset</MudButton>
               </MudStack>
             </MudItem>
           </MudGrid>
       </EditForm>
     </MudPaper>
-    @if (filteredWeights != allWeights && filteredWeights?.Any() == true)
+    @if (!ReferenceEquals(_filteredWeights, _allWeights) && _filteredWeights?.Any() == true)
     {
       <MudPaper Elevation="3"
                 Class="pa-2">
-        <WeightChart Weights="filteredWeights" Units="WeightUnit.lbs" />
+        <WeightChart Weights="_filteredWeights" Units="WeightUnit.lbs" />
       </MudPaper>
     }
     <MudPaper Elevation="3"
               Class="pa-2">
       <h2>Recent Weights</h2>
-      <MudDataGrid @ref="grid"
-                   Items="filteredWeights"
-                   Dense>
+      <MudDataGrid Items="_filteredWeights" Dense>
         <Columns>
           <PropertyColumn Property="x => x.DateTime"
                           Title="Date"
@@ -112,7 +106,7 @@ else
                           Title="Name" />
           <TemplateColumn Title="Weight">
             <CellTemplate>
-              @context.Item.Format(units)
+              @context.Item.Format(_units)
             </CellTemplate>
           </TemplateColumn>
           <TemplateColumn Context="data">
@@ -130,84 +124,81 @@ else
 }
 
 @code {
-  private List<Weight>? allWeights;
+  private List<Weight>? _allWeights;
+  private IEnumerable<Weight>? _filteredWeights;
+  private bool _isSaving;
+  private WeightEditModel _model = new();
+  private IDisposable? _stateSubscription;
+  private WeightUnit _units = WeightUnit.g;
 
-  private IEnumerable<Weight>? filteredWeights;
-
-  private WeightUnit units = WeightUnit.g;
-
-  private WeightEditModel model = new();
-
-  private bool isSaving = false;
-
-  private MudDataGrid<FosterRoster.Domain.Weight>? grid;
-
-  private IDisposable? stateSubscription;
+  public void Dispose() => _stateSubscription?.Dispose();
+  
   protected override async Task OnInitializedAsync()
   {
-    stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
-    ComponentState.TryTakeFromJson<List<Weight>>("allWeights", out allWeights);
-    allWeights ??= await WeightRepository.GetAllAsync();
-    filteredWeights = allWeights;
+    _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+    ComponentState.TryTakeFromJson("allWeights", out _allWeights);
+    _allWeights ??= await WeightRepository.GetAllAsync();
+    _filteredWeights = _allWeights;
     Reset();
   }
 
   private void OnFelineSelected(int felineId)
   {
-    model.FelineId = felineId;
-    filteredWeights = felineId switch
+    _model.FelineId = felineId;
+    _filteredWeights = felineId switch
     {
-      0 => allWeights ?? [],
+      0 => _allWeights ?? [],
       // When cat is selected, only show weights for the selected cat
-      _ => allWeights?.Where(x => x.FelineId == felineId) ?? []
+      _ => _allWeights?.Where(x => x.FelineId == felineId) ?? []
     };
     StateHasChanged();
   }
 
   private void OnUnitsSelected(WeightUnit unit)
   {
-    model.Units = unit;
-    units = unit;
+    _model.Units = unit;
+    _units = unit;
     StateHasChanged();
   }
 
   private void Reset()
   {
     // Start a new form, but keep the selected unit type
-    model = new()
+    _model = new()
       {
         DateTime = TimeProvider.GetUtcNow().UtcDateTime,
-        Units = units
+        Units = _units
       };
   }
 
   private async Task OnSaveAsync()
   {
-    isSaving = true;
-    var weight = await WeightRepository.AddAsync(model.ToWeight());
-    if (weight is not null)
-    {
-      Snackbar.Add("Weight saved", Severity.Success);
-      // insert the weight as the most recent regardless of date and time
-      allWeights = (allWeights ?? new()).Prepend(weight).ToList();
-      OnFelineSelected(model.FelineId);
-    }
-    isSaving = false;
+    _isSaving = true;
+    var weight = await WeightRepository.AddAsync(_model.ToWeight());
+    Snackbar.Add("Weight saved", Severity.Success);
+    // insert the weight as the most recent regardless of date and time
+    _allWeights = (_allWeights ?? new()).Prepend(weight).ToList();
+    OnFelineSelected(_model.FelineId);
+    _isSaving = false;
   }
 
-  private async Task OnDeleteAsync(Weight weight)
+  private async Task OnDeleteAsync(Weight? weight)
   {
-    if (await WeightRepository.DeleteByKeyAsync(weight.FelineId, weight.DateTime))
-    {
-      Snackbar.Add("Weight deleted", Severity.Success);
-      allWeights = allWeights?.Where(x => x.FelineId != weight.FelineId || x.DateTime != weight.DateTime).ToList() ?? [];
-      OnFelineSelected(model.FelineId);
-    }
+      if (weight is null)
+      {
+          return;
+      }
+        if (await WeightRepository.DeleteByKeyAsync(weight.FelineId, weight.DateTime))
+        {
+          Snackbar.Add("Weight deleted", Severity.Success);
+          _allWeights = _allWeights?.Where(x => x.FelineId != weight.FelineId || x.DateTime != weight.DateTime).ToList() ?? [];
+          OnFelineSelected(_model.FelineId);
+        }
   }
 
   private Task PersistStateAsync()
   {
-    ComponentState.PersistAsJson("allWeights", allWeights);
+    ComponentState.PersistAsJson("allWeights", _allWeights);
     return Task.CompletedTask;
   }
 

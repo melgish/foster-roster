@@ -1,29 +1,22 @@
 @page "/intake"
 @rendermode InteractiveWebAssembly
-@inject TimeProvider TimeProvider
-@inject NavigationManager NavigationManager
 @inject IFelineRepository FelineRepository
 @inject ISnackbar Snackbar
+@inject NavigationManager NavigationManager
+@inject TimeProvider TimeProvider
 
 <PageTitle>Intake</PageTitle>
-@if (feline is null)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <MudStack>
-        <MudPaper Class="pa-2" Elevation="3">
-            <FelineEditForm Feline="@feline" IsNew OnSave="OnSaveAsync" />
-        </MudPaper>
-    </MudStack>
-}
+<MudStack>
+    <MudPaper Class="pa-2" Elevation="3">
+        <FelineEditForm Feline="@_feline" IsNew OnSave="OnSaveAsync" />
+    </MudPaper>
+</MudStack>
 
 @code {
-    private Feline feline = null!;
+    private Feline _feline = null!;
     protected override void OnInitialized()
     {
-        feline = new()
+        _feline = new()
         {
             IntakeDate = DateOnly.FromDateTime(TimeProvider.GetLocalNow().DateTime),
             Category = Category.Kitten,

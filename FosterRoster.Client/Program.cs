@@ -14,6 +14,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddScoped<ICommentRepository, ClientCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ClientFelineRepository>();
+builder.Services.AddScoped<IFostererRepository, ClientFostererRepository>();
 builder.Services.AddScoped<ISourceRepository, ClientSourceRepository>();
 builder.Services.AddScoped<IWeightRepository, ClientWeightRepository>();
 

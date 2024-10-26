@@ -19,14 +19,14 @@ public sealed class ClientFelineRepository(
     /// <returns>Updated feline instance after add.</returns>
     public async Task<Feline> AddAsync(Feline feline)
     {
-        var rs = await httpClient.PostAsJsonAsync<FelineEditModel>(Route, new(feline));
+        var rs = await httpClient.PostAsJsonAsync(Route, new FelineEditModel(feline));
         return await rs.Content.ReadFromJsonAsync<Feline>() ?? feline;
     }
 
     /// <summary>
-    /// Deletes a cat by it's id.
+    /// Deletes a Feline by its ID.
     /// </summary>
-    /// <param name="felineId">Id of feline to remove.</param>
+    /// <param name="felineId">ID of feline to remove.</param>
     /// <returns>True if a cat was removed otherwise false.</returns>
     public async Task<bool> DeleteByKeyAsync(int felineId)
     {
@@ -53,13 +53,13 @@ public sealed class ClientFelineRepository(
     /// </summary>
     /// <param name="felineId"></param>
     /// <returns>A single cat if found, otherwise null</returns>
-    public async Task<Feline?> GetByIdAsync(int felineId)
+    public async Task<Feline?> GetByKeyAsync(int felineId)
         => await httpClient.GetFromJsonAsync<Feline>($"{Route}/{felineId}");
 
     /// <summary>
     /// Gets the thumbnail for a single cat.
     /// </summary>
-    /// <param name="felineId">Id of the cat</param>
+    /// <param name="felineId">ID of the cat</param>
     /// <returns>Thumbnail if found, otherwise null</returns>
     public async Task<Thumbnail?> GetThumbnailAsync(int felineId)
        => await httpClient.GetFromJsonAsync<Thumbnail>($"{Route}/{felineId}/thumbnail");
@@ -80,7 +80,7 @@ public sealed class ClientFelineRepository(
     /// <summary>
     /// Sets the thumbnail for a cat.
     /// </summary>
-    /// <param name="felineId">Id of cat to change</param>
+    /// <param name="felineId">ID of cat to change</param>
     /// <param name="thumbnail">Thumbnail to assign to cat</param>
     /// <returns>Updated cat, or null if cat was not found</returns>
     public async Task<Feline?> SetThumbnailAsync(int felineId, Thumbnail thumbnail)
@@ -92,7 +92,7 @@ public sealed class ClientFelineRepository(
     /// <summary>
     /// Updates a cat in the database.
     /// </summary>
-    /// <param name="felineId">Id of cat to update</param>
+    /// <param name="felineId">ID of cat to update</param>
     /// <param name="feline">Data to assign to cat</param>
     /// <returns>Updated cat if found, otherwise null</returns>
     public async Task<Feline?> UpdateAsync(int felineId, Feline feline)

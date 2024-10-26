@@ -11,7 +11,7 @@ public class Fosterer : IInactivatable
     /// <summary>
     /// Gets / Sets the preferred contact method for the Fosterer
     /// </summary>
-    public ContactMethod? ContactMethod { get; set; }
+    public ContactMethod ContactMethod { get; set; } = ContactMethod.Email;
 
     /// <summary>
     /// Email address of the Fosterer

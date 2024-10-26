@@ -1,53 +1,54 @@
 @inject IDialogService DialogService
 
-@if (model is null)
+@if (_model is null)
 {
     <p>Loading...</p>
 }
 else
 {
-    <EditForm Model="@model"
+    <EditForm Model="@_model"
               OnValidSubmit="@SaveAsync"
               FormName="editFeline">
         <FluentValidationValidator />
         <MudGrid Spacing="3">
             <MudItem xs="12">
-                <h1>@name</h1>
+                <h1>@_name</h1>
             </MudItem>
             <MudItem xs="4">
                 <MudFileUpload Accept="image/png"
-                               Disabled="@model.IsInactive"
+                               Disabled="@_model.IsInactive"
                                FilesChanged="@OnFilesChangedAsync"
                                T="IBrowserFile">
                     <ActivatorContent>
                         <MudImage Alt="Thumbnail"
-                                  Src="@model.Thumbnail.GetUrl()"
+                                  Src="@_model.Thumbnail.GetUrl()"
                                   Height="256"
                                   Width="256" />
                         <MudIconButton Color="Color.Default"
-                                       Disabled="@model.IsInactive"
+                                       Disabled="@_model.IsInactive"
                                        Icon="@Icons.Material.Rounded.CameraAlt" />
                     </ActivatorContent>
                 </MudFileUpload>
             </MudItem>
             <MudItem xs="8">
                 <MudStack>
-                    <MudDatePicker @bind-Date="model.IntakeDate"
-                                   Disabled="@model.IsInactive"
+                    <MudDatePicker @bind-Date="_model.IntakeDate"
+                                   Disabled="@_model.IsInactive"
                                    Editable="true"
                                    Label="Intake Date"
                                    Required
                                    RequiredError="" />
-                    <ValidationMessage For="@(() => model.IntakeDate)" />
-                    <MudTextField @bind-Value="model.Name"
-                                  Disabled="@model.IsInactive"
-                                  Label="Name" />
-                    <ValidationMessage For="@(() => model.Name)" />
+                    <ValidationMessage For="@(() => _model.IntakeDate)" />
+                    <MudTextField @bind-Value="_model.Name"
+                                  Disabled="@_model.IsInactive"
+                                  Label="Name"
+                                  ShrinkLabel />
+                    <ValidationMessage For="@(() => _model.Name)" />
                     <MudField Label="Gender">
                         <MudRadioGroup T="Gender"
-                                       @bind-Value="model.Gender"
+                                       @bind-Value="_model.Gender"
                                        Class="ps-2"
-                                       Disabled="@model.IsInactive"
+                                       Disabled="@_model.IsInactive"
                                        Style="margin-top:-0.5rem">
                             <MudRadio Dense
                                       Size="Size.Small"
@@ -56,36 +57,39 @@ else
                                       Size="Size.Small"
                                       Value="@Gender.Male">Male</MudRadio>
                         </MudRadioGroup>
-                        <ValidationMessage For="@(() => model.Gender)" />
+                        <ValidationMessage For="@(() => _model.Gender)" />
                     </MudField>
-                    <MudNumericField @bind-Value="model.IntakeAgeInWeeks"
-                                     Disabled="@model.IsInactive"
+                    <MudNumericField @bind-Value="_model.IntakeAgeInWeeks"
+                                     Disabled="@_model.IsInactive"
                                      HideSpinButtons
                                      Label="Age at Intake (weeks)"
-                                     Min="0" />
-                    <ValidationMessage For="@(() => model.IntakeAgeInWeeks)" />
+                                     Min="0"
+                                     ShrinkLabel />
+                    <ValidationMessage For="@(() => _model.IntakeAgeInWeeks)" />
                 </MudStack>
             </MudItem>
             <MudItem xs="6">
-                <MudTextField @bind-Value="model.Breed"
-                              Disabled="@model.IsInactive"
-                              Label="Breed" />
-                <ValidationMessage For="@(() => model.Breed)" />
+                <MudTextField @bind-Value="_model.Breed"
+                              Disabled="@_model.IsInactive"
+                              Label="Breed" 
+                              ShrinkLabel />
+                <ValidationMessage For="@(() => _model.Breed)" />
             </MudItem>
             <MudItem xs="6">
-                <MudTextField @bind-Value="model.Color"
-                              Disabled="@model.IsInactive"
-                              Label="Color" />
-                <ValidationMessage For="@(() => model.Color)" />
+                <MudTextField @bind-Value="_model.Color"
+                              Disabled="@_model.IsInactive"
+                              Label="Color"
+                              ShrinkLabel />
+                <ValidationMessage For="@(() => _model.Color)" />
             </MudItem>
             <MudItem xs="6">
-                <SourceSelect @bind-Value="model.SourceId"
-                              Disabled="@model.IsInactive" />
-                <ValidationMessage For="@(() => model.SourceId)" />
+                <SourceSelect @bind-Value="_model.SourceId"
+                              Disabled="@_model.IsInactive" />
+                <ValidationMessage For="@(() => _model.SourceId)" />
             </MudItem>
             <MudItem xs="6">
-                <MudSelect @bind-Value="model.Category"
-                           Disabled="@model.IsInactive"
+                <MudSelect @bind-Value="_model.Category"
+                           Disabled="@_model.IsInactive"
                            Label="Category"
                            Required>
                     <MudSelectItem Value="@Category.Kitten">Kitten</MudSelectItem>
@@ -94,22 +98,22 @@ else
                     <MudSelectItem Value="@Category.Cat">Cat</MudSelectItem>
                     <MudSelectItem Value="@Category.NursingCat">Nursing Cat</MudSelectItem>
                 </MudSelect>
-                <ValidationMessage For="@(() => model.Category)" />
+                <ValidationMessage For="@(() => _model.Category)" />
             </MudItem>
             <MudItem xs="6">
-                <MudDatePicker @bind-Date="model.RegistrationDate"
+                <MudDatePicker @bind-Date="_model.RegistrationDate"
                                Clearable="true"
-                               Disabled="@model.IsInactive"
+                               Disabled="@_model.IsInactive"
                                Editable="true"
                                Label="Registration Date" />
-                <ValidationMessage For="@(() => model.RegistrationDate)" />
+                <ValidationMessage For="@(() => _model.RegistrationDate)" />
             </MudItem>
             <MudItem xs="6">
                 <MudField Label="Weaned">
-                    <MudRadioGroup @bind-Value="model.Weaned"
+                    <MudRadioGroup @bind-Value="_model.Weaned"
                                    Class="ps-2"
                                    Style="margin-top:-0.5rem"
-                                   Disabled="@model.IsInactive">
+                                   Disabled="@_model.IsInactive">
                         <MudRadio Dense
                                   Size="Size.Small"
                                   Value="@Weaned.No">No</MudRadio>
@@ -121,19 +125,19 @@ else
                                   Value="@Weaned.Yes">Yes</MudRadio>
                     </MudRadioGroup>
                 </MudField>
-                <ValidationMessage For="@(() => model.Weaned)" />
+                <ValidationMessage For="@(() => _model.Weaned)" />
             </MudItem>
             <MudItem xs="12">
                 <MudStack Row="true"
                           AlignItems="AlignItems.Center">
-                    @if (model.IsInactive)
+                    @if (_model.IsInactive)
                     {
                         <MudText>
-                            Inactive as of @model.InactivatedAtUtc
+                            Inactive as of @_model.InactivatedAtUtc
                         </MudText>
                     }
                     <MudSpacer />
-                    @if (isSaving)
+                    @if (_isSaving)
                     {
                         <MudProgressCircular Color="Color.Primary"
                                              Indeterminate="true"
@@ -141,11 +145,11 @@ else
                     }
                     @if (!IsNew)
                     {
-                        @if (model.IsInactive)
+                        @if (_model.IsInactive)
                         {
                             <MudButton ButtonType="ButtonType.Button"
                                        Color="Color.Info"
-                                       Disabled="@(isSaving || !model.IsInactive)"
+                                       Disabled="@(_isSaving || !_model.IsInactive)"
                                        OnClick="@ActivateAsync"
                                        Variant="Variant.Outlined">Activate</MudButton>
                         }
@@ -153,23 +157,23 @@ else
                         {
                             <MudButton ButtonType="ButtonType.Button"
                                        Color="Color.Info"
-                                       Disabled="@(isSaving || model.IsInactive)"
+                                       Disabled="@(_isSaving || _model.IsInactive)"
                                        OnClick="@InactivateAsync"
                                        Variant="Variant.Outlined">Inactivate</MudButton>
                         }
                         <MudButton ButtonType="ButtonType.Button"
                                    Color="Color.Error"
-                                   Disabled="@(isSaving || model.IsInactive)"
+                                   Disabled="@(_isSaving || _model.IsInactive)"
                                    OnClick="@DeleteAsync"
                                    Variant="Variant.Outlined">Delete</MudButton>
                     }
                     <MudButton ButtonType="ButtonType.Submit"
                                Color="Color.Primary"
-                               Disabled="@(isSaving || model.IsInactive)"
+                               Disabled="@(_isSaving || _model.IsInactive)"
                                Variant="Variant.Outlined">Save</MudButton>
 
                     <MudButton Color="Color.Secondary"
-                               Disabled="@(isSaving || model.IsInactive)"
+                               Disabled="@(_isSaving || _model.IsInactive)"
                                OnClick="@ResetAsync"
                                Variant="Variant.Outlined">Reset</MudButton>
                 </MudStack>
@@ -179,15 +183,15 @@ else
 }
 
 @code {
-    private bool isSaving = false;
-    private string name = string.Empty;
-    private FelineEditModel? model = null;
+    private bool _isSaving = false;
+    private string _name = string.Empty;
+    private FelineEditModel? _model = null;
 
     [Parameter]
     public Feline Feline { get; set; } = null!;
 
     [Parameter]
-    public bool IsNew { get; set; } = false;
+    public bool IsNew { get; set; }
 
     [Parameter]
     public EventCallback OnActivate { get; set; } = EventCallback.Empty;
@@ -200,17 +204,16 @@ else
     EventCallback<DateTimeOffset>.Empty;
 
     [Parameter]
-    public EventCallback<FelineEditModel> OnSave { get; set; } =
-    EventCallback<FelineEditModel>.Empty;
+    public EventCallback<FelineEditModel> OnSave { get; set; } = EventCallback<FelineEditModel>.Empty;
 
     /// <summary>
     /// Re-activates an inactive cat.
     /// </summary>
     private async Task ActivateAsync()
     {
-        isSaving = true;
+        _isSaving = true;
         await OnActivate.InvokeAsync();
-        isSaving = false;
+        _isSaving = false;
     }
 
     /// <summary>
@@ -223,8 +226,7 @@ else
     /// </summary>
     private async Task DeleteAsync()
     {
-        var parameters = new DialogParameters();
-        parameters.Add(nameof(ConfirmDeleteFelineDialog.Model), model);
+        var parameters = new DialogParameters { { nameof(ConfirmDeleteFelineDialog.Model), _model } };
 
         var dialog = await DialogService
         .ShowAsync<ConfirmDeleteFelineDialog>("Confirm Delete", parameters);
@@ -235,9 +237,9 @@ else
             return;
         }
 
-        isSaving = true;
+        _isSaving = true;
         await OnDelete.InvokeAsync(Feline.Id);
-        isSaving = false;
+        _isSaving = false;
     }
 
     /// <summary>
@@ -245,8 +247,7 @@ else
     /// </summary>
     private async Task InactivateAsync()
     {
-        var parameters = new DialogParameters();
-        parameters.Add(nameof(ConfirmInactivateFelineDialog.Feline), model);
+        var parameters = new DialogParameters { { nameof(ConfirmInactivateFelineDialog.Feline), _model } };
 
         var dialog = await DialogService
         .ShowAsync<ConfirmInactivateFelineDialog>("Confirm Inactivate", parameters);
@@ -256,30 +257,30 @@ else
             return;
         }
 
-        isSaving = true;
+        _isSaving = true;
         await OnInactivate.InvokeAsync((DateTimeOffset)result.Data!);
-        isSaving = false;
+        _isSaving = false;
     }
 
-    private async Task OnFilesChangedAsync(IBrowserFile file)
+    private async Task OnFilesChangedAsync(IBrowserFile? file)
     {
-        if (model is not null)
+        if (_model is not null && file is not null)
         {
-            model.Thumbnail = await file.ToThumbnailAsync(model.Id);
+            _model.Thumbnail = await file.ToThumbnailAsync(_model.Id);
         }
     }
 
     private Task ResetAsync()
     {
-        model = new FelineEditModel(Feline);
-        name = IsNew ? "Intake" : model.Name;
+        _model = new FelineEditModel(Feline);
+        _name = IsNew ? "Intake" : _model.Name;
         return Task.CompletedTask;
     }
 
     private async Task SaveAsync()
     {
-        isSaving = true;
-        await OnSave.InvokeAsync(model);
-        isSaving = false;
+        _isSaving = true;
+        await OnSave.InvokeAsync(_model);
+        _isSaving = false;
     }
 }

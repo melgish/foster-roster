@@ -7,6 +7,11 @@ public sealed class WeightsController(
     IWeightRepository weightRepository
 ) : ControllerBase
 {
+    /// <summary>
+    /// Adds a new weight entry for a Feline.
+    /// </summary>
+    /// <param name="model">Data about weight to add.</param>
+    /// <returns>Updated weight after add.</returns>
     [HttpPost]
     public async Task<Weight> AddAsync(WeightEditModel model)
     {
@@ -14,6 +19,12 @@ public sealed class WeightsController(
         return await weightRepository.AddAsync(model.ToWeight());
     }
 
+    /// <summary>
+    /// Deletes a weight entry by its ID and time stamp
+    /// </summary>
+    /// <param name="felineId">ID of feline weight to delete.</param>
+    /// <param name="dateTime">Date time of weight instance to delete.</param>
+    /// <returns>True if a weight was deleted, otherwise false.</returns>
     [HttpDelete("{felineId:int}/{dateTime}")]
     public async Task<bool> DeleteByKeyAsync(int felineId, DateTimeOffset dateTime)
         => await weightRepository.DeleteByKeyAsync(felineId, dateTime);

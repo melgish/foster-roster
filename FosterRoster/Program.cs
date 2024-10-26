@@ -22,6 +22,7 @@ builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
 
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
+builder.Services.AddScoped<IFostererRepository, ServerFostererRepository>();
 builder.Services.AddScoped<ISourceRepository, ServerSourceRepository>();
 builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
 
