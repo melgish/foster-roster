@@ -87,13 +87,6 @@ else
           </MudGrid>
       </EditForm>
     </MudPaper>
-    @if (!ReferenceEquals(_filteredWeights, _allWeights) && _filteredWeights?.Any() == true)
-    {
-      <MudPaper Elevation="3"
-                Class="pa-2">
-        <WeightChart Weights="_filteredWeights" Units="WeightUnit.lbs" />
-      </MudPaper>
-    }
     <MudPaper Elevation="3"
               Class="pa-2">
       <h2>Recent Weights</h2>
@@ -151,14 +144,12 @@ else
       // When cat is selected, only show weights for the selected cat
       _ => _allWeights?.Where(x => x.FelineId == felineId) ?? []
     };
-    StateHasChanged();
   }
 
   private void OnUnitsSelected(WeightUnit unit)
   {
     _model.Units = unit;
     _units = unit;
-    StateHasChanged();
   }
 
   private void Reset()
