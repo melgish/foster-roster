@@ -5,6 +5,7 @@ public sealed class FelineEditModel()
     public string? Breed { get; set; }
     public Category Category { get; set; }
     public string? Color { get; set; } = string.Empty;
+    public int? FostererId { get; set; }
     public Gender Gender { get; set; }
     public int Id { get; set; }
     public int? IntakeAgeInWeeks { get; set; }
@@ -22,6 +23,7 @@ public sealed class FelineEditModel()
         Breed = feline.Breed;
         Category = feline.Category;
         Color = feline.Color;
+        FostererId = feline.FostererId;
         Gender = feline.Gender;
         Id = feline.Id;
         IntakeAgeInWeeks = feline.IntakeAgeInWeeks;
@@ -47,6 +49,7 @@ public sealed class FelineEditModel()
             Breed = string.IsNullOrWhiteSpace(Breed) ? null : Breed.Trim(),
             Category = Category,
             Color = string.IsNullOrWhiteSpace(Color) ? null : Color.Trim(),
+            FostererId = FostererId,
             Gender = Gender,
             Id = Id,
             IntakeAgeInWeeks = IntakeAgeInWeeks,

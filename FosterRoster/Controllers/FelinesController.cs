@@ -1,19 +1,18 @@
 namespace FosterRoster.Controllers;
 
-using FluentValidation;
-
-using FosterRoster.Domain;
-
-using Microsoft.AspNetCore.Mvc;
-
 [ApiController]
 [Route("api/felines")]
 public sealed class FelinesController(
+    IFelineRepository felineRepository,
     IValidator<FelineEditModel> felineEditModelValidator,
-    IValidator<DateTimeEditModel> dateTimeEditModelValidator,
-    IFelineRepository felineRepository
+    IValidator<DateTimeEditModel> dateTimeEditModelValidator
 ) : ControllerBase
 {
+    /// <summary>
+    /// Reactivates a previously inactivated Feline.
+    /// </summary>
+    /// <param name="felineId">Unqiue identifier for feline to activate.</param>
+    /// <returns>True if a feline was activated, otherwise false.</returns>
     [HttpPut("{felineId:int}/activate")]
     public async Task<bool> ActivateAsync(int felineId)
         => await felineRepository.Activate(felineId);
@@ -31,10 +30,10 @@ public sealed class FelinesController(
     }
 
     /// <summary>
-    /// Deletes a cat by it's id.
+    /// Deletes a cat by its ID.
     /// </summary>
-    /// <param name="felineId">Id of feline to remove.</param>
-    /// <returns>True if a cat was removed otherwise false.</returns>
+    /// <param name="felineId">ID of feline to remove.</param>
+    /// <returns>True if a feline was removed otherwise false.</returns>
     [HttpDelete("{felineId:int}")]
     public async Task<bool> DeleteByKeyAsync(int felineId)
         => await felineRepository.DeleteByKeyAsync(felineId);
@@ -61,18 +60,24 @@ public sealed class FelinesController(
     /// <param name="felineId"></param>
     /// <returns>A single cat if found, otherwise null</returns>
     [HttpGet("{felineId:int}")]
-    public async Task<Feline?> GetByIdAsync(int felineId)
-        => await felineRepository.GetByIdAsync(felineId);
+    public async Task<Feline?> GetByKeyAsync(int felineId)
+        => await felineRepository.GetByKeyAsync(felineId);
 
     /// <summary>
-    /// Gets the thumbnail for a single cat.
+    /// Gets the thumbnail for a single Feline.
     /// </summary>
-    /// <param name="felineId">Id of the cat</param>
-    /// <returns>Thumbnail if found, otherwise null</returns>
+    /// <param name="felineId">ID of the Feline.</param>
+    /// <returns>Thumbnail instance if found, otherwise null</returns>
     [HttpGet("{felineId:int}/thumbnail")]
     public async Task<Thumbnail?> GetThumbnailAsync(int felineId)
         => await felineRepository.GetThumbnailAsync(felineId);
 
+    /// <summary>
+    /// Deactivates the indicated feline using supplied AsOf date 
+    /// </summary>
+    /// <param name="felineId">ID of the Feline to modifiy.</param>
+    /// <param name="model">Inactivation date and time.</param>
+    /// <returns>True if a feline was inactivated, otherwise false.</returns>
     [HttpPut("{felineId:int}/inactivate")]
     public async Task<bool> InactivateAsync(int felineId, DateTimeEditModel model)
     {
@@ -81,7 +86,7 @@ public sealed class FelinesController(
     }
 
     /// <summary>
-    /// Sets the thumbnail for a cat.
+    /// Sets the thumbnail image for a Feline.
     /// </summary>
     /// <param name="felineId">Id of cat to change</param>
     /// <param name="thumbnail">Thumbnail to assign to cat</param>
@@ -91,11 +96,11 @@ public sealed class FelinesController(
         => await felineRepository.SetThumbnailAsync(felineId, thumbnail);
 
     /// <summary>
-    /// Updates a cat in the database.
+    /// Updates a Feline in the database.
     /// </summary>
-    /// <param name="felineId">Id of cat to update</param>
-    /// <param name="feline">Data to assign to cat</param>
-    /// <returns>Updated cat if found, otherwise null</returns>
+    /// <param name="felineId">ID of Feline to modify</param>
+    /// <param name="model">Updated data to assign</param>
+    /// <returns>Updated Feline if found, otherwise null</returns>
     [HttpPut("{felineId:int}")]
     public async Task<Feline?> UpdateAsync(int felineId, FelineEditModel model)
     {

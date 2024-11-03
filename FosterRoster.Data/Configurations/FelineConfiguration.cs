@@ -1,8 +1,8 @@
-namespace FosterRoster.Data.Configurations;
-
 using FosterRoster.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Data.Configurations;
 
 internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
 {
@@ -36,7 +36,7 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasOne(e => e.Fosterer)
-            .WithMany(e => e!.Felines)
+            .WithMany(e => e.Felines)
             .HasForeignKey(e => e.FostererId)
             .HasConstraintName("FK_Fosterers_Felines")
             .IsRequired(false)
@@ -58,12 +58,12 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
         builder
             .Property(e => e.IntakeDate)
             .HasColumnType("date")
-            .IsRequired(true);
+            .IsRequired();
 
         builder
             .Property(e => e.Name)
             .HasMaxLength(64)
-            .IsRequired(true);
+            .IsRequired();
 
         builder
             .Property(e => e.RegistrationDate)
@@ -99,7 +99,7 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
 
         builder
             .Property(e => e.IsInactive)
-            .IsRequired(true)
+            .IsRequired()
             .HasDefaultValue(false);
 
         builder

@@ -5,8 +5,8 @@
         <MudText Typo="Typo.h6">Confirm Inactivate</MudText>
     </TitleContent>
     <DialogContent>
-        <EditForm @ref="form"
-                  Model="@model"
+        <EditForm @ref="_form"
+                  Model="@_model"
                   FormName="inactivate">
             <FluentValidationValidator />
             <MudGrid Spacing="3">
@@ -19,19 +19,19 @@
                     </MudText>
                 </MudItem>
                 <MudItem xs="12">
-                    <MudDatePicker @bind-Date="model.Date"
+                    <MudDatePicker @bind-Date="_model.Date"
                                    Editable="true"
                                    HelperText="MM/DD/YYYY"
                                    Label="Date" />
-                    <ValidationMessage For="@(() => model.Date)" />
+                    <ValidationMessage For="@(() => _model.Date)" />
                 </MudItem>
                 <MudItem xs="12">
-                    <MudTimePicker @bind-Time="model.Time"
+                    <MudTimePicker @bind-Time="_model.Time"
                                    AmPm="true"
                                    HelperText="HH:MM (use 24 hour time for now, working on it)"
                                    Editable="true"
                                    Label="Time" />
-                    <ValidationMessage For="@(() => model.Time)" />
+                    <ValidationMessage For="@(() => _model.Time)" />
                 </MudItem>
             </MudGrid>
         </EditForm>
@@ -45,9 +45,9 @@
 </MudDialog>
 
 @code {
-    private EditForm form = null!;
+    private EditForm _form = null!;
 
-    private DateTimeEditModel model = new();
+    private DateTimeEditModel _model = new();
 
     [CascadingParameter]
     public MudDialogInstance MudDialog { get; set; } = null!;
@@ -59,14 +59,14 @@
 
     protected override void OnInitialized()
     {
-        model.Value = TimeProvider.GetUtcNow().DateTime;
+        _model.Value = TimeProvider.GetUtcNow().DateTime;
     }
     private void Submit()
     {
         // Need to validate manually because buttons are not inside the EditForm.
-        if (form.EditContext!.Validate())
+        if (_form.EditContext!.Validate())
         {
-            DateTimeOffset value = model.Value!.Value.ToUniversalTime();
+            DateTimeOffset value = _model.Value!.Value.ToUniversalTime();
             MudDialog.Close(DialogResult.Ok(value));
         }
     }

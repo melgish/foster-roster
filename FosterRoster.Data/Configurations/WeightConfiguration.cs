@@ -1,8 +1,8 @@
-namespace FosterRoster.Data.Configurations;
-
 using FosterRoster.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Data.Configurations;
 
 internal class WeightConfiguration : IEntityTypeConfiguration<Weight>
 {
@@ -16,7 +16,7 @@ internal class WeightConfiguration : IEntityTypeConfiguration<Weight>
 
         builder
             .Property(e => e.FelineId)
-            .IsRequired(true);
+            .IsRequired();
 
         builder
             .Property(e => e.DateTime)
@@ -25,11 +25,11 @@ internal class WeightConfiguration : IEntityTypeConfiguration<Weight>
         builder
             .Property(e => e.Value)
             .HasColumnType("float")
-            .IsRequired(true);
+            .IsRequired();
 
         builder
             .Property(e => e.Units)
             .HasConversion<string>()
-            .IsRequired(true);
+            .IsRequired();
     }
 }

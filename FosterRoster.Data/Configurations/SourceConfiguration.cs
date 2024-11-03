@@ -1,8 +1,8 @@
-namespace FosterRoster.Data.Configurations;
-
 using FosterRoster.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Data.Configurations;
 
 internal sealed class SourceConfiguration : IEntityTypeConfiguration<Source>
 {
@@ -18,7 +18,7 @@ internal sealed class SourceConfiguration : IEntityTypeConfiguration<Source>
 
         builder
             .Property(e => e.Name)
-            .IsRequired(true)
+            .IsRequired()
             .HasMaxLength(64);
     }
 }

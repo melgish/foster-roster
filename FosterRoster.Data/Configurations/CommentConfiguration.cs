@@ -1,8 +1,8 @@
-namespace FosterRoster.Data.Configurations;
-
 using FosterRoster.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Data.Configurations;
 
 internal sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
 {
@@ -18,7 +18,7 @@ internal sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
 
         builder
             .Property(e => e.Text)
-            .IsRequired(true)
+            .IsRequired()
             .HasColumnType("text")
             .HasMaxLength(4096)
             .HasConversion(new SanitizingValueConverter());

@@ -1,18 +1,18 @@
 ﻿@page "/"
 @rendermode InteractiveWebAssembly
-@using FosterRoster.Domain
+@implements IDisposable
 @inject IFelineRepository FelineRepository
 @inject PersistentComponentState ComponentState;
 
 <PageTitle>Dashboard</PageTitle>
-@if (felines is null)
+@if (_felines is null)
 {
-    <p>Loading...</p>
+    <Loading />
 }
 else
 {
     <div class="deck">
-        @foreach (var feline in felines)
+        @foreach (var feline in _felines)
         {
             <FelineCard @key="feline.Id"
                         Feline="@feline"
@@ -22,28 +22,23 @@ else
 }
 
 @code {
-    private ICollection<Feline>? felines;
-    private IDisposable? stateSubscription;
+    private ICollection<Feline>? _felines;
+    private IDisposable? _stateSubscription;
 
-    private void Dispose() => stateSubscription?.Dispose();
+    public void Dispose() => _stateSubscription?.Dispose();
 
     private void OnFelineChanged(Feline feline)
-    {
-        felines = felines!.Select(f => f.Id == feline.Id ? feline : f).ToList();
-        StateHasChanged();
-    }
+        => _felines = _felines!.Select(f => f.Id == feline.Id ? feline : f).ToList();
 
     protected override async Task OnInitializedAsync()
     {
-        stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
-        ComponentState.TryTakeFromJson<ICollection<Feline>>("felines", out felines);
-        felines ??= await FelineRepository.GetAllAsync();
+        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+        ComponentState.TryTakeFromJson("felines", out _felines);
+        _felines ??= await FelineRepository.GetAllAsync();
     }
-
     private Task PersistStateAsync()
     {
-        ComponentState.PersistAsJson("felines", felines);
+        ComponentState.PersistAsJson("felines", _felines);
         return Task.CompletedTask;
     }
-
 }

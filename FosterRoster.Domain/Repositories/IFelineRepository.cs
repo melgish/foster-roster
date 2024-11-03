@@ -1,4 +1,4 @@
-namespace FosterRoster.Domain;
+namespace FosterRoster.Domain.Repositories;
 
 public interface IFelineRepository
 {
@@ -40,13 +40,13 @@ public interface IFelineRepository
     /// </summary>
     /// <param name="felineId">Id of cat to get.</param>
     /// <returns>A single cat if found, otherwise null</returns>
-    public Task<Feline?> GetByIdAsync(int felineId);
+    public Task<Feline?> GetByKeyAsync(int felineId);
 
     /// <summary>
     /// Sets a cat as inactive in the database.
     /// </summary>
     /// <param name="felineId"></param>
-    /// <param name="dateInactive"></param>
+    /// <param name="dateTimeUtc"></param>
     /// <returns></returns>
     public Task<bool> Inactivate(int felineId, DateTimeOffset dateTimeUtc);
 

@@ -1,18 +1,17 @@
-@inject ISourceRepository SourceRepository;
+﻿@inject IFostererRepository FostererRepository
 
-<MudSelect T="int" Label="Source" Value="@_value" ValueChanged="@OnValueChanged" @attributes="@Attributes">
-    <MudSelectItem Value="0">Select a source...</MudSelectItem>
-    @foreach (var name in _sources)
+<MudSelect T="int" Label="Fosterer" Value="@_value" ValueChanged="@OnValueChanged" @attributes="@Attributes">
+    <MudSelectItem Value="0">Select a fosterer...</MudSelectItem>
+    @foreach (var name in _fosterers)
     {
-        <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
+    <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
     }
 </MudSelect>
 
 @code {
     private int _value = 0;
-
-    private List<ListItem<int>> _sources = [];
-
+    private List<ListItem<int>> _fosterers = [];
+    
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; } = [];
 
@@ -22,8 +21,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _sources = await SourceRepository.GetAllNamesAsync();
-        _value = Value ?? 0;
+        _fosterers = await FostererRepository.GetAllNamesAsync();
         await base.OnInitializedAsync();
         // Without this call, the select will display the ID value instead
         // of the associated text.
@@ -32,7 +30,6 @@
 
     private void OnValueChanged(int value)
     {
-        _value = value;
         ValueChanged.InvokeAsync(value == 0 ? null : value);
     }
 

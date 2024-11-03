@@ -1,6 +1,3 @@
-using FosterRoster.Data;
-using FosterRoster.Domain;
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace FosterRoster.Services;
@@ -19,6 +16,7 @@ public sealed class ServerFelineRepository(
             Breed = f.Breed,
             Category = f.Category,
             Comments = f.Comments.OrderByDescending(c => c.TimeStamp).ToList(),
+            FostererId = f.FostererId,
             Gender = f.Gender,
             IntakeAgeInWeeks = f.IntakeAgeInWeeks,
             IntakeDate = f.IntakeDate,
@@ -33,8 +31,10 @@ public sealed class ServerFelineRepository(
                 Version = f.Thumbnail.Version,
             },
             Weaned = f.Weaned,
-            Weights = f.Weights.Take(7).ToList(),
-
+            Weights = f.Weights
+                .OrderByDescending(w => w.DateTime)
+                .Take(7)
+                .ToList(),
             InactivatedAtUtc = f.InactivatedAtUtc,
             IsInactive = f.IsInactive,
         };
@@ -42,7 +42,7 @@ public sealed class ServerFelineRepository(
     /// <summary>
     /// Restores identified cat to active status.
     /// </summary>
-    /// <param name="felineId">Id of cat to update</param>
+    /// <param name="felineId">ID of cat to update</param>
     /// <returns>true if a cat was updated, otherwise false</returns>
     public async Task<bool> Activate(int felineId)
     {
@@ -72,9 +72,9 @@ public sealed class ServerFelineRepository(
     }
 
     /// <summary>
-    /// Deletes a cat by it's id.
+    /// Deletes a Feline by its ID.
     /// </summary>
-    /// <param name="felineId">Id of feline to remove.</param>
+    /// <param name="felineId">ID of feline to remove.</param>
     /// <returns>True if a cat was removed otherwise false.</returns>
     public async Task<bool> DeleteByKeyAsync(int felineId)
     {
@@ -91,7 +91,7 @@ public sealed class ServerFelineRepository(
     /// <returns>List of cats, or empty list if no cats exist.</returns>
     public async Task<List<Feline>> GetAllAsync()
     {
-        await using var context = contextFactory.CreateDbContext();
+        await using var context = await contextFactory.CreateDbContextAsync();
         return await context
             .Felines
             .Include(f => f.Thumbnail)
@@ -102,7 +102,7 @@ public sealed class ServerFelineRepository(
 
     public async Task<List<ListItem<int>>> GetAllNamesAsync()
     {
-        await using var context = contextFactory.CreateDbContext();
+        await using var context = await contextFactory.CreateDbContextAsync();
         return await context
             .Felines
             .OrderBy(f => f.Name)
@@ -115,9 +115,9 @@ public sealed class ServerFelineRepository(
     /// </summary>
     /// <param name="felineId"></param>
     /// <returns>A single cat if found, otherwise null</returns>
-    public async Task<Feline?> GetByIdAsync(int felineId)
+    public async Task<Feline?> GetByKeyAsync(int felineId)
     {
-        await using var context = contextFactory.CreateDbContext();
+        await using var context = await contextFactory.CreateDbContextAsync();
         return await context
             .Felines
             .IgnoreQueryFilters()
@@ -131,7 +131,7 @@ public sealed class ServerFelineRepository(
     /// <summary>
     /// Gets the thumbnail for a single cat.
     /// </summary>
-    /// <param name="felineId">Id of the cat</param>
+    /// <param name="felineId">ID of the cat</param>
     /// <returns>Thumbnail if found, otherwise null</returns>
     public async Task<Thumbnail?> GetThumbnailAsync(int felineId)
     {
@@ -145,9 +145,9 @@ public sealed class ServerFelineRepository(
     /// <summary>
     /// Marks a cat as being inactive in the database.
     /// </summary>
-    /// <param name="felineId"></param>
-    /// <param name="dateTimeUtc"></param>
-    /// <returns></returns>
+    /// <param name="felineId">ID of feline to inactivate</param>
+    /// <param name="dateTimeUtc">TimeStamp for inactivation</param>
+    /// <returns>True if feline was modified, otherwise false.</returns>
     public async Task<bool> Inactivate(int felineId, DateTimeOffset dateTimeUtc)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
@@ -156,17 +156,17 @@ public sealed class ServerFelineRepository(
             .Where(f => f.Id == felineId)
             .ExecuteUpdateAsync(f => f
                 // Postgres needs +00:00
-                .SetProperty(f => f.InactivatedAtUtc, dateTimeUtc.ToUniversalTime())
-                .SetProperty(f => f.IsInactive, true)
+                .SetProperty(p => p.InactivatedAtUtc, dateTimeUtc.ToUniversalTime())
+                .SetProperty(p => p.IsInactive, true)
             ) > 0;
     }
 
     /// <summary>
     /// Sets the thumbnail for a cat.
     /// </summary>
-    /// <param name="felineId">Id of cat to change</param>
-    /// <param name="thumbnail">Thumbnail to assign to cat</param>
-    /// <returns>Updated cat, or null if cat was not found</returns>
+    /// <param name="felineId">ID of Feline to change.</param>
+    /// <param name="thumbnail">Thumbnail to assign to Feline.</param>
+    /// <returns>Updated Feline, or null if Feline was not found</returns>
     public async Task<Feline?> SetThumbnailAsync(int felineId, Thumbnail thumbnail)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
@@ -189,7 +189,7 @@ public sealed class ServerFelineRepository(
     /// <summary>
     /// Updates a cat in the database.
     /// </summary>
-    /// <param name="felineId">Id of cat to update</param>
+    /// <param name="felineId">ID of cat to update</param>
     /// <param name="feline">Data to assign to cat</param>
     /// <returns>Updated cat if found, otherwise null</returns>
     public async Task<Feline?> UpdateAsync(int felineId, Feline feline)
@@ -206,6 +206,7 @@ public sealed class ServerFelineRepository(
 
         existing.Breed = feline.Breed;
         existing.Category = feline.Category;
+        existing.FostererId = feline.FostererId;
         existing.Gender = feline.Gender;
         existing.IntakeAgeInWeeks = feline.IntakeAgeInWeeks;
         existing.IntakeDate = feline.IntakeDate;

@@ -1,12 +1,7 @@
 // spell-checker: ignore npgsql
-using FluentValidation;
 using FosterRoster.Client.Components;
-using FosterRoster.Data;
-using FosterRoster.Domain;
 using FosterRoster.Services;
-using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +22,7 @@ builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
 
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
+builder.Services.AddScoped<IFostererRepository, ServerFostererRepository>();
 builder.Services.AddScoped<ISourceRepository, ServerSourceRepository>();
 builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
 
@@ -41,8 +37,8 @@ if (builder.Configuration.GetValue("AutoMigrate", false))
 {
     using var scope = app.Services.CreateScope();
     var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<FosterRosterDbContext>>();
-    using var context = factory.CreateDbContext();
-    context.Database.MigrateAsync().Wait();
+    await using var context = await factory.CreateDbContextAsync();
+    await context.Database.MigrateAsync();
 }
 
 // Configure the HTTP request pipeline.

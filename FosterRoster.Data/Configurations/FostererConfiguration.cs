@@ -1,8 +1,8 @@
-namespace FosterRoster.Data.Configurations;
-
 using FosterRoster.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Data.Configurations;
 
 internal sealed class FostererConfiguration : IEntityTypeConfiguration<Fosterer>
 {
@@ -36,13 +36,13 @@ internal sealed class FostererConfiguration : IEntityTypeConfiguration<Fosterer>
 
         builder
             .Property(e => e.IsInactive)
-            .IsRequired(true)
+            .IsRequired()
             .HasDefaultValue(false);
 
         builder
             .Property(e => e.Name)
             .HasMaxLength(64)
-            .IsRequired(true);
+            .IsRequired();
 
         builder
             .Property(e => e.Phone)

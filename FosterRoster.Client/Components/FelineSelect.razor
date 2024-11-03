@@ -1,34 +1,26 @@
 @inject IFelineRepository FelineRepository;
 
-@if (names is null)
-{
-  <p>Loading...</p>
-}
-else
-{
-  <MudSelect Label="Name" Value="@Value" ValueChanged="@ValueChanged">
+<MudSelect Label="Name" Value="@Value" ValueChanged="@ValueChanged">
     <MudSelectItem Value="0">Select a name...</MudSelectItem>
-    @foreach (var name in names)
+    @foreach (var name in _names)
     {
-      <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
+        <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
     }
-  </MudSelect>
-}
+</MudSelect>
 
 @code {
-  [Parameter]
-  public int Value { get; set; } = 0;
+    private List<ListItem<int>> _names = [];
 
-  [Parameter]
-  public EventCallback<int> ValueChanged { get; set; } = EventCallback<int>.Empty;
+    [Parameter] public int Value { get; set; }
 
-  private List<ListItem<int>> names = [];
+    [Parameter] public EventCallback<int> ValueChanged { get; set; } = EventCallback<int>.Empty;
 
-  protected override async Task OnInitializedAsync()
-  {
-    names = await FelineRepository.GetAllNamesAsync();
-    await base.OnInitializedAsync();
-    StateHasChanged();
-  }
+    protected override async Task OnInitializedAsync()
+    {
+        _names = await FelineRepository.GetAllNamesAsync();
+        await base.OnInitializedAsync();
+        // Without this call, the select will display the ID value instead
+        // of the associated text.
+        await InvokeAsync(StateHasChanged);
+    }
 }
-

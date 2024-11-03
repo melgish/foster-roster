@@ -1,22 +1,23 @@
+@using System.Globalization
 @inject TimeProvider TimeProvider
 
-@if (Comment is not null) {
-    <MudPaper Elevation="2" Outlined="true">
-        <MudStack>
-            <MudStack Row Class="px-1"
-                AlignItems="AlignItems.Center"
-                Justify="Justify.SpaceBetween">
-                <MudText>@Comment.TimeStamp.ToLocalTime().DateTime.ToString() <small>(@Comment.FormatAgo(now))</small></MudText>
-                <MudIconButton Color="Color.Error"
-                               Icon="@Icons.Material.TwoTone.Delete"
-                               OnClick="() => OnDelete.InvokeAsync(Comment)"
-                               Size="Size.Small"
-                               Variant="Variant.Text" />
-            </MudStack>
-            <div style="padding: 0.25rem;">@html</div>
+
+<MudPaper Elevation="2" Outlined="true">
+    <MudStack>
+        <MudStack Row Class="px-1"
+            AlignItems="AlignItems.Center"
+            Justify="Justify.SpaceBetween">
+            <MudText>
+                @Comment.TimeStamp.ToLocalTime().DateTime.ToString(CultureInfo.CurrentUICulture) <small>(@Comment.FormatAgo(_now))</small></MudText>
+            <MudIconButton Color="Color.Error"
+                           Icon="@Icons.Material.TwoTone.Delete"
+                           OnClick="() => OnDelete.InvokeAsync(Comment)"
+                           Size="Size.Small"
+                           Variant="Variant.Text" />
         </MudStack>
-    </MudPaper>
-}
+        <div style="padding: 0.25rem;">@_html</div>
+    </MudStack>
+</MudPaper>
 
 @code {
     [Parameter]
@@ -25,15 +26,12 @@
     [Parameter]
     public EventCallback<Comment> OnDelete { get; set; }
 
-    private MarkupString? html = null;
-
-    private DateTimeOffset now;
-    override protected void OnInitialized()
+    private MarkupString? _html = null;
+    private DateTimeOffset _now;
+    
+    protected override void OnInitialized()
     {
-        now = TimeProvider.GetUtcNow();
-        if (Comment is not null)
-        {
-            html = new(Comment.Text);
-        }
+        _now = TimeProvider.GetUtcNow();
+        _html = new(Comment.Text);
     }
 }
