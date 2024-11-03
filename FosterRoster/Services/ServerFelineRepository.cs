@@ -30,8 +30,10 @@ public sealed class ServerFelineRepository(
                 Version = f.Thumbnail.Version,
             },
             Weaned = f.Weaned,
-            Weights = f.Weights.Take(7).ToList(),
-
+            Weights = f.Weights
+                .OrderByDescending(w => w.DateTime)
+                .Take(7)
+                .ToList(),
             InactivatedAtUtc = f.InactivatedAtUtc,
             IsInactive = f.IsInactive,
         };
