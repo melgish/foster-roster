@@ -8,7 +8,7 @@ public sealed class FosterersController(
 ) : ControllerBase
 {
     /// <summary>
-    /// Adds a new cat to the database.
+    /// Adds a new fosterer to the database.
     /// </summary>
     /// <param name="model">Model containing fosterer data to add.</param>
     /// <returns>Updated fosterer instance after add.</returns>
@@ -19,6 +19,15 @@ public sealed class FosterersController(
         return await fostererRepository.AddAsync(model.ToFosterer());
     }
 
+    /// <summary>
+    /// Deletes a fosterer by its ID.
+    /// </summary>
+    /// <param name="fostererId">ID of fosterer to remove.</param>
+    /// <returns>True if a fosterer was removed otherwise false.</returns>
+    [HttpDelete("{fostererId:int}")]
+    public async Task<bool> DeleteByKeyAsync(int fostererId)
+        => await fostererRepository.DeleteByKeyAsync(fostererId);
+    
     /// <summary>
     /// Get list of all cats in the database.
     /// </summary>

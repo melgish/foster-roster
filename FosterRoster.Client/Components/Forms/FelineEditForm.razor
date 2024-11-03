@@ -2,7 +2,7 @@
 
 @if (_model is null)
 {
-    <p>Loading...</p>
+    <Loading />
 }
 else
 {
@@ -88,13 +88,17 @@ else
                 <ValidationMessage For="@(() => _model.SourceId)" />
             </MudItem>
             <MudItem xs="6">
+                <FostererSelect @bind-Value="_model.FostererId"
+                              Disabled="@_model.IsInactive" />
+                <ValidationMessage For="@(() => _model.FostererId)" />
+            </MudItem>
+            <MudItem xs="6">
                 <MudSelect @bind-Value="_model.Category"
                            Disabled="@_model.IsInactive"
                            Label="Category"
                            Required>
                     <MudSelectItem Value="@Category.Kitten">Kitten</MudSelectItem>
-                    <MudSelectItem Value="@Category.NursingKitten">Nursing Kitten
-                    </MudSelectItem>
+                    <MudSelectItem Value="@Category.NursingKitten">Nursing Kitten</MudSelectItem>
                     <MudSelectItem Value="@Category.Cat">Cat</MudSelectItem>
                     <MudSelectItem Value="@Category.NursingCat">Nursing Cat</MudSelectItem>
                 </MudSelect>
@@ -128,8 +132,7 @@ else
                 <ValidationMessage For="@(() => _model.Weaned)" />
             </MudItem>
             <MudItem xs="12">
-                <MudStack Row="true"
-                          AlignItems="AlignItems.Center">
+                <MudStack Row="true" AlignItems="AlignItems.Center">
                     @if (_model.IsInactive)
                     {
                         <MudText>

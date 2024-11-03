@@ -2,10 +2,10 @@
 @rendermode InteractiveWebAssembly
 @implements IDisposable
 @inject ICommentRepository CommentRepository
-@inject IFelineRepository FelineRepository
-@inject ISnackbar Snackbar
-@inject NavigationManager NavigationManager
 @inject PersistentComponentState ComponentState;
+@inject IFelineRepository FelineRepository
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
 
 <PageTitle>Details: @Name</PageTitle>
 @if (_feline is null)

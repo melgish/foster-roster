@@ -1,9 +1,7 @@
-﻿namespace FosterRoster.Data;
-
-using FosterRoster.Domain;
-
+﻿using FosterRoster.Domain;
 using Microsoft.EntityFrameworkCore;
 
+namespace FosterRoster.Data;
 
 public class FosterRosterDbContext : DbContext
 {

@@ -24,7 +24,7 @@
   [Parameter]
   public EventCallback<int> ValueChanged { get; set; } = EventCallback<int>.Empty;
 
-  private static string GetText(ListItem<int> item) => item?.Text ?? string.Empty;
+  private static string GetText(ListItem<int>? item) => item?.Text ?? string.Empty;
 
   protected override async Task OnInitializedAsync()
   {
@@ -52,7 +52,7 @@
   token)
   => await Task.Run(() => Search(value), token);
 
-  private void OnValueChanged(ListItem<int> value)
+  private void OnValueChanged(ListItem<int>? value)
   {
     _selectedValue = value;
     Value = value?.Value ?? 0;

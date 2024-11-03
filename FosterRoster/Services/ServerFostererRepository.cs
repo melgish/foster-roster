@@ -4,12 +4,31 @@ public sealed class ServerFostererRepository(
     IDbContextFactory<FosterRosterDbContext> contextFactory
 ) : IFostererRepository
 {
+    /// <summary>
+    /// Adds a new fosterer to the database.
+    /// </summary>
+    /// <param name="fosterer">Fosterer instance to add.</param>
+    /// <returns>Updated feline instance after add.</returns>
     public async Task<Fosterer> AddAsync(Fosterer fosterer)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         var entry = await context.Fosterers.AddAsync(fosterer);
         await context.SaveChangesAsync();
         return entry.Entity;
+    }
+
+    /// <summary>
+    /// Deletes a Fosterer by its ID.
+    /// </summary>
+    /// <param name="fostererId">ID of fosterer to remove.</param>
+    /// <returns>True if a fosterer was removed otherwise false.</returns>
+    public async Task<bool> DeleteByKeyAsync(int fostererId)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return await context
+            .Fosterers
+            .Where(f => f.Id == fostererId)
+            .ExecuteDeleteAsync() > 0;
     }
 
     public async Task<List<Fosterer>> GetAllAsync()

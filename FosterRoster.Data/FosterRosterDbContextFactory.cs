@@ -1,7 +1,7 @@
-namespace FosterRoster.Data.Design;
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+
+namespace FosterRoster.Data;
 
 public class FosterRosterDbContextFactory
     : IDesignTimeDbContextFactory<FosterRosterDbContext>

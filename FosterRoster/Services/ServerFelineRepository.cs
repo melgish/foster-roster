@@ -16,6 +16,7 @@ public sealed class ServerFelineRepository(
             Breed = f.Breed,
             Category = f.Category,
             Comments = f.Comments.OrderByDescending(c => c.TimeStamp).ToList(),
+            FostererId = f.FostererId,
             Gender = f.Gender,
             IntakeAgeInWeeks = f.IntakeAgeInWeeks,
             IntakeDate = f.IntakeDate,
@@ -205,6 +206,7 @@ public sealed class ServerFelineRepository(
 
         existing.Breed = feline.Breed;
         existing.Category = feline.Category;
+        existing.FostererId = feline.FostererId;
         existing.Gender = feline.Gender;
         existing.IntakeAgeInWeeks = feline.IntakeAgeInWeeks;
         existing.IntakeDate = feline.IntakeDate;

@@ -46,7 +46,7 @@ public interface IFelineRepository
     /// Sets a cat as inactive in the database.
     /// </summary>
     /// <param name="felineId"></param>
-    /// <param name="dateInactive"></param>
+    /// <param name="dateTimeUtc"></param>
     /// <returns></returns>
     public Task<bool> Inactivate(int felineId, DateTimeOffset dateTimeUtc);
 

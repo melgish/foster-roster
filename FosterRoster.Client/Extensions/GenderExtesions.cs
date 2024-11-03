@@ -1,5 +1,3 @@
-using FosterRoster.Domain;
-
 namespace FosterRoster.Client.Extensions;
 
 public static class GenderExtensions

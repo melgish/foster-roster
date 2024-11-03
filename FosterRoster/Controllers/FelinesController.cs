@@ -30,10 +30,10 @@ public sealed class FelinesController(
     }
 
     /// <summary>
-    /// Deletes a cat by it's id.
+    /// Deletes a cat by its ID.
     /// </summary>
-    /// <param name="felineId">Id of feline to remove.</param>
-    /// <returns>True if a cat was removed otherwise false.</returns>
+    /// <param name="felineId">ID of feline to remove.</param>
+    /// <returns>True if a feline was removed otherwise false.</returns>
     [HttpDelete("{felineId:int}")]
     public async Task<bool> DeleteByKeyAsync(int felineId)
         => await felineRepository.DeleteByKeyAsync(felineId);

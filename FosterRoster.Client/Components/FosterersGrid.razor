@@ -1,0 +1,34 @@
+﻿<MudDataGrid Dense Items="@Items">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Fosterers</MudText>
+        <MudSpacer />
+        <MudButton
+            Color="Color.Info"
+            OnClick="@(() => OnAdd.InvokeAsync())"
+            Size="Size.Small"
+            Variant="Variant.Outlined">Add</MudButton>
+    </ToolBarContent>
+    <Columns>
+        <TemplateColumn>
+            <CellTemplate>
+                <MudIconButton
+                    Color="Color.Info"
+                    Icon="@Icons.Material.TwoTone.Edit"
+                    OnClick="@(() => OnEdit.InvokeAsync(context.Item?.Id ?? 0))"
+                    Size="Size.Small"
+                    Variant="Variant.Outlined"
+                    />
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn Property="e => e.Name"></PropertyColumn>
+        <PropertyColumn Property="e => e.Email"></PropertyColumn>
+        <PropertyColumn Property="e => e.Phone"></PropertyColumn>
+    </Columns>
+</MudDataGrid>
+
+
+@code {
+    [Parameter] public List<Fosterer> Items { get; set; } = [];
+    [Parameter] public EventCallback OnAdd { get; set; } = EventCallback.Empty;
+    [Parameter] public EventCallback<int> OnEdit { get; set; } = EventCallback<int>.Empty;
+}

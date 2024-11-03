@@ -1,7 +1,5 @@
 namespace FosterRoster.Domain;
 
-using FluentValidation;
-
 public sealed class WeightEditModel()
 {
     public int FelineId { get; set; }
