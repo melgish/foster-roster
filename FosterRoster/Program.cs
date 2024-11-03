@@ -37,8 +37,8 @@ if (builder.Configuration.GetValue("AutoMigrate", false))
 {
     using var scope = app.Services.CreateScope();
     var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<FosterRosterDbContext>>();
-    using var context = factory.CreateDbContext();
-    context.Database.MigrateAsync().Wait();
+    await using var context = await factory.CreateDbContextAsync();
+    await context.Database.MigrateAsync();
 }
 
 // Configure the HTTP request pipeline.
