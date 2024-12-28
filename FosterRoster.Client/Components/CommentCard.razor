@@ -5,33 +5,33 @@
 <MudPaper Elevation="2" Outlined="true">
     <MudStack>
         <MudStack Row Class="px-1"
-            AlignItems="AlignItems.Center"
-            Justify="Justify.SpaceBetween">
+                  AlignItems="AlignItems.Center"
+                  Justify="Justify.SpaceBetween">
             <MudText>
-                @Comment.TimeStamp.ToLocalTime().DateTime.ToString(CultureInfo.CurrentUICulture) <small>(@Comment.FormatAgo(_now))</small></MudText>
+                @Comment.TimeStamp.ToLocalTime().DateTime.ToString(CultureInfo.CurrentUICulture) <small>(@Comment.FormatAgo(_now))</small>
+            </MudText>
             <MudIconButton Color="Color.Error"
                            Icon="@Icons.Material.TwoTone.Delete"
                            OnClick="() => OnDelete.InvokeAsync(Comment)"
                            Size="Size.Small"
-                           Variant="Variant.Text" />
+                           Variant="Variant.Text"/>
         </MudStack>
         <div style="padding: 0.25rem;">@_html</div>
     </MudStack>
 </MudPaper>
 
 @code {
-    [Parameter]
-    public Comment Comment { get; set; } = null!;
+    [Parameter] public Comment Comment { get; set; } = null!;
 
-    [Parameter]
-    public EventCallback<Comment> OnDelete { get; set; }
+    [Parameter] public EventCallback<Comment> OnDelete { get; set; }
 
     private MarkupString? _html = null;
     private DateTimeOffset _now;
-    
+
     protected override void OnInitialized()
     {
         _now = TimeProvider.GetUtcNow();
         _html = new(Comment.Text);
     }
+
 }

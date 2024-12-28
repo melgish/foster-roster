@@ -4,14 +4,14 @@
     <MudSelectItem Value="0">Select a fosterer...</MudSelectItem>
     @foreach (var name in _fosterers)
     {
-    <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
+        <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
     }
 </MudSelect>
 
 @code {
     private int _value = 0;
     private List<ListItem<int>> _fosterers = [];
-    
+
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; } = [];
 
@@ -21,7 +21,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _fosterers = await FostererRepository.GetAllNamesAsync();
+        _fosterers = (await FostererRepository.GetAllNamesAsync()).Value;
         await base.OnInitializedAsync();
         // Without this call, the select will display the ID value instead
         // of the associated text.
@@ -37,4 +37,5 @@
     {
         _value = Value ?? 0;
     }
+
 }

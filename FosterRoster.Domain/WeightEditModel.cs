@@ -19,15 +19,12 @@ public sealed class WeightEditModel()
         Units = weight.Units;
     }
 
-    public Weight ToWeight()
-    {
-        return new()
+    public Weight ToWeight() =>
+        new()
         {
             FelineId = FelineId,
             Value = Value,
             DateTime = DateTime.Value!.Value,
             Units = Units
         };
-    }
 }
-

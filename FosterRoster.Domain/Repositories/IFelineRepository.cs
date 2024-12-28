@@ -3,73 +3,73 @@ namespace FosterRoster.Domain.Repositories;
 public interface IFelineRepository
 {
     /// <summary>
-    /// Restores identified cat to active status.
+    ///     Restores identified feline to active status.
     /// </summary>
-    /// <param name="felineId">Id of cat to update</param>
-    /// <returns>true if a cat was updated, otherwise false</returns>
-    public Task<bool> Activate(int felineId);
+    /// <param name="felineId">ID of feline to update.</param>
+    /// <returns>A Result instance indicating success or failure.</returns>
+    public Task<Result> ActivateAsync(int felineId);
 
     /// <summary>
-    /// Adds a new cat to the database.
+    ///     Adds a new feline to the database.
     /// </summary>
     /// <param name="feline">Feline instance to add.</param>
-    /// <returns>Updated feline instance after add.</returns>
-    public Task<Feline> AddAsync(Feline feline);
+    /// <returns>A Result with added feline, or errors on failure.</returns>
+    public Task<Result<FelineEditModel>> AddAsync(FelineEditModel feline);
 
     /// <summary>
-    /// Deletes a cat by it's id.
+    ///     Sets a feline as inactive in the database.
     /// </summary>
-    /// <param name="felineId">Id of cat to remove.</param>
-    /// <returns>True if a cat was removed otherwise false.</returns>
-    public Task<bool> DeleteByKeyAsync(int felineId);
+    /// <param name="felineId">ID of feline to deactivate.</param>
+    /// <param name="dateTimeUtc">Date and Time of deactivation.</param>
+    /// <returns>A Result instance indicating success or failure.</returns>
+    public Task<Result> DeactivateAsync(int felineId, DateTimeOffset dateTimeUtc);
 
     /// <summary>
-    /// Get list of all cats in the database.
+    ///     Deletes a feline by its ID.
     /// </summary>
-    /// <returns>List of cats, or empty list if no cats exist.</returns>
-    public Task<List<Feline>> GetAllAsync();
+    /// <param name="felineId">ID of feline to remove.</param>
+    /// <returns>A Result instance indicating success or failure.</returns>
+    public Task<Result> DeleteByKeyAsync(int felineId);
 
     /// <summary>
-    /// Get list of all cats in the database, with only their names and ids.
+    ///     Get list of all felines in the database.
     /// </summary>
-    /// <returns></returns>
-    public Task<List<ListItem<int>>> GetAllNamesAsync();
+    /// <returns>A Result with list of felines, or errors on failure.</returns>
+    public Task<Result<List<Feline>>> GetAllAsync();
 
     /// <summary>
-    /// Gets a single cat by ID.
+    ///     Get list of all felines in the database, with only their names and ids.
     /// </summary>
-    /// <param name="felineId">Id of cat to get.</param>
-    /// <returns>A single cat if found, otherwise null</returns>
-    public Task<Feline?> GetByKeyAsync(int felineId);
+    /// <returns>A Result with list of items, or errors on failure.</returns>
+    public Task<Result<List<ListItem<int>>>> GetAllNamesAsync();
 
     /// <summary>
-    /// Sets a cat as inactive in the database.
+    ///     Gets a single feline by ID.
     /// </summary>
-    /// <param name="felineId"></param>
-    /// <param name="dateTimeUtc"></param>
-    /// <returns></returns>
-    public Task<bool> Inactivate(int felineId, DateTimeOffset dateTimeUtc);
+    /// <param name="felineId">ID of feline to get.</param>
+    /// <returns>A Result with Feline if found, or errors on failure</returns>
+    public Task<Result<Feline>> GetByKeyAsync(int felineId);
 
     /// <summary>
-    /// Gets the thumbnail for a single cat.
+    ///     Gets the thumbnail for a single feline.
     /// </summary>
-    /// <param name="felineId">Id of the cat</param>
-    /// <returns>Thumbnail if found, otherwise null</returns>
-    public Task<Thumbnail?> GetThumbnailAsync(int felineId);
+    /// <param name="felineId">ID of the feline</param>
+    /// <returns>A Result with Thumbnail if found, or errors on failure.</returns>
+    public Task<Result<Thumbnail>> GetThumbnailAsync(int felineId);
 
     /// <summary>
-    /// Sets the thumbnail for a cat.
+    ///     Sets the thumbnail for a feline.
     /// </summary>
-    /// <param name="felineId">Id of cat to change</param>
-    /// <param name="thumbnail">Thumbnail to assign to cat</param>
-    /// <returns>Updated cat, or null if cat was not found</returns>
-    public Task<Feline?> SetThumbnailAsync(int felineId, Thumbnail thumbnail);
+    /// <param name="felineId">ID of feline to change</param>
+    /// <param name="thumbnail">Thumbnail to assign to feline</param>
+    /// <returns>A Result with Feline if updated, or errors on failure.</returns>
+    public Task<Result<Feline>> SetThumbnailAsync(int felineId, Thumbnail thumbnail);
 
     /// <summary>
-    /// Updates a cat in the database.
+    ///     Updates a feline in the database.
     /// </summary>
-    /// <param name="felineId">Id of cat to update</param>
-    /// <param name="feline">Data to assign to cat</param>
-    /// <returns>Updated cat if found, otherwise null</returns>
-    public Task<Feline?> UpdateAsync(int felineId, Feline feline);
+    /// <param name="felineId">ID of feline to update</param>
+    /// <param name="feline">Data to assign to feline</param>
+    /// <returns>A Result with Feline if updated, or errors on failure.</returns>
+    public Task<Result<Feline>> UpdateAsync(int felineId, Feline feline);
 }

@@ -10,7 +10,7 @@
 <PageTitle>Details: @Name</PageTitle>
 @if (_feline is null)
 {
-    <Loading />
+    <Loading/>
 }
 else
 {
@@ -20,16 +20,16 @@ else
                             OnActivate="OnActivateAsync"
                             OnDelete="OnDeleteAsync"
                             OnInactivate="OnInactivateAsync"
-                            OnSave="OnSaveAsync" />
+                            OnSave="OnSaveAsync"/>
         </MudPaper>
         <MudTabs Elevation="3" ApplyEffectsToContainer="true" PanelClass="pa-2">
             <MudTabPanel Text="Journal" Icon="@Icons.Material.Filled.NoteAlt">
-                <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded" />
+                <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded"/>
                 <MudStack Spacing="3">
-                @foreach (var comment in _feline.Comments)
-                {
-                    <CommentCard @key="comment.Id" Comment="comment" OnDelete="OnDeleteCommentAsync" />
-                }
+                    @foreach (var comment in _feline.Comments)
+                    {
+                        <CommentCard @key="comment.Id" Comment="comment" OnDelete="OnDeleteCommentAsync"/>
+                    }
                 </MudStack>
             </MudTabPanel>
             <MudTabPanel Text="Medical" Icon="@Icons.Material.Filled.HealthAndSafety">
@@ -45,14 +45,13 @@ else
 @code {
     private IDisposable? _stateSubscription;
     private Feline? _feline;
-    
+
     private string Name => _feline?.Name ?? string.Empty;
-    
-    [Parameter]
-    public int FelineId { get; set; }
+
+    [Parameter] public int FelineId { get; set; }
 
     private async Task<Feline?> LoadAsync()
-        => await FelineRepository.GetByKeyAsync(FelineId);
+        => (await FelineRepository.GetByKeyAsync(FelineId)).ValueOrDefault;
 
     void OnCommentAdded(Comment comment)
     {
@@ -61,7 +60,8 @@ else
 
     async Task OnDeleteCommentAsync(Comment comment)
     {
-        if (await CommentRepository.DeleteByKeyAsync(comment.Id)) {
+        if ((await CommentRepository.DeleteByKeyAsync(comment.Id)).IsSuccess)
+        {
             _feline!.Comments = _feline.Comments.Where(c => c.Id != comment.Id).ToArray();
         }
     }
@@ -71,7 +71,8 @@ else
         _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
         ComponentState.TryTakeFromJson("feline", out _feline);
         _feline ??= await LoadAsync();
-        if (_feline is null) {
+        if (_feline is null)
+        {
             NavigationManager.NavigateTo("/not-found");
         }
     }
@@ -89,34 +90,40 @@ else
 
     private async Task OnActivateAsync()
     {
-        if (!await FelineRepository.Activate(FelineId))
+        var rs = await FelineRepository.ActivateAsync(FelineId);
+        _ = rs switch
         {
-            Snackbar.Add("Failed to activate", Severity.Error);
-            return;
-        }
-        Snackbar.Add("Activated", Severity.Success);
+            { IsSuccess: true } => Snackbar.Add("Activated", Severity.Success),
+            { IsSuccess: false } => Snackbar.Add(rs.Errors.First().Message, Severity.Error)
+        };
         await RefreshAsync();
     }
 
     private async Task OnDeleteAsync()
     {
-        if (await FelineRepository.DeleteByKeyAsync(FelineId))
+        var rs = await FelineRepository.DeleteByKeyAsync(FelineId);
+        if (rs.IsFailed)
         {
-            NavigationManager.NavigateTo("/");
+            Snackbar.Add("Failed to delete", Severity.Error);
+            await RefreshAsync();
             return;
         }
-        Snackbar.Add("Failed to delete", Severity.Error);
+
+        NavigationManager.NavigateTo("/");
     }
 
     private async Task OnInactivateAsync(DateTimeOffset asOf)
     {
-        if (!await FelineRepository.Inactivate(FelineId, asOf))
+        var rs = await FelineRepository.DeactivateAsync(FelineId, asOf);
+        if (rs.IsSuccess)
         {
-            Snackbar.Add("Failed to inactivate", Severity.Error);
-            return;
+            Snackbar.Add("Deactivated", Severity.Success);
+        }
+        else
+        {
+            Snackbar.Add(rs.Errors.First().Message, Severity.Error);
         }
 
-        Snackbar.Add("Inactivated", Severity.Success);
         await RefreshAsync();
     }
 
@@ -125,16 +132,18 @@ else
     /// </summary>
     private async Task OnSaveAsync(FelineEditModel model)
     {
-        var updated = await FelineRepository.UpdateAsync(FelineId, model.ToFeline());
-        if (updated is null)
+        var rs = await FelineRepository.UpdateAsync(FelineId, model.ToFeline());
+        if (rs.IsSuccess)
         {
-            Snackbar.Add("Failed to save", Severity.Error);
+            _feline = rs.Value;
+            Snackbar.Add("Saved", Severity.Success);
         }
         else
         {
-            _feline = updated;
-            Snackbar.Add("Saved", Severity.Success);
+            Snackbar.Add("Failed to save", Severity.Error);
         }
+
         await RefreshAsync();
     }
+
 }

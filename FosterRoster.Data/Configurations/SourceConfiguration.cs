@@ -22,4 +22,3 @@ internal sealed class SourceConfiguration : IEntityTypeConfiguration<Source>
             .HasMaxLength(64);
     }
 }
-

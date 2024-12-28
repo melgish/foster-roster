@@ -6,24 +6,24 @@
         <MudText Typo="Typo.body1">
             If you click Yes, you will delete all data about @Model.Name.
             This action cannot be undone.
-            <br /><br />
+            <br/><br/>
             NOTE: @Model.Name will not be harmed.
         </MudText>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default"
-                   OnClick="Cancel">Cancel</MudButton>
+                   OnClick="Cancel">Cancel
+        </MudButton>
         <MudButton Color="Color.Error"
-                   OnClick="Confirm">Yes</MudButton>
+                   OnClick="Confirm">Yes
+        </MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    [CascadingParameter]
-    MudDialogInstance MudDialog { get; set; } = null!;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
-    [Parameter]
-    public FelineEditModel Model { get; set; } = null!;
+    [Parameter] public FelineEditModel Model { get; set; } = null!;
 
 
     void Cancel()
@@ -35,4 +35,5 @@
     {
         MudDialog.Close(DialogResult.Ok(true));
     }
+
 }

@@ -22,7 +22,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _sources = await SourceRepository.GetAllNamesAsync();
+        _sources = await SourceRepository.GetAllNamesAsync() switch
+        {
+            { IsSuccess: true } ok => ok.Value,
+            _ => []
+        };
         _value = Value ?? 0;
         await base.OnInitializedAsync();
         // Without this call, the select will display the ID value instead
@@ -40,4 +44,5 @@
     {
         _value = Value ?? 0;
     }
+
 }

@@ -14,14 +14,12 @@ public sealed class ThumbnailsController(
     [HttpGet("{felineId:int}")]
     public async Task<IActionResult> GetThumbnailAsync(int felineId)
     {
-        var thumbnail = await felineRepository.GetThumbnailAsync(felineId);
+        var thumbnail = (await felineRepository.GetThumbnailAsync(felineId)).Value;
         if (thumbnail is not null)
-        {
             return new FileContentResult(
                 thumbnail.ImageData,
                 thumbnail.ContentType
             );
-        }
         return NotFound();
     }
 }

@@ -1,3 +1,5 @@
+global using FluentResults;
+global using FluentResults.Extensions;
 global using FluentValidation;
 global using FosterRoster.Domain;
 global using FosterRoster.Domain.Repositories;

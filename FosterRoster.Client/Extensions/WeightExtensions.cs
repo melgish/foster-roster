@@ -43,8 +43,9 @@ public static class WeightExtensions
             },
             _ => throw new InvalidOperationException($"Unknown weight unit: {from}")
         };
+
     private static Weight Copy(this Weight weight, float value, WeightUnit units)
-        => new Weight
+        => new()
         {
             FelineId = weight.FelineId,
             DateTime = weight.DateTime,

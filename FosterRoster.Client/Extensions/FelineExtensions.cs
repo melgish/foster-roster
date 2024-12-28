@@ -6,9 +6,7 @@ public static class FelineExtensions
     {
         TimeSpan? age = null;
         if (ageInWeeks.HasValue && intakeDate.HasValue)
-        {
             age = TimeSpan.FromDays(ageInWeeks.Value * 7) + (asOfDate - intakeDate.Value);
-        }
         return age switch
         {
             { Days: <= 7 } d => $"{d.Days} days old",

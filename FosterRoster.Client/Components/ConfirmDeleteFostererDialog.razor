@@ -8,24 +8,24 @@
             Any cats linked to @Model.Name will not be deleted. Instead
             the Fosterer link will be cleared.
             <em>This action cannot be undone.</em>
-            <br /><br />
+            <br/><br/>
             NOTE: @Model.Name will not be harmed.
         </MudText>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default"
-                   OnClick="Cancel">Cancel</MudButton>
+                   OnClick="Cancel">Cancel
+        </MudButton>
         <MudButton Color="Color.Error"
-                   OnClick="Confirm">Yes</MudButton>
+                   OnClick="Confirm">Yes
+        </MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    [CascadingParameter]
-    MudDialogInstance MudDialog { get; set; } = null!;
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
 
-    [Parameter]
-    public FostererEditModel Model { get; set; } = null!;
+    [Parameter] public FostererEditModel Model { get; set; } = null!;
 
     void Cancel()
     {
@@ -36,4 +36,5 @@
     {
         MudDialog.Close(DialogResult.Ok(true));
     }
+
 }

@@ -41,27 +41,31 @@
 </div>
 
 @code {
+
     /// <summary>
     /// Feline to display.
     /// </summary>
-    [Parameter] public Feline? Feline { get; set; }
-    
+    [Parameter]
+    public Feline? Feline { get; set; }
+
     /// <summary>
     /// Fired if Feline is updated.
     /// </summary>
-    [Parameter] public EventCallback<Feline> FelineChanged { get; set; }
+    [Parameter]
+    public EventCallback<Feline> FelineChanged { get; set; }
 
     private async Task OnFilesChangedAsync(IBrowserFile? file)
     {
         var thumbnail = await file.ToThumbnailAsync(Feline!.Id);
         if (thumbnail is not null)
         {
-            var updated = await FelineRepository.SetThumbnailAsync(Feline.Id, thumbnail);
-            if (updated != null)
+            var rs = await FelineRepository.SetThumbnailAsync(Feline.Id, thumbnail);
+            if (rs.IsSuccess)
             {
-                Feline = updated;
+                Feline = rs.Value;
                 await FelineChanged.InvokeAsync(Feline);
             }
         }
     }
+
 }

@@ -5,7 +5,9 @@ namespace FosterRoster.Data;
 
 public class FosterRosterDbContext : DbContext
 {
-    public FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options) : base(options) { }
+    public FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options) : base(options)
+    {
+    }
 
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<Feline> Felines { get; set; } = null!;

@@ -5,12 +5,9 @@ using MudBlazor.Services;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Logging.SetMinimumLevel(LogLevel.Information);
-builder.Services.AddMudServices(config =>
-{
-    config.SnackbarConfiguration.VisibleStateDuration = 2500;
-});
+builder.Services.AddMudServices(config => { config.SnackbarConfiguration.VisibleStateDuration = 2500; });
 
-builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped(_ => new HttpClient { BaseAddress = new(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddScoped<ICommentRepository, ClientCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ClientFelineRepository>();

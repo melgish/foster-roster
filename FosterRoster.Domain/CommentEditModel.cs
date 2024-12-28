@@ -19,14 +19,12 @@ public sealed class CommentEditModel()
         TimeStamp = comment.TimeStamp;
     }
 
-    public Comment ToComment()
-    {
-        return new()
+    public Comment ToComment() =>
+        new()
         {
             FelineId = FelineId,
             Id = Id,
             Text = Text,
             TimeStamp = TimeStamp
         };
-    }
 }

@@ -2,7 +2,7 @@
 
 @if (_model is null)
 {
-    <Loading />
+    <Loading/>
 }
 else
 {
@@ -103,10 +103,9 @@ else
     [Parameter] public Fosterer Fosterer { get; set; } = null!;
 
     [Parameter] public bool IsNew { get; set; }
-    
-    [Parameter]
-    public EventCallback OnDelete { get; set; } = EventCallback.Empty;
-    
+
+    [Parameter] public EventCallback OnDelete { get; set; } = EventCallback.Empty;
+
     /// <summary>
     ///     Event fired when save button is clicked.
     /// </summary>
@@ -120,10 +119,7 @@ else
     [Parameter]
     public EventCallback OnAdd { get; set; } = EventCallback.Empty;
 
-    private Task ActivateAsync()
-    {
-        return Task.CompletedTask;
-    }
+    private Task ActivateAsync() => Task.CompletedTask;
 
     private async Task DeleteAsync()
     {
@@ -143,18 +139,12 @@ else
         _isSaving = false;
     }
 
-    private Task InactivateAsync()
-    {
-        return Task.CompletedTask;
-    }
+    private Task InactivateAsync() => Task.CompletedTask;
 
     /// <summary>
     ///     Resets form any time the parent Feline is updated.
     /// </summary>
-    protected override Task OnParametersSetAsync()
-    {
-        return ResetAsync();
-    }
+    protected override Task OnParametersSetAsync() => ResetAsync();
 
     /// <summary>
     ///     Resets the form back to it's initial state.
@@ -162,7 +152,7 @@ else
     /// <returns></returns>
     private Task ResetAsync()
     {
-        _model = new FostererEditModel(Fosterer);
+        _model = new(Fosterer);
         _name = IsNew ? "Create Fosterer" : _model.Name;
         return Task.CompletedTask;
     }

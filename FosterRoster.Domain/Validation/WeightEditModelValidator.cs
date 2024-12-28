@@ -1,5 +1,3 @@
-using FluentValidation;
-
 namespace FosterRoster.Domain.Validation;
 
 public sealed class WeightEditModelValidator : AbstractValidator<WeightEditModel>

@@ -8,13 +8,13 @@
         <EditForm @ref="_form"
                   Model="@_model"
                   FormName="inactivate">
-            <FluentValidationValidator />
+            <FluentValidationValidator/>
             <MudGrid Spacing="3">
                 <MudItem xs="12">
                     <MudText Typo="Typo.body1">
                         If you click Yes, you will inactivate @Feline.Name and hide all
                         @Feline.Gender.PossessivePronoun() data from view.
-                        <br /><br />
+                        <br/><br/>
                         NOTE: @Feline.Name will not be harmed.
                     </MudText>
                 </MudItem>
@@ -22,25 +22,27 @@
                     <MudDatePicker @bind-Date="_model.Date"
                                    Editable="true"
                                    HelperText="MM/DD/YYYY"
-                                   Label="Date" />
-                    <ValidationMessage For="@(() => _model.Date)" />
+                                   Label="Date"/>
+                    <ValidationMessage For="@(() => _model.Date)"/>
                 </MudItem>
                 <MudItem xs="12">
                     <MudTimePicker @bind-Time="_model.Time"
                                    AmPm="true"
                                    HelperText="HH:MM (use 24 hour time for now, working on it)"
                                    Editable="true"
-                                   Label="Time" />
-                    <ValidationMessage For="@(() => _model.Time)" />
+                                   Label="Time"/>
+                    <ValidationMessage For="@(() => _model.Time)"/>
                 </MudItem>
             </MudGrid>
         </EditForm>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default"
-                   OnClick="Cancel">Cancel</MudButton>
+                   OnClick="Cancel">Cancel
+        </MudButton>
         <MudButton Color="Color.Error"
-                   OnClick="Submit">Yes</MudButton>
+                   OnClick="Submit">Yes
+        </MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -49,11 +51,9 @@
 
     private DateTimeEditModel _model = new();
 
-    [CascadingParameter]
-    public MudDialogInstance MudDialog { get; set; } = null!;
+    [CascadingParameter] public MudDialogInstance MudDialog { get; set; } = null!;
 
-    [Parameter]
-    public FelineEditModel Feline { get; set; } = null!;
+    [Parameter] public FelineEditModel Feline { get; set; } = null!;
 
     private void Cancel() => MudDialog.Cancel();
 
@@ -61,6 +61,7 @@
     {
         _model.Value = TimeProvider.GetUtcNow().DateTime;
     }
+
     private void Submit()
     {
         // Need to validate manually because buttons are not inside the EditForm.
@@ -70,4 +71,5 @@
             MudDialog.Close(DialogResult.Ok(value));
         }
     }
+
 }

@@ -6,5 +6,5 @@ public enum Category
     Kitten = 1,
     Cat = 2,
     NursingKitten = 5,
-    NursingCat = 6,
+    NursingCat = 6
 }

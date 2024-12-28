@@ -17,13 +17,13 @@
         />
     </MudPaper>
     <MudPaper Elevation="3">
-        <FosterersGrid Items="_fosterers" OnAdd="@OnAddAsync" OnEdit="@OnEditAsync" />
+        <FosterersGrid Items="_fosterers" OnAdd="@OnAddAsync" OnEdit="@OnEditAsync"/>
     </MudPaper>
 </MudStack>
 
 @code {
     private Fosterer _fosterer = new();
-    private List<Fosterer>? _fosterers = [];
+    private ICollection<Fosterer>? _fosterers = [];
     private IDisposable? _stateSubscription;
 
     private Task OnAddAsync()
@@ -31,16 +31,14 @@
         _fosterer = new();
         return Task.CompletedTask;
     }
+
     public void Dispose() => _stateSubscription?.Dispose();
 
-    private async Task<List<Fosterer>> LoadAsync()
-        => _fosterers = await FostererRepository.GetAllAsync();
-    
     protected override async Task OnInitializedAsync()
     {
         _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
-        ComponentState.TryTakeFromJson<List<Fosterer>>("fosterers", out var fosterers);
-        _fosterers = fosterers is not null ? _fosterers : await LoadAsync();
+        ComponentState.TryTakeFromJson("fosterers", out _fosterers);
+        _fosterers ??= (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
         _fosterer = new();
         await base.OnInitializedAsync();
     }
@@ -52,37 +50,40 @@
             return;
         }
 
-        var deleted = await FostererRepository.DeleteByKeyAsync(_fosterer.Id);
-        if (deleted)
-        {
-            _fosterer = new();
-            Snackbar.Add("Deleted", Severity.Success);
-        }
-        else
+        if ((await FostererRepository.DeleteByKeyAsync(_fosterer.Id)).IsFailed)
         {
             Snackbar.Add("Failed to Delete", Severity.Error);
+            return;
         }
+
+        _fosterer = new();
+        Snackbar.Add("Deleted", Severity.Success);
     }
+
     private async Task OnEditAsync(int fostererId)
     {
-        var fetched = await FostererRepository.GetByKeyAsync(fostererId);
-        if (fetched is null)
+        var rs = await FostererRepository.GetByKeyAsync(fostererId);
+        if (rs.IsFailed)
         {
             NavigationManager.NavigateTo("/not-found");
             return;
         }
-        _fosterer = fetched;
+
+        _fosterer = rs.Value;
     }
 
     private async Task OnSaveAsync(FostererEditModel model)
     {
-        var updated = model.Id == 0
+        var rs = model.Id == 0
             ? await FostererRepository.AddAsync(model.ToFosterer())
             : await FostererRepository.UpdateAsync(model.Id, model.ToFosterer());
-        if (updated is not null)
+        if (rs.IsFailed)
         {
-            _fosterer = updated;
+            Snackbar.Add("Failed to Save", Severity.Error);
+            return;
         }
+
+        _fosterer = rs.Value;
     }
 
     private Task PersistStateAsync()
@@ -90,4 +91,5 @@
         ComponentState.PersistAsJson("fosterers", _fosterers);
         return Task.CompletedTask;
     }
+
 }

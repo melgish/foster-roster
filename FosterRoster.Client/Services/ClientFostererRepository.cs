@@ -1,65 +1,67 @@
 namespace FosterRoster.Client.Services;
+
 public sealed class ClientFostererRepository(
     HttpClient httpClient
 ) : IFostererRepository
 {
     private const string Route = "api/fosterers";
+    private const string FailedToCreate = "Failed to create fosterer";
+    private const string FailedToDelete = "Failed to delete fosterer";
 
     /// <summary>
-    /// Adds a new fosterer to the database.
+    ///     Adds a new fosterer to the database.
     /// </summary>
     /// <param name="fosterer">Fosterer instance to add.</param>
-    /// <returns>Updated feline instance after add.</returns>
-    public async Task<Fosterer> AddAsync(Fosterer fosterer)
-    {
-        var rs = await httpClient.PostAsJsonAsync(Route, new FostererEditModel(fosterer));
-        return await rs.Content.ReadFromJsonAsync<Fosterer>() ?? fosterer;
-    }
+    /// <returns>Result with Fosterer after add, or Errors on failure.</returns>
+    public async Task<Result<Fosterer>> AddAsync(Fosterer fosterer)
+        => await Result
+            .Try(() => httpClient.PostAsJsonAsync(Route, new FostererEditModel(fosterer)))
+            .Bind(rs => Result.OkIf(rs.IsSuccessStatusCode, FailedToCreate).ToResult(rs))
+            .Bind(rs => Result.Try(() => rs.Content.ReadFromJsonAsync<Fosterer>()))
+            .Bind(f => Result.OkIf(f is not null, FailedToCreate).ToResult(f!));
 
     /// <summary>
-    /// Deletes a Fosterer by its ID.
+    ///     Deletes a Fosterer by its ID.
     /// </summary>
     /// <param name="fostererId">ID of fosterer to remove.</param>
-    /// <returns>True if a fosterer was removed otherwise false.</returns>
-    public async Task<bool> DeleteByKeyAsync(int fostererId)
-    {
-        var rs = await httpClient.DeleteAsync($"{Route}/{fostererId}");
-        return await rs.Content.ReadFromJsonAsync<bool>();
-    }
+    /// <returns>A Result instance indicating success or failure.</returns>
+    public async Task<Result> DeleteByKeyAsync(int fostererId)
+        => await Result
+            .Try(() => httpClient.DeleteAsync($"{Route}/{fostererId}"))
+            .Bind(rs => Result.OkIf(rs.IsSuccessStatusCode, FailedToDelete));
 
     /// <summary>
-    /// Get list of all fosterers in the database.
+    ///     Gets list of all fosterers from the database.
     /// </summary>
-    /// <returns>List of fosterers, or empty list if none are found.</returns>
-    public async Task<List<Fosterer>> GetAllAsync()
-    {
-        var rs = await httpClient.GetAsync($"{Route}");
-        return await rs.Content.ReadFromJsonAsync<List<Fosterer>>() ?? [];
-    }
+    /// <returns>Result with list of fosterers, or Errors on failure.</returns>
+    public async Task<Result<List<Fosterer>>> GetAllAsync()
+        => await Result
+            .Try(() => httpClient.GetFromJsonAsync<List<Fosterer>>(Route))
+            .Bind(list => Result.Ok(list!));
 
     /// <summary>
-    /// Get list of all fosterer names.
+    ///     Gets names of all fosterers from the database.
     /// </summary>
-    /// <returns>List of fosterers, or empty list if none are found.</returns>
-    public async Task<List<ListItem<int>>> GetAllNamesAsync()
-    {
-        var rs = await httpClient.GetAsync($"{Route}/names");
-        return await rs.Content.ReadFromJsonAsync<List<ListItem<int>>>() ?? [];
-    }
+    /// <returns>Result with list of items, or Errors on failure.</returns>
+    public async Task<Result<List<ListItem<int>>>> GetAllNamesAsync()
+        => await Result
+            .Try(() => httpClient.GetFromJsonAsync<List<ListItem<int>>>($"{Route}/names"))
+            .Bind(list => Result.Ok(list!));
 
-    
     /// <summary>
-    /// Gets a single fosterer by their ID.
+    ///     Gets single fosterer from the database.
     /// </summary>
-    /// <param name="fostererId">ID of fosterer to fetch</param>
-    /// <returns>A single fosterer if found, otherwise null</returns>
-    public async Task<Fosterer?> GetByKeyAsync(int fostererId)
-        => await httpClient.GetFromJsonAsync<Fosterer>($"{Route}/{fostererId}");
+    /// <param name="fostererId">ID of fosterer to return.</param>
+    /// <returns>Result with Fosterer if successful, or Errors on failure.</returns>
+    public async Task<Result<Fosterer>> GetByKeyAsync(int fostererId)
+        => await Result
+            .Try(() => httpClient.GetFromJsonAsync<Fosterer>($"{Route}/{fostererId}"))
+            .Bind(fosterer => Result.Ok(fosterer!));
 
-    public async Task<Fosterer?> UpdateAsync(int fostererId, Fosterer fosterer)
+    public async Task<Result<Fosterer>> UpdateAsync(int fostererId, Fosterer fosterer)
     {
         var model = new FostererEditModel(fosterer);
         var rs = await httpClient.PutAsJsonAsync($"{Route}/{fostererId}", model);
-        return await rs.Content.ReadFromJsonAsync<Fosterer>();
+        return Result.Ok((await rs.Content.ReadFromJsonAsync<Fosterer>())!);
     }
 }

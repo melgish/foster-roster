@@ -54,9 +54,8 @@ public sealed class FostererEditModel()
     /// </summary>
     public string? Phone { get; set; }
 
-    public Fosterer ToFosterer()
-    {
-        return new Fosterer
+    public Fosterer ToFosterer() =>
+        new()
         {
             Address = string.IsNullOrWhiteSpace(Address) ? null : Address.Trim(),
             ContactMethod = ContactMethod,
@@ -67,5 +66,4 @@ public sealed class FostererEditModel()
             Name = Name.Trim(),
             Phone = string.IsNullOrWhiteSpace(Phone) ? null : Phone.Trim()
         };
-    }
 }

@@ -17,10 +17,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _names = await FelineRepository.GetAllNamesAsync();
+        _names = (await FelineRepository.GetAllNamesAsync()).Value;
         await base.OnInitializedAsync();
         // Without this call, the select will display the ID value instead
         // of the associated text.
         await InvokeAsync(StateHasChanged);
     }
+
 }
