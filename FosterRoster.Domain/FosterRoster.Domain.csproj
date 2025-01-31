@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RuntimeFrameworkVersion>8.0.8</RuntimeFrameworkVersion>
         <Version>1.0.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Blazored.FluentValidation" Version="2.2.0"/>
         <PackageReference Include="FluentResults" Version="3.16.0"/>
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0"/>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0"/>
     </ItemGroup>
 
 </Project>

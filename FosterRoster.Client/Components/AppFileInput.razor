@@ -1,0 +1,106 @@
+﻿@inherits ComponentBase
+@rendermode InteractiveWebAssembly
+
+<label class="@GetComponentCssClass()" style="@Style">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <i class="notranslate rz-button-icon-left rzi">@((MarkupString)Icon)</i>
+    }
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <span class="rz-button-text">@Text</span>
+    }
+    <InputFile accept="@Accept" OnChange="@OnChange" disabled="@Disabled"/>
+</label>
+
+@code
+{
+    /// <summary>
+    /// Gets or sets the input file accept attribute.
+    /// </summary>
+    [Parameter]
+    public string Accept { get; set; } = "image/*";
+
+    /// <summary>
+    /// Gets or sets the size.
+    /// </summary>
+    /// <value>The size.</value>
+    [Parameter]
+    public ButtonSize Size { get; set; } = ButtonSize.Medium;
+
+    /// <summary>
+    /// Gets or sets the button style.
+    /// </summary>
+    /// <value>The button style.</value>
+    [Parameter]
+    public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Primary;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether this  is disabled.
+    /// </summary>
+    /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    /// <summary>
+    /// Event callback for the change event.
+    /// </summary>
+    [Parameter]
+    public EventCallback<InputFileChangeEventArgs> OnChange { get; set; }
+
+    /// <summary>
+    /// Gets or sets the color shade of the button.
+    /// </summary>
+    /// <value>The color shade of the button.</value>
+    [Parameter]
+    public Shade Shade { get; set; } = Shade.Default;
+
+    /// <summary>
+    /// Style for the button
+    /// </summary>
+    [Parameter]
+    public string Style { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the text.
+    /// </summary>
+    /// <value>The text.</value>
+    [Parameter]
+    public string Text { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the design variant of the button.
+    /// </summary>
+    /// <value>The variant of the button.</value>
+    [Parameter]
+    public Variant Variant { get; set; } = Variant.Filled;
+
+    /// <summary>
+    /// Icon for the button
+    /// </summary>
+    [Parameter]
+    public string Icon { get; set; } = "camera_alt";
+
+    private string GetButtonSize() => Size switch
+    {
+        ButtonSize.Medium => "md",
+        ButtonSize.Large => "lg",
+        ButtonSize.Small => "sm",
+        _ => "xs"
+    };
+
+    private string GetComponentCssClass()
+    {
+        string[] parts =
+        [
+            "app-file-input rz-button",
+            $"rz-button-{GetButtonSize()}",
+            $"rz-variant-{Enum.GetName(Variant)}",
+            $"rz-{Enum.GetName(ButtonStyle)}",
+            $"rz-shade-{Enum.GetName(Shade)}",
+            Disabled ? "rz-state-disabled" : "",
+            string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? "rz-button-icon-only" : ""
+        ];
+        return string.Join(' ', parts.Where(e => !string.IsNullOrWhiteSpace(e))).ToLowerInvariant();
+    }
+}

@@ -1,60 +1,51 @@
-@inject ISnackbar Snackbar
+@inject NotificationService NotificationService
 @inject ICommentRepository CommentRepository
-
-
 
 <EditForm Model="@_model" OnValidSubmit="SaveAsync" FormName="newComment">
     <FluentValidationValidator/>
-    <MudStack Row AlignItems="AlignItems.Start" Spacing="1">
-        <MudStack Style="width: 100%">
-            <TinyMCE.Blazor.Editor
-                @bind-Value="_model.Text"
-                Conf="@_conf"
-                Field="@(() => _model.Text)"
-                ScriptSrc="/tinymce/tinymce.min.js"
-                ValidateOnInput="@false"
-            />
-            <ValidationMessage For="@(() => _model.Text)"/>
-        </MudStack>
-        <MudIconButton
-            ButtonType="@ButtonType.Submit"
-            Color="Color.Primary"
-            Icon="@Icons.Material.Filled.Save"
-            Variant="Variant.Outlined"
-        />
-    </MudStack>
+    <RadzenHtmlEditor @bind-Value="_model.Text">
+        <RadzenHtmlEditorCustomTool>
+            <Template Context="tool">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary"
+                              ButtonType="ButtonType.Submit"
+                              Disabled="tool.Disabled"
+                              Icon="save"
+                              Size="ButtonSize.Small"
+                              Style="margin-top:0.125rem"
+                              Variant="Variant.Flat"/>
+            </Template>
+        </RadzenHtmlEditorCustomTool>
+        <RadzenHtmlEditorSeparator/>
+        <RadzenHtmlEditorUndo/>
+        <RadzenHtmlEditorRedo/>
+        <RadzenHtmlEditorSeparator/>
+        <RadzenHtmlEditorBold/>
+        <RadzenHtmlEditorItalic/>
+        <RadzenHtmlEditorSeparator/>
+        <RadzenHtmlEditorAlignLeft/>
+        <RadzenHtmlEditorAlignCenter/>
+        <RadzenHtmlEditorAlignRight/>
+        <RadzenHtmlEditorSeparator/>
+        <RadzenHtmlEditorIndent/>
+        <RadzenHtmlEditorOutdent/>
+    </RadzenHtmlEditor>
+    <ValidationMessage For="@(() => _model.Text)"/>
 </EditForm>
 
 @code
 {
-    private Dictionary<string, object> _conf = new()
-    {
-        { "promotion", false },
-        { "plugins", "" },
-        { "removed_menuitems", "newdocument print fontfamily codeformat" },
-        { "statusbar", true },
-        { "height", "240" },
-        { "licence_key", "gpl" }
-    };
-
     private CommentEditModel _model = null!;
 
     [Parameter] public int FelineId { get; set; }
 
     [Parameter] public EventCallback<Comment> CommentAdded { get; set; }
 
-    protected override void OnInitialized()
-    {
-        _model = new()
-        {
-            FelineId = FelineId
-        };
-    }
+    protected override void OnInitialized() => _model = new() { FelineId = FelineId };
 
     private async Task SaveAsync()
     {
-        Snackbar.Add("Comment saved", Severity.Success);
         var rs = await CommentRepository.AddAsync(_model.ToComment());
+        NotificationService.Notify(rs, "Comment saved", "Failed to save comment");
         if (rs.IsSuccess)
         {
             await CommentAdded.InvokeAsync(rs.Value);

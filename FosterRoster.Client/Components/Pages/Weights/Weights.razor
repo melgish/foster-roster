@@ -1,0 +1,216 @@
+@page "/weights"
+@rendermode InteractiveWebAssembly
+@implements IDisposable
+@inject NotificationService NotificationService
+@inject IWeightRepository WeightRepository
+@inject PersistentComponentState ComponentState;
+@inject TimeProvider TimeProvider
+
+<PageTitle>Weights</PageTitle>
+
+@if (_allWeights is null)
+{
+    <Loading/>
+}
+else
+{
+    <RadzenStack>
+        <RadzenCard>
+            <EditForm FormName="weightForm"
+                      Model="_model"
+                      OnValidSubmit="OnSaveAsync">
+                <FluentValidationValidator/>
+                <RadzenStack Gap="0.5rem">
+                    <RadzenRow Gap="1rem" RowGap="0.5rem">
+                        <RadzenColumn Size="12">
+                            <h1>Enter Weight</h1>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow Gap="1rem" RowGap="0.5rem">
+                        <RadzenColumn SizeXS="12" SizeSM="6">
+                            <RadzenStack Gap="0rem">
+                                <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
+                                    <FelineSelect @bind-Value="_model.FelineId"/>
+                                </RadzenFormField>
+                                <ValidationMessage For="@(() => _model.FelineId)"/>
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn SizeXS="12" SizeSM="6">
+                            <RadzenStack Gap="0rem">
+                                <RadzenFormField AllowFloatingLabel="false" Text="Date" Variant="Variant.Text">
+                                    <RadzenDatePicker @bind-Value="_model.DateTime"
+                                                      DateFormat="MM/dd/yyyy h:mm tt"
+                                                      HourFormat="12"
+                                                      Placeholder="MM/DD/YYYY hh:mm am"
+                                                      ShowTime="true"/>
+                                </RadzenFormField>
+                                <ValidationMessage For="@(() => _model.DateTime)"/>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow Gap="1rem" RowGap="0.5rem">
+                        <RadzenColumn SizeXS="12" SizeSM="6">
+                            <RadzenStack Gap="0rem">
+                                <RadzenFormField AllowFloatingLabel="false" Text="Weight" Variant="Variant.Text">
+                                    <RadzenNumeric TValue="float"
+                                                   @bind-Value="_model.Value"
+                                                   Step="0.1f"
+                                                   Min="0.0m"
+                                                   ShowUpDown="false"/>
+                                </RadzenFormField>
+                                <ValidationMessage For="@(() => _model.Value)"/>
+                            </RadzenStack>
+                        </RadzenColumn>
+                        <RadzenColumn SizeXS="12" SizeSM="6">
+                            <RadzenStack Gap="0rem">
+                                <RadzenFormField AllowFloatingLabel="false" Text="Units" Variant="Variant.Text">
+                                    <RadzenDropDown TValue="Enum" Value="@((Enum)_model.Units)" Data="@UnitChoices"
+                                                    ValueChanged="@((args) => OnUnitsSelected((WeightUnit)args))"/>
+                                </RadzenFormField>
+                                <ValidationMessage For="@(() => _model.Units)"/>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                    <RadzenRow Gap="1rem" RowGap="0.5rem">
+                        <RadzenColumn Size="12">
+                            <RadzenStack JustifyContent="JustifyContent.End" Orientation="Orientation.Horizontal">
+                                <RadzenButton BusyText="Saving..."
+                                              ButtonStyle="ButtonStyle.Primary"
+                                              ButtonType="ButtonType.Submit"
+                                              Disabled="_isSaving"
+                                              IsBusy="_isSaving"
+                                              Text="Save"
+                                              Variant="Variant.Outlined"/>
+                                <RadzenButton ButtonStyle="ButtonStyle.Secondary"
+                                              Click="@Reset"
+                                              Disabled="_isSaving"
+                                              Text="Reset"
+                                              Variant="Variant.Outlined"/>
+                            </RadzenStack>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenStack>
+            </EditForm>
+        </RadzenCard>
+        <RadzenCard>
+            <h2>Recent Weights</h2>
+            <RadzenDataGrid TItem="Weight" Data="_filteredWeights">
+                <Columns>
+                    <RadzenDataGridColumn Property="DateTime" Title="Date" FormatString="{0:MMM dd \a\t hh:mm tt}"/>
+                    <RadzenDataGridColumn Property="Feline.Name" Title="Name"/>
+                    <RadzenDataGridColumn Property="Value" Title="Weight">
+                        <Template Context="data">@data.Format(_units)</Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Title="Actions">
+                        <Template>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                          Click="@(() => OnDeleteAsync(context))"
+                                          Icon="delete"
+                                          Size="ButtonSize.Small"/>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </RadzenStack>
+}
+
+@code {
+
+    /// <summary>
+    /// Choices used by the Units dropdown(s)
+    /// </summary>
+    private static readonly Enum[] UnitChoices =
+    [
+        WeightUnit.g,
+        WeightUnit.oz,
+        WeightUnit.lbs,
+        WeightUnit.kg
+    ];
+
+    private List<Weight>? _allWeights;
+    private IEnumerable<Weight>? _filteredWeights;
+    private bool _isSaving;
+    private WeightEditModel _model = new();
+    private IDisposable? _stateSubscription;
+    private WeightUnit _units = WeightUnit.g;
+
+    public void Dispose() => _stateSubscription?.Dispose();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+        ComponentState.TryTakeFromJson("allWeights", out _allWeights);
+        _allWeights ??= (await WeightRepository.GetAllAsync()).ValueOrDefault ?? [];
+        _filteredWeights = _allWeights;
+        Reset();
+    }
+
+    private void OnFelineSelected(int? felineId)
+    {
+        _model.FelineId = felineId ?? 0;
+        _filteredWeights = felineId switch
+        {
+            0 => _allWeights ?? [],
+            // When cat is selected, only show weights for the selected cat
+            _ => _allWeights?.Where(x => x.FelineId == felineId) ?? []
+        };
+    }
+
+    private void OnUnitsSelected(WeightUnit unit)
+    {
+        _model.Units = unit;
+        _units = unit;
+    }
+
+    private void Reset()
+    {
+        // Start a new form, but keep the selected unit type
+        _model = new()
+        {
+            DateTime = TimeProvider.GetLocalNow(),
+            Units = _units
+        };
+    }
+
+    private async Task OnSaveAsync()
+    {
+        _isSaving = true;
+        var rs = await WeightRepository.AddAsync(_model.ToWeight());
+        NotificationService.Notify(rs, "Weight saved", "Failed to save weight");
+        if (rs.IsSuccess)
+        {
+            // insert the weight as the most recent regardless of date and time
+            _allWeights = (_allWeights ?? []).Prepend(rs.Value).ToList();
+            OnFelineSelected(_model.FelineId);
+        }
+
+        _isSaving = false;
+    }
+
+    private async Task OnDeleteAsync(Weight? weight)
+    {
+        if (weight is null)
+        {
+            return;
+        }
+
+        _isSaving = true;
+        var rs = await WeightRepository.DeleteByKeyAsync(weight.FelineId, weight.DateTime);
+        NotificationService.Notify(rs, "Weight deleted", "Failed to delete weight");
+        if (rs.IsSuccess)
+        {
+            _allWeights = _allWeights?.Where(x => x.FelineId != weight.FelineId || x.DateTime != weight.DateTime).ToList() ?? [];
+            OnFelineSelected(_model.FelineId);
+        }
+
+        _isSaving = false;
+    }
+
+    private Task PersistStateAsync()
+    {
+        ComponentState.PersistAsJson("allWeights", _allWeights);
+        return Task.CompletedTask;
+    }
+
+}

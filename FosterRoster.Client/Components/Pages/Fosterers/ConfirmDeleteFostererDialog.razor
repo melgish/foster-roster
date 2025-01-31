@@ -1,11 +1,13 @@
-@inject DialogService DialogService
+﻿@inject DialogService DialogService
 
 <RadzenStack>
     <RadzenRow>
         <RadzenColumn>
             <RadzenText Typo="Typo.body1">
                 If you click Yes, you will delete all data about @Model.Name.
-                This action cannot be undone.
+                Any cats linked to @Model.Name will not be deleted. Instead
+                the Fosterer link will be cleared.
+                <em>This action cannot be undone.</em>
                 <br/><br/>
                 NOTE: @Model.Name will not be harmed.
             </RadzenText>
@@ -18,7 +20,7 @@
 </RadzenStack>
 
 @code {
-    [Parameter] public FelineEditModel Model { get; set; } = null!;
+    [Parameter] public FostererEditModel Model { get; set; } = null!;
 
     void Cancel() => DialogService.Close(false);
     void Confirm() => DialogService.Close(true);

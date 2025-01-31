@@ -1,0 +1,12 @@
+.deck {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.deck ::deep .mud-card-media {
+    background-color: silver;
+    border-radius: 1rem;
+}

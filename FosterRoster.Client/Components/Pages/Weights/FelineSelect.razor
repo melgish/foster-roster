@@ -1,17 +1,19 @@
-﻿@inject IFostererRepository FostererRepository
+@inject IFelineRepository FelineRepository;
 
 <RadzenDropDown TValue="int"
                 @attributes="@Attributes"
+                AllowFiltering="true"
                 Data="@_data"
                 Disabled="@Disabled"
-                Value="@Value.GetValueOrDefault(Select.Id)"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                FilterOperator="StringFilterOperator.StartsWith"
                 TextProperty="@nameof(ListItem<int>.Name)"
-                ValueChanged="@OnValueChanged"
+                Value="@Value.GetValueOrDefault()"
+                ValueChanged="@ValueChanged"
                 ValueProperty="@nameof(ListItem<int>.Id)"/>
 
 @code {
-    private static readonly ListItem<int> Select = new(0, "Select a forester...");
-    private List<ListItem<int>> _data = [Select];
+    private List<ListItem<int>> _data = [];
 
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; } = [];
@@ -20,22 +22,19 @@
 
     [Parameter] public int? Value { get; set; }
 
-    [Parameter] public EventCallback<int?> ValueChanged { get; set; }
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        _data = await FostererRepository.GetAllNamesAsync() switch
+        _data = await FelineRepository.GetAllNamesAsync() switch
         {
-            { IsSuccess: true } ok => ok.Value.Prepend(Select).ToList(),
-            _ => [Select]
+            { IsSuccess: true } ok => ok.Value.ToList(),
+            _ => []
         };
         await base.OnInitializedAsync();
         // Without this call, the select will display the ID value instead
         // of the associated text.
         await InvokeAsync(StateHasChanged);
     }
-
-    private void OnValueChanged(int value)
-        => ValueChanged.InvokeAsync(value == 0 ? null : value);
 
 }

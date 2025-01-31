@@ -2,6 +2,9 @@ namespace FosterRoster.Client.Extensions;
 
 public static class FelineExtensions
 {
+    private static string FormatAge(int? ageInWeeks, DateOnly? intakeDate, DateTimeOffset asOfDate)
+        => FormatAge(ageInWeeks, intakeDate?.ToDateTime(TimeOnly.MinValue), asOfDate);
+
     private static string FormatAge(int? ageInWeeks, DateTime? intakeDate, DateTimeOffset asOfDate)
     {
         TimeSpan? age = null;

@@ -15,6 +15,7 @@ public sealed class ServerFelineRepository(
             Id = f.Id,
             Breed = f.Breed,
             Category = f.Category,
+            Color = f.Color,
             Comments = f.Comments.OrderByDescending(c => c.TimeStamp).ToList(),
             FostererId = f.FostererId,
             Gender = f.Gender,
@@ -241,6 +242,7 @@ public sealed class ServerFelineRepository(
 
         existing.Breed = feline.Breed;
         existing.Category = feline.Category;
+        existing.Color = feline.Color;
         existing.FostererId = feline.FostererId;
         existing.Gender = feline.Gender;
         existing.IntakeAgeInWeeks = feline.IntakeAgeInWeeks;

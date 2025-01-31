@@ -1,0 +1,3 @@
+﻿.app-file-input ::deep input {
+    display: none;
+}

@@ -2,12 +2,10 @@
 
 using FosterRoster.Client.Components;
 using FosterRoster.Services;
-using MudBlazor.Services;
+using Radzen;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddMudServices(config => { config.SnackbarConfiguration.VisibleStateDuration = 2500; });
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
@@ -28,7 +26,9 @@ builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
+builder.Services.AddValidatorsFromAssemblyContaining<App>();
 
+builder.Services.AddRadzenComponents();
 
 var app = builder.Build();
 

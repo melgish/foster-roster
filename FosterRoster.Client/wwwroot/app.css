@@ -1,3 +1,4 @@
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -12,26 +13,13 @@ html, body {
     content: "An error has occurred."
 }
 
-.darker-border-checkbox.form-check-input {
-    border-color: #929292;
+.invalid ~ .rz-form-field-label {
+    /** use darker danger color for labels when invalid */
+    --rz-danger: var(--rz-danger-darker);
 }
 
 .validation-message {
-    color: var(--mud-palette-error);
+    /** use darker danger color for validation errors */
+    color: var(--rz-danger-darker);
 }
 
-.mud-file-upload .mud-image {
-    background-color: silver;
-    border-radius: 1rem;
-}
-
-.mud-file-upload .mud-image + .mud-button-root {
-    position: absolute;
-    left: 0.5rem;
-    top: 0.5rem;
-    background-color: white;
-}
-
-
-@import "_content/FosterRoster.Client/FosterRoster.Client.bundle.scp.css";
-@import "_content/FosterRoster.Client/tinymce/skins/content/default/content.min.css";

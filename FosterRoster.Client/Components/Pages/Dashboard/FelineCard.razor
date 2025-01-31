@@ -1,0 +1,59 @@
+@inject TimeProvider TimeProvider
+@inject IFelineRepository FelineRepository
+@inject ILogger<FelineCard> Logger
+
+@if (Feline is null)
+{
+    <RadzenCard Variant="Variant.Outlined">
+        <p>Loading...</p>
+    </RadzenCard>
+}
+else
+{
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Gap="0">
+            <RadzenStack Orientation="Orientation.Horizontal">
+                <RadzenText Text="@Feline.Name" TextStyle="TextStyle.H6"/>
+                <div style="flex: auto"></div>
+                <RadzenIcon Icon="photo_camera" IconStyle="IconStyle.Primary"/>
+            </RadzenStack>
+            <NavLink href=@($"/details/{Feline!.Id}")>
+                <img src="@Feline.Thumbnail.GetUrl()" alt="@Feline.Name" class="thumbnail"/>
+            </NavLink>
+            <RadzenText Text="@GenderCategory" TextStyle="TextStyle.Body1"/>
+            <RadzenText Text="@Feline.FormatAge(TimeProvider.GetUtcNow())"/>
+        </RadzenStack>
+    </RadzenCard>
+}
+
+@code {
+
+    /// <summary>
+    /// Feline to display.
+    /// </summary>
+    [Parameter]
+    public Feline? Feline { get; set; }
+
+    private string GenderCategory => $"{Feline?.Gender} {Feline?.Category}";
+
+    /// <summary>
+    /// Fired if Feline is updated.
+    /// </summary>
+    [Parameter]
+    public EventCallback<Feline> FelineChanged { get; set; }
+
+    private async Task OnFilesChangedAsync(IBrowserFile? file)
+    {
+        var thumbnail = await file.ToThumbnailAsync(Feline!.Id);
+        if (thumbnail is not null)
+        {
+            var rs = await FelineRepository.SetThumbnailAsync(Feline.Id, thumbnail);
+            if (rs.IsSuccess)
+            {
+                Feline = rs.Value;
+                await FelineChanged.InvokeAsync(Feline);
+            }
+        }
+    }
+
+}

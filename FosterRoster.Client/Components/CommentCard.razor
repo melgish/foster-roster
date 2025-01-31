@@ -1,24 +1,18 @@
 @using System.Globalization
 @inject TimeProvider TimeProvider
 
-
-<MudPaper Elevation="2" Outlined="true">
-    <MudStack>
-        <MudStack Row Class="px-1"
-                  AlignItems="AlignItems.Center"
-                  Justify="Justify.SpaceBetween">
-            <MudText>
-                @Comment.TimeStamp.ToLocalTime().DateTime.ToString(CultureInfo.CurrentUICulture) <small>(@Comment.FormatAgo(_now))</small>
-            </MudText>
-            <MudIconButton Color="Color.Error"
-                           Icon="@Icons.Material.TwoTone.Delete"
-                           OnClick="() => OnDelete.InvokeAsync(Comment)"
-                           Size="Size.Small"
-                           Variant="Variant.Text"/>
-        </MudStack>
-        <div style="padding: 0.25rem;">@_html</div>
-    </MudStack>
-</MudPaper>
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+        <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                      Click="() => OnDelete.InvokeAsync(Comment)"
+                      Icon="delete"
+                      Size="ButtonSize.Small"
+                      Variant="Variant.Outlined"/>
+        <RadzenText>@Comment.TimeStamp.ToLocalTime().DateTime.ToString(CultureInfo.CurrentUICulture) <small>(@Comment.FormatAgo(_now))</small>
+        </RadzenText>
+    </RadzenStack>
+    <RadzenHtml>@_html</RadzenHtml>
+</RadzenCard>
 
 @code {
     [Parameter] public Comment Comment { get; set; } = null!;

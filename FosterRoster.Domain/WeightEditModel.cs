@@ -4,11 +4,7 @@ public sealed class WeightEditModel()
 {
     public int FelineId { get; set; }
     public float Value { get; set; }
-
-    // This is a computed property that combines the Date and Time properties
-    // because MudBlazor does not have a Date+Time picker.
-    public DateTimeEditModel DateTime { get; set; } = new();
-
+    public DateTimeOffset? DateTime { get; set; }
     public WeightUnit Units { get; set; } = WeightUnit.g;
 
     public WeightEditModel(Weight weight) : this()
@@ -24,7 +20,7 @@ public sealed class WeightEditModel()
         {
             FelineId = FelineId,
             Value = Value,
-            DateTime = DateTime.Value!.Value,
+            DateTime = DateTime.GetValueOrDefault().UtcDateTime,
             Units = Units
         };
 }

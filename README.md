@@ -11,7 +11,7 @@ dotnet watch --project FosterRoster
 
 ### update database
 ```sh
-dotnet ef database upgrade --project FosterRoster.Data
+dotnet ef database update --project FosterRoster.Data
 ```
 
 ### create database migration

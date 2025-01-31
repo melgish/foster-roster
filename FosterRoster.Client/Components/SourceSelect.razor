@@ -1,33 +1,34 @@
 @inject ISourceRepository SourceRepository;
 
-<MudSelect T="int" Label="Source" Value="@_value" ValueChanged="@OnValueChanged" @attributes="@Attributes">
-    <MudSelectItem Value="0">Select a source...</MudSelectItem>
-    @foreach (var name in _sources)
-    {
-        <MudSelectItem @key="@name.Value" Value="@name.Value">@name.Text</MudSelectItem>
-    }
-</MudSelect>
+<RadzenDropDown TValue="int"
+                @attributes="@Attributes"
+                Data="@_data"
+                Disabled="@Disabled"
+                TextProperty="@nameof(ListItem<int>.Name)"
+                Value="@Value.GetValueOrDefault(Select.Id)"
+                ValueChanged="@OnValueChanged"
+                ValueProperty="@nameof(ListItem<int>.Id)"/>
 
 @code {
-    private int _value = 0;
-
-    private List<ListItem<int>> _sources = [];
+    private static readonly ListItem<int> Select = new(0, "Select a source...");
+    private List<ListItem<int>> _data = [Select];
 
     [Parameter(CaptureUnmatchedValues = true)]
     public Dictionary<string, object> Attributes { get; set; } = [];
 
-    [Parameter] public EventCallback<int?> ValueChanged { get; set; }
+    [Parameter] public bool Disabled { get; set; }
 
     [Parameter] public int? Value { get; set; }
 
+    [Parameter] public EventCallback<int?> ValueChanged { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        _sources = await SourceRepository.GetAllNamesAsync() switch
+        _data = await SourceRepository.GetAllNamesAsync() switch
         {
-            { IsSuccess: true } ok => ok.Value,
-            _ => []
+            { IsSuccess: true } ok => ok.Value.Prepend(Select).ToList(),
+            _ => [Select]
         };
-        _value = Value ?? 0;
         await base.OnInitializedAsync();
         // Without this call, the select will display the ID value instead
         // of the associated text.
@@ -35,14 +36,6 @@
     }
 
     private void OnValueChanged(int value)
-    {
-        _value = value;
-        ValueChanged.InvokeAsync(value == 0 ? null : value);
-    }
-
-    protected override void OnParametersSet()
-    {
-        _value = Value ?? 0;
-    }
+        => ValueChanged.InvokeAsync(value == 0 ? null : value);
 
 }
