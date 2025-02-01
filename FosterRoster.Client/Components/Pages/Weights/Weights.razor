@@ -30,7 +30,7 @@ else
                         <RadzenColumn SizeXS="12" SizeSM="6">
                             <RadzenStack Gap="0rem">
                                 <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
-                                    <FelineSelect @bind-Value="_model.FelineId"/>
+                                    <FelineSelect Value="@_model.FelineId" ValueChanged="@OnFelineSelected"/>
                                 </RadzenFormField>
                                 <ValidationMessage For="@(() => _model.FelineId)"/>
                             </RadzenStack>
@@ -152,9 +152,9 @@ else
         Reset();
     }
 
-    private void OnFelineSelected(int? felineId)
+    private void OnFelineSelected(int felineId)
     {
-        _model.FelineId = felineId ?? 0;
+        _model.FelineId = felineId;
         _filteredWeights = felineId switch
         {
             0 => _allWeights ?? [],
