@@ -96,7 +96,11 @@ else
             <RadzenText Text="Weights" TextStyle="TextStyle.DisplayH4" class="rz-px-4"/>
             <RadzenDataGrid TItem="Weight" Data="_filteredWeights">
                 <Columns>
-                    <RadzenDataGridColumn Property="DateTime" Title="Date" FormatString="{0:MMM dd \a\t hh:mm tt}"/>
+                    <RadzenDataGridColumn Property="DateTime" Title="Date">
+                        <Template Context="data">
+                            @(data.DateTime.ToLocalTime().ToString("MMM dd \\a\\t hh:mm tt"))
+                        </Template>
+                    </RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="Feline.Name" Title="Name"/>
                     <RadzenDataGridColumn Property="Value" Title="Weight">
                         <Template Context="data">@data.Format(_units)</Template>
