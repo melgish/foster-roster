@@ -15,11 +15,11 @@ html, body {
 
 .invalid ~ .rz-form-field-label {
     /** use darker danger color for labels when invalid */
-    --rz-danger: var(--rz-danger-darker);
+    /*--rz-danger: var(--rz-danger);*/
 }
 
 .validation-message {
     /** use darker danger color for validation errors */
-    color: var(--rz-danger-darker);
+    color: var(--rz-danger);
 }
 

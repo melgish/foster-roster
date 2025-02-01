@@ -1,3 +1,7 @@
 @using System.Reflection
 
-<RadzenText>v@(Assembly.GetExecutingAssembly().GetName().Version)</RadzenText>
+<RadzenText Text="@_version" TextStyle="TextStyle.Body1"/>
+
+@code {
+    private static string _version = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
+}

@@ -7,7 +7,7 @@
 
 <PageTitle>Intake</PageTitle>
 <RadzenStack>
-    <RadzenPanel class="rz-pa-2 rz-shadow-3">
+    <RadzenPanel class="rz-shadow-3">
         <FelineEditForm Feline="@_feline" IsNew OnSave="OnSaveAsync"/>
     </RadzenPanel>
 </RadzenStack>
@@ -33,13 +33,12 @@
     private async Task OnSaveAsync(FelineEditModel model)
     {
         var result = await FelineRepository.AddAsync(model);
-        if (!result.IsSuccess)
+        NotificationService.Notify(result, "Feline saved", "Failed to save feline");
+        if (result.IsSuccess)
         {
-            NotificationService.Notify(NotificationSeverity.Error, $"Failed to save. {result.Reasons}");
+            var feline = result.Value;
+            NavigationManager.NavigateTo($"/details/{feline.Id}");
         }
-
-        var feline = result.Value;
-        NavigationManager.NavigateTo($"/details/{feline.Id}");
     }
 
 }

@@ -4,9 +4,8 @@
 <div class="app-thumbnail">
     <RadzenImage AlternateText="@(AlternateText ?? "Thumbnail")"
                  Path="@Path"
-                 class="foo"
                  Style="width:256px;height:256px;background-color:var(--rz-primary-lighter);"/>
-    <AppFileInput OnChange="OnChange" Style="border-radius: 50%"/>
+    <AppFileInput OnChange="OnChange" Rounded="true"/>
 </div>
 
 @code {

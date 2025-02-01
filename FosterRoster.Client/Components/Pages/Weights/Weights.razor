@@ -15,7 +15,7 @@
 else
 {
     <RadzenStack>
-        <RadzenCard>
+        <RadzenPanel class="rz-shadow-3">
             <EditForm FormName="weightForm"
                       Model="_model"
                       OnValidSubmit="OnSaveAsync">
@@ -23,7 +23,7 @@ else
                 <RadzenStack Gap="0.5rem">
                     <RadzenRow Gap="1rem" RowGap="0.5rem">
                         <RadzenColumn Size="12">
-                            <h1>Enter Weight</h1>
+                            <RadzenText Text="Enter Weight" TextStyle="TextStyle.DisplayH4"/>
                         </RadzenColumn>
                     </RadzenRow>
                     <RadzenRow Gap="1rem" RowGap="0.5rem">
@@ -61,7 +61,7 @@ else
                                 <ValidationMessage For="@(() => _model.Value)"/>
                             </RadzenStack>
                         </RadzenColumn>
-                        <RadzenColumn SizeXS="12" SizeSM="6">
+                        <RadzenColumn SizeSM="6" SizeXS="12">
                             <RadzenStack Gap="0rem">
                                 <RadzenFormField AllowFloatingLabel="false" Text="Units" Variant="Variant.Text">
                                     <RadzenDropDown TValue="Enum" Value="@((Enum)_model.Units)" Data="@UnitChoices"
@@ -91,9 +91,9 @@ else
                     </RadzenRow>
                 </RadzenStack>
             </EditForm>
-        </RadzenCard>
-        <RadzenCard>
-            <h2>Recent Weights</h2>
+        </RadzenPanel>
+        <RadzenPanel class="rz-px-0 rz-pb-0 rz-shadow-3">
+            <RadzenText Text="Weights" TextStyle="TextStyle.DisplayH4" class="rz-px-4"/>
             <RadzenDataGrid TItem="Weight" Data="_filteredWeights">
                 <Columns>
                     <RadzenDataGridColumn Property="DateTime" Title="Date" FormatString="{0:MMM dd \a\t hh:mm tt}"/>
@@ -106,12 +106,14 @@ else
                             <RadzenButton ButtonStyle="ButtonStyle.Danger"
                                           Click="@(() => OnDeleteAsync(context))"
                                           Icon="delete"
-                                          Size="ButtonSize.Small"/>
+                                          Size="ButtonSize.ExtraSmall"
+                                          Text="Delete"
+                                          Variant="Variant.Outlined"/>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
-        </RadzenCard>
+        </RadzenPanel>
     </RadzenStack>
 }
 

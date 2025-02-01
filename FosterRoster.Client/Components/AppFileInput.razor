@@ -49,6 +49,12 @@
     public EventCallback<InputFileChangeEventArgs> OnChange { get; set; }
 
     /// <summary>
+    /// Get or sets value indicating if buttn should be round
+    /// </summary>
+    [Parameter]
+    public bool Rounded { get; set; } = false;
+
+    /// <summary>
     /// Gets or sets the color shade of the button.
     /// </summary>
     /// <value>The color shade of the button.</value>
@@ -94,6 +100,7 @@
         string[] parts =
         [
             "app-file-input rz-button",
+            Rounded ? "app-rounded" : "",
             $"rz-button-{GetButtonSize()}",
             $"rz-variant-{Enum.GetName(Variant)}",
             $"rz-{Enum.GetName(ButtonStyle)}",

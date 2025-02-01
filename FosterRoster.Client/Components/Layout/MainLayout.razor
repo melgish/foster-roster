@@ -10,13 +10,14 @@
             <RadzenLink Path="/weights" Text="Weights"/>
             <RadzenLink Path="/fosterers" Text="Fosterers"/>
             <div style="flex: auto"></div>
+            <RadzenAppearanceToggle @rendermode="InteractiveWebAssembly"/>
             <RadzenLink Path="https://github.com/melgish/foster-roster" Target="_blank">Source</RadzenLink>
         </RadzenStack>
     </RadzenHeader>
     <RadzenBody>
         @Body
     </RadzenBody>
-    <RadzenFooter>
+    <RadzenFooter class="rz-py-0 rz-background-secondary-light">
         <Verison/>
     </RadzenFooter>
 </RadzenLayout>

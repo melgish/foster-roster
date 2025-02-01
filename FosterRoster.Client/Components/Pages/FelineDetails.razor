@@ -15,18 +15,18 @@
 else
 {
     <RadzenStack>
-        <RadzenCard Variant="Variant.Outlined">
+        <RadzenPanel class="rz-shadow-3">
             <FelineEditForm Feline="@_feline"
                             OnActivate="OnActivateAsync"
                             OnDelete="OnDeleteAsync"
                             OnInactivate="OnInactivateAsync"
                             OnSave="OnSaveAsync"/>
-        </RadzenCard>
-        <RadzenCard Variant="Variant.Outlined">
+        </RadzenPanel>
+        <RadzenPanel class="rz-p-0 rz-shadow-3">
             <RadzenTabs>
                 <Tabs>
                     <RadzenTabsItem Text="Journal" Icon="edit">
-                        <RadzenStack>
+                        <RadzenStack Gap="1rem" Style="margin:-1rem;">
                             <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded"/>
                             @foreach (var comment in _feline.Comments)
                             {
@@ -40,7 +40,7 @@ else
                     <RadzenTabsItem Text="TBD?"></RadzenTabsItem>
                 </Tabs>
             </RadzenTabs>
-        </RadzenCard>
+        </RadzenPanel>
     </RadzenStack>
 }
 

@@ -10,201 +10,213 @@ else
               Model="@_model"
               OnValidSubmit="@SaveAsync">
         <FluentValidationValidator/>
-        <RadzenRow>
-            <RadzenColumn Size="12">
-                <h1>@_name</h1>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="4">
-                <AppThumbnail
-                    Path="@_model.Thumbnail.GetUrl()"
-                    disabled="@_model.IsInactive"
-                    OnChange="OnFilesChangedAsync"
-                />
-            </RadzenColumn>
-            <RadzenColumn Size="8">
-                <RadzenStack>
-                    <RadzenFormField
-                        AllowFloatingLabel="false"
-                        Text="Intake Date"
-                        Variant="Variant.Text">
-                        <RadzenDatePicker @bind-Value="_model.IntakeDate"
-                                          Disabled="@_model.IsInactive"
-                                          Placeholder="mm/dd/yyyy"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.IntakeDate)"/>
+        <RadzenStack Gap="0.5rem">
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn Size="12">
+                    <RadzenText Text="@_name" TextStyle="TextStyle.DisplayH4"/>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="4" SizeXS="12">
+                    <RadzenStack JustifyContent="JustifyContent.SpaceAround" Orientation="Orientation.Horizontal">
+                        <AppThumbnail
+                            Path="@_model.Thumbnail.GetUrl()"
+                            disabled="@_model.IsInactive"
+                            OnChange="OnFilesChangedAsync"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="8" SizeXS="12">
+                    <RadzenStack Gap="1rem">
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Text="Intake Date"
+                                Variant="Variant.Text">
+                                <RadzenDatePicker @bind-Value="_model.IntakeDate"
+                                                  Disabled="@_model.IsInactive"
+                                                  Placeholder="mm/dd/yyyy"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.IntakeDate)"/>
+                        </RadzenStack>
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Text="Name" Variant="Variant.Text">
 
-                    <RadzenFormField
-                        AllowFloatingLabel="false"
-                        Text="Name" Variant="Variant.Text">
-
-                        <RadzenTextBox @bind-Value="_model.Name"
-                                       Disabled="@_model.IsInactive"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Name)"/>
-
-                    <RadzenFormField
-                        AllowFloatingLabel="false"
-                        Text="Gender"
-                        Variant="Variant.Text">
-                        <RadzenRadioButtonList TValue="Gender" @bind-Value="_model.Gender" Disabled="@_model.IsInactive"
-                                               class="rz-pt-2">
-                            <Items>
-                                <RadzenRadioButtonListItem Text="Female" Value="@Gender.Female" TValue="Gender"/>
-                                <RadzenRadioButtonListItem Text="Male" Value="@Gender.Male" TValue="Gender"/>
-                            </Items>
-                        </RadzenRadioButtonList>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Gender)"/>
-
-                    <RadzenFormField
-                        AllowFloatingLabel="false"
-                        Text="Age at Intake (weeks)" Variant="Variant.Text">
-                        <RadzenNumeric @bind-Value="_model.IntakeAgeInWeeks"
-                                       Disabled="@_model.IsInactive"
-                                       Min="0"
-                                       ShowUpDown="false"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.IntakeAgeInWeeks)"/>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Breed" Variant="Variant.Text">
-                        <RadzenTextBox @bind-Value="_model.Breed"
-                                       Disabled="@_model.IsInactive"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Breed)"/>
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Color" Variant="Variant.Text">
-                        <RadzenTextBox @bind-Value="_model.Color"
-                                       Disabled="@_model.IsInactive"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Color)"/>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Source" Variant="Variant.Text">
-                        <SourceSelect @bind-Value="_model.SourceId"
-                                      Disabled="@_model.IsInactive"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.SourceId)"/>
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Fosterer" Variant="Variant.Text">
-                        <FostererSelect @bind-Value="_model.FostererId"
-                                        Disabled="@_model.IsInactive"/>
-                        <ValidationMessage For="@(() => _model.FostererId)"/>
-                    </RadzenFormField>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Category" Variant="Variant.Text">
-                        <RadzenDropDown @bind-Value="_model.Category" Data="@CategoryChoices"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Category)"/>
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Registration Date" Variant="Variant.Text">
-                        <RadzenDatePicker @bind-Value="_model.RegistrationDate"
-                                          Disabled="@_model.IsInactive"
-                                          Placeholder="mm/dd/yyyy"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.RegistrationDate)"/>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField
-                        AllowFloatingLabel="false"
-                        Text="Weaned"
-                        Variant="Variant.Text">
-                        <RadzenRadioButtonList TValue="Weaned" @bind-Value="_model.Weaned" Disabled="@_model.IsInactive"
-                                               class="rz-pt-2">
-                            <Items>
-                                <RadzenRadioButtonListItem Text="No" Value="@Weaned.No" TValue="Weaned"/>
-                                <RadzenRadioButtonListItem Text="In Progress" Value="@Weaned.InProgress"
-                                                           TValue="Weaned"/>
-                                <RadzenRadioButtonListItem Text="Yes" Value="@Weaned.Yes" TValue="Weaned"/>
-                            </Items>
-                        </RadzenRadioButtonList>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Weaned)"/>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow class="rz-mt-2">
-            <RadzenColumn>
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                             JustifyContent="JustifyContent.End">
-                    @if (_model.IsInactive)
-                    {
-                        <RadzenText>
-                            Inactive as of @_model.InactivatedAtUtc
-                        </RadzenText>
-                    }
-                    <div></div>
-                    @if (_isSaving)
-                    {
-                        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" ShowValue="false"
-                                                   Mode="ProgressBarMode.Indeterminate"/>
-                    }
-                    @if (!IsNew)
-                    {
+                                <RadzenTextBox @bind-Value="_model.Name"
+                                               Disabled="@_model.IsInactive"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.Name)"/>
+                        </RadzenStack>
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Text="Gender"
+                                Variant="Variant.Text">
+                                <RadzenRadioButtonList TValue="Gender" @bind-Value="_model.Gender"
+                                                       Disabled="@_model.IsInactive"
+                                                       class="rz-pt-2">
+                                    <Items>
+                                        <RadzenRadioButtonListItem Text="Female" Value="@Gender.Female"
+                                                                   TValue="Gender"/>
+                                        <RadzenRadioButtonListItem Text="Male" Value="@Gender.Male" TValue="Gender"/>
+                                    </Items>
+                                </RadzenRadioButtonList>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.Gender)"/>
+                        </RadzenStack>
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Text="Age at Intake (weeks)" Variant="Variant.Text">
+                                <RadzenNumeric @bind-Value="_model.IntakeAgeInWeeks"
+                                               Disabled="@_model.IsInactive"
+                                               Min="0"
+                                               ShowUpDown="false"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.IntakeAgeInWeeks)"/>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Breed" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.Breed"
+                                           Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Breed)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Color" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.Color"
+                                           Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Color)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Source" Variant="Variant.Text">
+                            <SourceSelect @bind-Value="_model.SourceId"
+                                          Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.SourceId)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Fosterer" Variant="Variant.Text">
+                            <FostererSelect @bind-Value="_model.FostererId"
+                                            Disabled="@_model.IsInactive"/>
+                            <ValidationMessage For="@(() => _model.FostererId)"/>
+                        </RadzenFormField>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Category" Variant="Variant.Text">
+                            <RadzenDropDown @bind-Value="_model.Category" Data="@CategoryChoices"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Category)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Registration Date" Variant="Variant.Text">
+                            <RadzenDatePicker @bind-Value="_model.RegistrationDate"
+                                              Disabled="@_model.IsInactive"
+                                              Placeholder="mm/dd/yyyy"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.RegistrationDate)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField
+                            AllowFloatingLabel="false"
+                            Text="Weaned"
+                            Variant="Variant.Text">
+                            <RadzenRadioButtonList TValue="Weaned" @bind-Value="_model.Weaned"
+                                                   Disabled="@_model.IsInactive"
+                                                   class="rz-pt-2">
+                                <Items>
+                                    <RadzenRadioButtonListItem Text="No" Value="@Weaned.No" TValue="Weaned"/>
+                                    <RadzenRadioButtonListItem Text="In Progress" Value="@Weaned.InProgress"
+                                                               TValue="Weaned"/>
+                                    <RadzenRadioButtonListItem Text="Yes" Value="@Weaned.Yes" TValue="Weaned"/>
+                                </Items>
+                            </RadzenRadioButtonList>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Weaned)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn Size="12">
+                    <RadzenStack AlignItems="AlignItems.Center"
+                                 JustifyContent="JustifyContent.End"
+                                 Orientation="Orientation.Horizontal">
                         @if (_model.IsInactive)
                         {
-                            <RadzenButton ButtonStyle="ButtonStyle.Info"
-                                          Click="@ActivateAsync"
-                                          Disabled="@(_isSaving || !_model.IsInactive)"
-                                          Text="Activate"
-                                          Variant="Variant.Outlined"/>
+                            <RadzenText>
+                                Inactive as of @_model.InactivatedAtUtc
+                            </RadzenText>
                         }
-                        else
+                        <div></div>
+                        @if (_isSaving)
                         {
-                            <RadzenButton ButtonStyle="ButtonStyle.Info"
-                                          Click="@InactivateAsync"
+                            <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" ShowValue="false"
+                                                       Mode="ProgressBarMode.Indeterminate"/>
+                        }
+                        @if (!IsNew)
+                        {
+                            @if (_model.IsInactive)
+                            {
+                                <RadzenButton ButtonStyle="ButtonStyle.Info"
+                                              Click="@ActivateAsync"
+                                              Disabled="@(_isSaving || !_model.IsInactive)"
+                                              Text="Activate"
+                                              Variant="Variant.Outlined"/>
+                            }
+                            else
+                            {
+                                <RadzenButton ButtonStyle="ButtonStyle.Info"
+                                              Click="@InactivateAsync"
+                                              Disabled="@(_isSaving || _model.IsInactive)"
+                                              Text="Inactivate"
+                                              Variant="Variant.Outlined"/>
+                            }
+
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                          Click="@DeleteAsync"
                                           Disabled="@(_isSaving || _model.IsInactive)"
-                                          Text="Inactivate"
+                                          Text="Delete"
                                           Variant="Variant.Outlined"/>
                         }
+                        <RadzenButton ButtonType="ButtonType.Submit"
+                                      Disabled="@(_isSaving || _model.IsInactive)"
+                                      Text="Save"
+                                      Variant="Variant.Outlined"/>
 
                         <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                      Click="@DeleteAsync"
+                                      Click="@ResetAsync"
                                       Disabled="@(_isSaving || _model.IsInactive)"
-                                      Text="Delete"
+                                      Text="Reset"
                                       Variant="Variant.Outlined"/>
-                    }
-                    <RadzenButton ButtonType="ButtonType.Submit"
-                                  Disabled="@(_isSaving || _model.IsInactive)"
-                                  Text="Save"
-                                  Variant="Variant.Outlined"/>
-
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                  Click="@ResetAsync"
-                                  Disabled="@(_isSaving || _model.IsInactive)"
-                                  Text="Reset"
-                                  Variant="Variant.Outlined"/>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
     </EditForm>
 }
 

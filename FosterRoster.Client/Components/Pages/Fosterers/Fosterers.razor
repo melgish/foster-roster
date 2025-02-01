@@ -8,17 +8,17 @@
 
 <PageTitle>Fosterers</PageTitle>
 <RadzenStack>
-    <RadzenCard Variant="Variant.Outlined">
+    <RadzenPanel class="rz-shadow-3">
         <FostererForm
             Fosterer="_fosterer"
             IsNew="@(_fosterer.Id == 0)"
             OnDelete="OnDeleteAsync"
             OnSave="OnSaveAsync"
         />
-    </RadzenCard>
-    <RadzenCard Variant="Variant.Outlined">
+    </RadzenPanel>
+    <RadzenPanel class="rz-p-0 rz-shadow-3">
         <FosterersGrid Items="_fosterers" OnAdd="@OnAddAsync" OnEdit="@OnEditAsync"/>
-    </RadzenCard>
+    </RadzenPanel>
 </RadzenStack>
 
 @code {
