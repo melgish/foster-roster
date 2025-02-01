@@ -1,0 +1,13 @@
+﻿.app-thumbnail {
+    position: relative;
+}
+
+.app-thumbnail ::deep label {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+}
+
+.app-thumbnail ::deep img {
+    border-radius: 1rem;
+}

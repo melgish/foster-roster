@@ -1,0 +1,40 @@
+@inject IFelineRepository FelineRepository;
+
+<RadzenDropDown TValue="int"
+                @attributes="@Attributes"
+                AllowFiltering="true"
+                Data="@_data"
+                Disabled="@Disabled"
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                FilterOperator="StringFilterOperator.StartsWith"
+                TextProperty="@nameof(ListItem<int>.Name)"
+                Value="@Value.GetValueOrDefault()"
+                ValueChanged="@ValueChanged"
+                ValueProperty="@nameof(ListItem<int>.Id)"/>
+
+@code {
+    private List<ListItem<int>> _data = [];
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; } = [];
+
+    [Parameter] public bool Disabled { get; set; }
+
+    [Parameter] public int? Value { get; set; }
+
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _data = await FelineRepository.GetAllNamesAsync() switch
+        {
+            { IsSuccess: true } ok => ok.Value.ToList(),
+            _ => []
+        };
+        await base.OnInitializedAsync();
+        // Without this call, the select will display the ID value instead
+        // of the associated text.
+        await InvokeAsync(StateHasChanged);
+    }
+
+}

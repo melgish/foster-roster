@@ -1,10 +1,14 @@
 namespace FosterRoster.Domain;
 
+using System.ComponentModel.DataAnnotations;
+
 public enum Category
 {
     Unknown = 0,
     Kitten = 1,
     Cat = 2,
+
+    [Display(Description = "Nursing Kitten")]
     NursingKitten = 5,
-    NursingCat = 6,
+    [Display(Description = "Nursing Cat")] NursingCat = 6
 }

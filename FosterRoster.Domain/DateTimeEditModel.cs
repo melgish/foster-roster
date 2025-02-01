@@ -1,7 +1,5 @@
 namespace FosterRoster.Domain;
 
-using FluentValidation;
-
 /// <summary>
 /// A model for dealing with MudBlazor Date / Time picker quirks.
 /// </summary>
@@ -22,10 +20,7 @@ public sealed class DateTimeEditModel
         set => (Date, Time) = (value?.Date, value?.TimeOfDay);
     }
 
-    public DateTimeEditModel(DateTime? value = null)
-    {
-        Value = value;
-    }
+    public DateTimeEditModel(DateTime? value = null) => Value = value;
 
     /// <summary>
     /// Gets or sets the date part of the value.
@@ -42,18 +37,3 @@ public sealed class DateTimeEditModel
     public static implicit operator DateTime(DateTimeEditModel model) => model.Value!.Value;
     public static implicit operator DateTimeEditModel(DateTime? value) => new(value);
 }
-
-public sealed class DateTimeEditModelValidator : AbstractValidator<DateTimeEditModel>
-{
-    public DateTimeEditModelValidator()
-    {
-        RuleFor(model => model.Date)
-            .NotNull()
-            .WithMessage("Please enter a date.");
-        RuleFor(model => model.Time)
-            .NotNull()
-            .WithMessage("Please enter a time.");
-    }
-}
-
-

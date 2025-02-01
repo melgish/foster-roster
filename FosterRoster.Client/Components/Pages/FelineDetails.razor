@@ -2,57 +2,58 @@
 @rendermode InteractiveWebAssembly
 @implements IDisposable
 @inject ICommentRepository CommentRepository
-@inject PersistentComponentState ComponentState;
+@inject PersistentComponentState ComponentState
 @inject IFelineRepository FelineRepository
 @inject NavigationManager NavigationManager
-@inject ISnackbar Snackbar
+@inject NotificationService NotificationService
 
 <PageTitle>Details: @Name</PageTitle>
 @if (_feline is null)
 {
-    <Loading />
+    <Loading/>
 }
 else
 {
-    <MudStack>
-        <MudPaper Elevation="3" Class="pa-2">
+    <RadzenStack>
+        <RadzenPanel class="rz-shadow-3">
             <FelineEditForm Feline="@_feline"
                             OnActivate="OnActivateAsync"
                             OnDelete="OnDeleteAsync"
                             OnInactivate="OnInactivateAsync"
-                            OnSave="OnSaveAsync" />
-        </MudPaper>
-        <MudTabs Elevation="3" ApplyEffectsToContainer="true" PanelClass="pa-2">
-            <MudTabPanel Text="Journal" Icon="@Icons.Material.Filled.NoteAlt">
-                <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded" />
-                <MudStack Spacing="3">
-                @foreach (var comment in _feline.Comments)
-                {
-                    <CommentCard @key="comment.Id" Comment="comment" OnDelete="OnDeleteCommentAsync" />
-                }
-                </MudStack>
-            </MudTabPanel>
-            <MudTabPanel Text="Medical" Icon="@Icons.Material.Filled.HealthAndSafety">
-                <MudText>TBD</MudText>
-            </MudTabPanel>
-            <MudTabPanel Text="TBD" Icon="@Icons.Material.Filled.QuestionMark">
-                <MudText>TBD</MudText>
-            </MudTabPanel>
-        </MudTabs>
-    </MudStack>
+                            OnSave="OnSaveAsync"/>
+        </RadzenPanel>
+        <RadzenPanel class="rz-p-0 rz-shadow-3">
+            <RadzenTabs>
+                <Tabs>
+                    <RadzenTabsItem Text="Journal" Icon="edit">
+                        <RadzenStack Gap="1rem" Style="margin:-1rem;">
+                            <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded"/>
+                            @foreach (var comment in _feline.Comments)
+                            {
+                                <CommentCard @key="comment.Id" Comment="comment" OnDelete="OnDeleteCommentAsync"/>
+                            }
+                        </RadzenStack>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="Medical">
+                        <RadzenText Text="Medical"/>
+                    </RadzenTabsItem>
+                    <RadzenTabsItem Text="TBD?"></RadzenTabsItem>
+                </Tabs>
+            </RadzenTabs>
+        </RadzenPanel>
+    </RadzenStack>
 }
 
 @code {
     private IDisposable? _stateSubscription;
     private Feline? _feline;
-    
+
     private string Name => _feline?.Name ?? string.Empty;
-    
-    [Parameter]
-    public int FelineId { get; set; }
+
+    [Parameter] public int FelineId { get; set; }
 
     private async Task<Feline?> LoadAsync()
-        => await FelineRepository.GetByKeyAsync(FelineId);
+        => (await FelineRepository.GetByKeyAsync(FelineId)).ValueOrDefault;
 
     void OnCommentAdded(Comment comment)
     {
@@ -61,7 +62,10 @@ else
 
     async Task OnDeleteCommentAsync(Comment comment)
     {
-        if (await CommentRepository.DeleteByKeyAsync(comment.Id)) {
+        var rs = await CommentRepository.DeleteByKeyAsync(comment.Id);
+        NotificationService.Notify(rs, "Comment Deleted", "Failed to delete comment");
+        if (rs.IsSuccess)
+        {
             _feline!.Comments = _feline.Comments.Where(c => c.Id != comment.Id).ToArray();
         }
     }
@@ -71,7 +75,8 @@ else
         _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
         ComponentState.TryTakeFromJson("feline", out _feline);
         _feline ??= await LoadAsync();
-        if (_feline is null) {
+        if (_feline is null)
+        {
             NavigationManager.NavigateTo("/not-found");
         }
     }
@@ -87,36 +92,40 @@ else
 
     public void Dispose() => _stateSubscription?.Dispose();
 
+    /// <summary>
+    /// Handle when user clicks activate button.
+    /// </summary>
     private async Task OnActivateAsync()
     {
-        if (!await FelineRepository.Activate(FelineId))
-        {
-            Snackbar.Add("Failed to activate", Severity.Error);
-            return;
-        }
-        Snackbar.Add("Activated", Severity.Success);
+        var rs = await FelineRepository.ActivateAsync(FelineId);
+        NotificationService.Notify(rs, "Activated", "Failed to Activate");
         await RefreshAsync();
     }
 
+    /// <summary>
+    /// Handle when user clicks delete button.
+    /// </summary>
     private async Task OnDeleteAsync()
     {
-        if (await FelineRepository.DeleteByKeyAsync(FelineId))
+        var rs = await FelineRepository.DeleteByKeyAsync(FelineId);
+        NotificationService.Notify(rs, "Deleted", "Failed to Delete");
+        if (rs.IsFailed)
         {
-            NavigationManager.NavigateTo("/");
+            await RefreshAsync();
             return;
         }
-        Snackbar.Add("Failed to delete", Severity.Error);
+
+        NavigationManager.NavigateTo("/");
     }
 
+    /// <summary>
+    /// Handle when user clicks inactivate button
+    /// </summary>
+    /// <param name="asOf"></param>
     private async Task OnInactivateAsync(DateTimeOffset asOf)
     {
-        if (!await FelineRepository.Inactivate(FelineId, asOf))
-        {
-            Snackbar.Add("Failed to inactivate", Severity.Error);
-            return;
-        }
-
-        Snackbar.Add("Inactivated", Severity.Success);
+        var rs = await FelineRepository.DeactivateAsync(FelineId, asOf);
+        NotificationService.Notify(rs, "Deactivated", "Failed to Deactivate");
         await RefreshAsync();
     }
 
@@ -125,16 +134,14 @@ else
     /// </summary>
     private async Task OnSaveAsync(FelineEditModel model)
     {
-        var updated = await FelineRepository.UpdateAsync(FelineId, model.ToFeline());
-        if (updated is null)
+        var rs = await FelineRepository.UpdateAsync(FelineId, model.ToFeline());
+        NotificationService.Notify(rs, "Saved", "Failed to save");
+        if (rs.IsSuccess)
         {
-            Snackbar.Add("Failed to save", Severity.Error);
+            _feline = rs.Value;
         }
-        else
-        {
-            _feline = updated;
-            Snackbar.Add("Saved", Severity.Success);
-        }
+
         await RefreshAsync();
     }
+
 }

@@ -5,7 +5,7 @@ services:
   db:
     image: postgres:17
     environment:
-      # localhost devleopment settings. change these in the real world.
+      # localhost development settings. change these in the real world.
       POSTGRES_DB: mydb
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword

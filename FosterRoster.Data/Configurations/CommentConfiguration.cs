@@ -37,4 +37,3 @@ internal sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .IsDescending(false, true);
     }
 }
-

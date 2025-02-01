@@ -1,0 +1,97 @@
+@page "/fosterers"
+@rendermode InteractiveWebAssembly
+@implements IDisposable
+@inject PersistentComponentState ComponentState
+@inject IFostererRepository FostererRepository
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+
+<PageTitle>Fosterers</PageTitle>
+<RadzenStack>
+    <RadzenPanel class="rz-shadow-3">
+        <FostererForm
+            Fosterer="_fosterer"
+            IsNew="@(_fosterer.Id == 0)"
+            OnDelete="OnDeleteAsync"
+            OnSave="OnSaveAsync"
+        />
+    </RadzenPanel>
+    <RadzenPanel class="rz-p-0 rz-shadow-3">
+        <FosterersGrid Items="_fosterers" OnAdd="@OnAddAsync" OnEdit="@OnEditAsync"/>
+    </RadzenPanel>
+</RadzenStack>
+
+@code {
+    private Fosterer _fosterer = new();
+    private ICollection<Fosterer>? _fosterers = [];
+    private IDisposable? _stateSubscription;
+
+    private Task OnAddAsync()
+    {
+        _fosterer = new();
+        return Task.CompletedTask;
+    }
+
+    public void Dispose() => _stateSubscription?.Dispose();
+
+    private async Task RefreshAsync(int fostererId)
+    {
+        _fosterers = (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
+        _fosterer = _fosterers.FirstOrDefault(e => e.Id == fostererId) ?? new();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+        ComponentState.TryTakeFromJson("fosterers", out _fosterers);
+        _fosterers ??= (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
+        _fosterer = new();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task OnDeleteAsync()
+    {
+        if (_fosterer.Id <= 0)
+        {
+            return;
+        }
+
+        var rs = await FostererRepository.DeleteByKeyAsync(_fosterer.Id);
+        NotificationService.Notify(rs, "Deleted Fosterer", "Failed to Delete Fosterer");
+        if (rs.IsSuccess)
+        {
+            await RefreshAsync(0);
+        }
+    }
+
+    private async Task OnEditAsync(int fostererId)
+    {
+        var rs = await FostererRepository.GetByKeyAsync(fostererId);
+        if (rs.IsFailed)
+        {
+            NavigationManager.NavigateTo("/not-found");
+            return;
+        }
+
+        _fosterer = rs.Value;
+    }
+
+    private async Task OnSaveAsync(FostererEditModel model)
+    {
+        var rs = model.Id == 0
+            ? await FostererRepository.AddAsync(model.ToFosterer())
+            : await FostererRepository.UpdateAsync(model.Id, model.ToFosterer());
+        NotificationService.Notify(rs, "Saved Fosterer", "Failed to Save Fosterer");
+        if (rs.IsSuccess)
+        {
+            await RefreshAsync(rs.Value.Id);
+        }
+    }
+
+    private Task PersistStateAsync()
+    {
+        ComponentState.PersistAsJson("fosterers", _fosterers);
+        return Task.CompletedTask;
+    }
+
+}

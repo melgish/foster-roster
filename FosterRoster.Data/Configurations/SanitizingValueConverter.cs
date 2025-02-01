@@ -12,5 +12,6 @@ internal sealed class SanitizingValueConverter : ValueConverter<string, string>
             v => sanitizer.Sanitize(v.Trim(), string.Empty, null),
             v => sanitizer.Sanitize(v.Trim(), string.Empty, null),
             mappingHints)
-    { }
+    {
+    }
 }

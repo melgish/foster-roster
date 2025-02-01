@@ -1,18 +1,13 @@
-using FluentValidation;
-
 namespace FosterRoster.Domain.Validation;
 
+[UsedImplicitly]
 public sealed class WeightEditModelValidator : AbstractValidator<WeightEditModel>
 {
     public WeightEditModelValidator()
     {
-        RuleFor(model => model.DateTime.Date)
+        RuleFor(model => model.DateTime)
             .NotNull()
             .WithMessage("Please enter a date.");
-
-        RuleFor(model => model.DateTime.Time)
-            .NotNull()
-            .WithMessage("Please enter a time.");
 
         RuleFor(model => model.FelineId)
             .GreaterThan(0)

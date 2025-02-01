@@ -1,0 +1,7 @@
+﻿.app-file-input ::deep input {
+    display: none;
+}
+
+.app-file-input.app-rounded {
+    border-radius: 50% !important;
+}

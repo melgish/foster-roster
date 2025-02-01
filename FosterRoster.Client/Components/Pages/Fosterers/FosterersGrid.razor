@@ -1,0 +1,32 @@
+﻿<RadzenDataGrid TItem="Fosterer" Data="@Items">
+    <Columns>
+        <RadzenDataGridColumn Width="14ch">
+            <HeaderTemplate>
+                <RadzenButton ButtonStyle="ButtonStyle.Info"
+                              Click="@(() => OnAdd.InvokeAsync())"
+                              Icon="add"
+                              Size="ButtonSize.Small"
+                              Text="Add"
+                              Variant="Variant.Outlined"/>
+            </HeaderTemplate>
+            <Template Context="data">
+                <RadzenButton ButtonStyle="ButtonStyle.Info"
+                              Click="@(() => OnEdit.InvokeAsync(data.Id))"
+                              Icon="edit"
+                              Size="ButtonSize.Small"
+                              Text="Edit"
+                              Variant="Variant.Outlined"/>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Fosterer.Name)" Title="@nameof(Fosterer.Name)"/>
+        <RadzenDataGridColumn Property="@nameof(Fosterer.Email)" Title="@nameof(Fosterer.Email)"/>
+        <RadzenDataGridColumn Property="@nameof(Fosterer.Phone)" Title="@nameof(Fosterer.Phone)"/>
+    </Columns>
+</RadzenDataGrid>
+
+
+@code {
+    [Parameter] public ICollection<Fosterer> Items { get; set; } = [];
+    [Parameter] public EventCallback OnAdd { get; set; } = EventCallback.Empty;
+    [Parameter] public EventCallback<int> OnEdit { get; set; } = EventCallback<int>.Empty;
+}

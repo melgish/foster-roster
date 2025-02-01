@@ -1,213 +1,248 @@
-@inject IDialogService DialogService
+@inject DialogService DialogService
 
 @if (_model is null)
 {
-    <Loading />
+    <Loading/>
 }
 else
 {
-    <EditForm Model="@_model"
-              OnValidSubmit="@SaveAsync"
-              FormName="editFeline">
-        <FluentValidationValidator />
-        <MudGrid Spacing="3">
-            <MudItem xs="12">
-                <h1>@_name</h1>
-            </MudItem>
-            <MudItem xs="4">
-                <MudFileUpload Accept="image/png"
-                               Disabled="@_model.IsInactive"
-                               FilesChanged="@OnFilesChangedAsync"
-                               T="IBrowserFile">
-                    <ActivatorContent>
-                        <MudImage Alt="Thumbnail"
-                                  Src="@_model.Thumbnail.GetUrl()"
-                                  Height="256"
-                                  Width="256" />
-                        <MudIconButton Color="Color.Default"
-                                       Disabled="@_model.IsInactive"
-                                       Icon="@Icons.Material.Rounded.CameraAlt" />
-                    </ActivatorContent>
-                </MudFileUpload>
-            </MudItem>
-            <MudItem xs="8">
-                <MudStack>
-                    <MudDatePicker @bind-Date="_model.IntakeDate"
-                                   Disabled="@_model.IsInactive"
-                                   Editable="true"
-                                   Label="Intake Date"
-                                   Required
-                                   RequiredError="" />
-                    <ValidationMessage For="@(() => _model.IntakeDate)" />
-                    <MudTextField @bind-Value="_model.Name"
-                                  Disabled="@_model.IsInactive"
-                                  Label="Name"
-                                  ShrinkLabel />
-                    <ValidationMessage For="@(() => _model.Name)" />
-                    <MudField Label="Gender">
-                        <MudRadioGroup T="Gender"
-                                       @bind-Value="_model.Gender"
-                                       Class="ps-2"
-                                       Disabled="@_model.IsInactive"
-                                       Style="margin-top:-0.5rem">
-                            <MudRadio Dense
-                                      Size="Size.Small"
-                                      Value="@Gender.Female">Female</MudRadio>
-                            <MudRadio Dense
-                                      Size="Size.Small"
-                                      Value="@Gender.Male">Male</MudRadio>
-                        </MudRadioGroup>
-                        <ValidationMessage For="@(() => _model.Gender)" />
-                    </MudField>
-                    <MudNumericField @bind-Value="_model.IntakeAgeInWeeks"
-                                     Disabled="@_model.IsInactive"
-                                     HideSpinButtons
-                                     Label="Age at Intake (weeks)"
-                                     Min="0"
-                                     ShrinkLabel />
-                    <ValidationMessage For="@(() => _model.IntakeAgeInWeeks)" />
-                </MudStack>
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="_model.Breed"
-                              Disabled="@_model.IsInactive"
-                              Label="Breed" 
-                              ShrinkLabel />
-                <ValidationMessage For="@(() => _model.Breed)" />
-            </MudItem>
-            <MudItem xs="6">
-                <MudTextField @bind-Value="_model.Color"
-                              Disabled="@_model.IsInactive"
-                              Label="Color"
-                              ShrinkLabel />
-                <ValidationMessage For="@(() => _model.Color)" />
-            </MudItem>
-            <MudItem xs="6">
-                <SourceSelect @bind-Value="_model.SourceId"
-                              Disabled="@_model.IsInactive" />
-                <ValidationMessage For="@(() => _model.SourceId)" />
-            </MudItem>
-            <MudItem xs="6">
-                <FostererSelect @bind-Value="_model.FostererId"
-                              Disabled="@_model.IsInactive" />
-                <ValidationMessage For="@(() => _model.FostererId)" />
-            </MudItem>
-            <MudItem xs="6">
-                <MudSelect @bind-Value="_model.Category"
-                           Disabled="@_model.IsInactive"
-                           Label="Category"
-                           Required>
-                    <MudSelectItem Value="@Category.Kitten">Kitten</MudSelectItem>
-                    <MudSelectItem Value="@Category.NursingKitten">Nursing Kitten</MudSelectItem>
-                    <MudSelectItem Value="@Category.Cat">Cat</MudSelectItem>
-                    <MudSelectItem Value="@Category.NursingCat">Nursing Cat</MudSelectItem>
-                </MudSelect>
-                <ValidationMessage For="@(() => _model.Category)" />
-            </MudItem>
-            <MudItem xs="6">
-                <MudDatePicker @bind-Date="_model.RegistrationDate"
-                               Clearable="true"
-                               Disabled="@_model.IsInactive"
-                               Editable="true"
-                               Label="Registration Date" />
-                <ValidationMessage For="@(() => _model.RegistrationDate)" />
-            </MudItem>
-            <MudItem xs="6">
-                <MudField Label="Weaned">
-                    <MudRadioGroup @bind-Value="_model.Weaned"
-                                   Class="ps-2"
-                                   Style="margin-top:-0.5rem"
-                                   Disabled="@_model.IsInactive">
-                        <MudRadio Dense
-                                  Size="Size.Small"
-                                  Value="@Weaned.No">No</MudRadio>
-                        <MudRadio Dense
-                                  Size="Size.Small"
-                                  Value="@Weaned.InProgress">In Progress</MudRadio>
-                        <MudRadio Dense
-                                  Size="Size.Small"
-                                  Value="@Weaned.Yes">Yes</MudRadio>
-                    </MudRadioGroup>
-                </MudField>
-                <ValidationMessage For="@(() => _model.Weaned)" />
-            </MudItem>
-            <MudItem xs="12">
-                <MudStack Row="true" AlignItems="AlignItems.Center">
-                    @if (_model.IsInactive)
-                    {
-                        <MudText>
-                            Inactive as of @_model.InactivatedAtUtc
-                        </MudText>
-                    }
-                    <MudSpacer />
-                    @if (_isSaving)
-                    {
-                        <MudProgressCircular Color="Color.Primary"
-                                             Indeterminate="true"
-                                             StrokeWidth="4" />
-                    }
-                    @if (!IsNew)
-                    {
+    <EditForm FormName="editFeline"
+              Model="@_model"
+              OnValidSubmit="@SaveAsync">
+        <FluentValidationValidator/>
+        <RadzenStack Gap="0.5rem">
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn Size="12">
+                    <RadzenText Text="@_name" TextStyle="TextStyle.DisplayH4"/>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="4" SizeXS="12">
+                    <RadzenStack JustifyContent="JustifyContent.SpaceAround" Orientation="Orientation.Horizontal">
+                        <AppThumbnail
+                            Path="@_model.Thumbnail.GetUrl()"
+                            disabled="@_model.IsInactive"
+                            OnChange="OnFilesChangedAsync"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="8" SizeXS="12">
+                    <RadzenStack Gap="1rem">
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Text="Intake Date"
+                                Variant="Variant.Text">
+                                <RadzenDatePicker @bind-Value="_model.IntakeDate"
+                                                  Disabled="@_model.IsInactive"
+                                                  Placeholder="mm/dd/yyyy"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.IntakeDate)"/>
+                        </RadzenStack>
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Text="Name" Variant="Variant.Text">
+
+                                <RadzenTextBox @bind-Value="_model.Name"
+                                               Disabled="@_model.IsInactive"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.Name)"/>
+                        </RadzenStack>
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Text="Gender"
+                                Variant="Variant.Text">
+                                <RadzenRadioButtonList TValue="Gender" @bind-Value="_model.Gender"
+                                                       Disabled="@_model.IsInactive"
+                                                       class="rz-pt-2">
+                                    <Items>
+                                        <RadzenRadioButtonListItem Text="Female" Value="@Gender.Female"
+                                                                   TValue="Gender"/>
+                                        <RadzenRadioButtonListItem Text="Male" Value="@Gender.Male" TValue="Gender"/>
+                                    </Items>
+                                </RadzenRadioButtonList>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.Gender)"/>
+                        </RadzenStack>
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Text="Age at Intake (weeks)" Variant="Variant.Text">
+                                <RadzenNumeric @bind-Value="_model.IntakeAgeInWeeks"
+                                               Disabled="@_model.IsInactive"
+                                               Min="0"
+                                               ShowUpDown="false"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.IntakeAgeInWeeks)"/>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Breed" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.Breed"
+                                           Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Breed)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Color" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.Color"
+                                           Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Color)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Source" Variant="Variant.Text">
+                            <SourceSelect @bind-Value="_model.SourceId"
+                                          Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.SourceId)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Fosterer" Variant="Variant.Text">
+                            <FostererSelect @bind-Value="_model.FostererId"
+                                            Disabled="@_model.IsInactive"/>
+                            <ValidationMessage For="@(() => _model.FostererId)"/>
+                        </RadzenFormField>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Category" Variant="Variant.Text">
+                            <RadzenDropDown @bind-Value="_model.Category" Data="@CategoryChoices"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Category)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Registration Date" Variant="Variant.Text">
+                            <RadzenDatePicker @bind-Value="_model.RegistrationDate"
+                                              Disabled="@_model.IsInactive"
+                                              Placeholder="mm/dd/yyyy"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.RegistrationDate)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField
+                            AllowFloatingLabel="false"
+                            Text="Weaned"
+                            Variant="Variant.Text">
+                            <RadzenRadioButtonList TValue="Weaned" @bind-Value="_model.Weaned"
+                                                   Disabled="@_model.IsInactive"
+                                                   class="rz-pt-2">
+                                <Items>
+                                    <RadzenRadioButtonListItem Text="No" Value="@Weaned.No" TValue="Weaned"/>
+                                    <RadzenRadioButtonListItem Text="In Progress" Value="@Weaned.InProgress"
+                                                               TValue="Weaned"/>
+                                    <RadzenRadioButtonListItem Text="Yes" Value="@Weaned.Yes" TValue="Weaned"/>
+                                </Items>
+                            </RadzenRadioButtonList>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Weaned)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn Size="12">
+                    <RadzenStack AlignItems="AlignItems.Center"
+                                 JustifyContent="JustifyContent.End"
+                                 Orientation="Orientation.Horizontal">
                         @if (_model.IsInactive)
                         {
-                            <MudButton ButtonType="ButtonType.Button"
-                                       Color="Color.Info"
-                                       Disabled="@(_isSaving || !_model.IsInactive)"
-                                       OnClick="@ActivateAsync"
-                                       Variant="Variant.Outlined">Activate</MudButton>
+                            <RadzenText>
+                                Inactive as of @_model.InactivatedAtUtc
+                            </RadzenText>
                         }
-                        else
+                        <div></div>
+                        @if (_isSaving)
                         {
-                            <MudButton ButtonType="ButtonType.Button"
-                                       Color="Color.Info"
-                                       Disabled="@(_isSaving || _model.IsInactive)"
-                                       OnClick="@InactivateAsync"
-                                       Variant="Variant.Outlined">Inactivate</MudButton>
+                            <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" ShowValue="false"
+                                                       Mode="ProgressBarMode.Indeterminate"/>
                         }
-                        <MudButton ButtonType="ButtonType.Button"
-                                   Color="Color.Error"
-                                   Disabled="@(_isSaving || _model.IsInactive)"
-                                   OnClick="@DeleteAsync"
-                                   Variant="Variant.Outlined">Delete</MudButton>
-                    }
-                    <MudButton ButtonType="ButtonType.Submit"
-                               Color="Color.Primary"
-                               Disabled="@(_isSaving || _model.IsInactive)"
-                               Variant="Variant.Outlined">Save</MudButton>
+                        @if (!IsNew)
+                        {
+                            @if (_model.IsInactive)
+                            {
+                                <RadzenButton ButtonStyle="ButtonStyle.Info"
+                                              Click="@ActivateAsync"
+                                              Disabled="@(_isSaving || !_model.IsInactive)"
+                                              Text="Activate"
+                                              Variant="Variant.Outlined"/>
+                            }
+                            else
+                            {
+                                <RadzenButton ButtonStyle="ButtonStyle.Info"
+                                              Click="@InactivateAsync"
+                                              Disabled="@(_isSaving || _model.IsInactive)"
+                                              Text="Inactivate"
+                                              Variant="Variant.Outlined"/>
+                            }
 
-                    <MudButton Color="Color.Secondary"
-                               Disabled="@(_isSaving || _model.IsInactive)"
-                               OnClick="@ResetAsync"
-                               Variant="Variant.Outlined">Reset</MudButton>
-                </MudStack>
-            </MudItem>
-        </MudGrid>
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                          Click="@DeleteAsync"
+                                          Disabled="@(_isSaving || _model.IsInactive)"
+                                          Text="Delete"
+                                          Variant="Variant.Outlined"/>
+                        }
+                        <RadzenButton ButtonType="ButtonType.Submit"
+                                      Disabled="@(_isSaving || _model.IsInactive)"
+                                      Text="Save"
+                                      Variant="Variant.Outlined"/>
+
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                      Click="@ResetAsync"
+                                      Disabled="@(_isSaving || _model.IsInactive)"
+                                      Text="Reset"
+                                      Variant="Variant.Outlined"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
     </EditForm>
 }
 
 @code {
+
+    // must be Enum[] for RadzenDropDown to use Display Attribute instead of numeric values.
+    private static readonly Enum[] CategoryChoices =
+        [Category.Cat, Category.NursingCat, Category.Kitten, Category.NursingKitten];
+
     private bool _isSaving = false;
     private string _name = string.Empty;
     private FelineEditModel? _model = null;
 
-    [Parameter]
-    public Feline Feline { get; set; } = null!;
+    [Parameter] public Feline Feline { get; set; } = null!;
 
-    [Parameter]
-    public bool IsNew { get; set; }
+    [Parameter] public bool IsNew { get; set; }
 
-    [Parameter]
-    public EventCallback OnActivate { get; set; } = EventCallback.Empty;
+    [Parameter] public EventCallback OnActivate { get; set; } = EventCallback.Empty;
 
-    [Parameter]
-    public EventCallback OnDelete { get; set; } = EventCallback.Empty;
+    [Parameter] public EventCallback OnDelete { get; set; } = EventCallback.Empty;
 
     [Parameter]
     public EventCallback<DateTimeOffset> OnInactivate { get; set; } =
-    EventCallback<DateTimeOffset>.Empty;
+        EventCallback<DateTimeOffset>.Empty;
 
-    [Parameter]
-    public EventCallback<FelineEditModel> OnSave { get; set; } = EventCallback<FelineEditModel>.Empty;
+    [Parameter] public EventCallback<FelineEditModel> OnSave { get; set; } = EventCallback<FelineEditModel>.Empty;
 
     /// <summary>
     /// Re-activates an inactive cat.
@@ -229,20 +264,19 @@ else
     /// </summary>
     private async Task DeleteAsync()
     {
-        var parameters = new DialogParameters { { nameof(ConfirmDeleteFelineDialog.Model), _model } };
-
-        var dialog = await DialogService
-        .ShowAsync<ConfirmDeleteFelineDialog>("Confirm Delete", parameters);
-
-        var result = await dialog.Result;
-        if (result is null || result.Canceled)
+        var parameters = new Dictionary<string, object>
         {
-            return;
-        }
+            { nameof(ConfirmDeleteFelineDialog.Model), _model! }
+        };
 
-        _isSaving = true;
-        await OnDelete.InvokeAsync(Feline.Id);
-        _isSaving = false;
+        bool result = await DialogService
+            .OpenAsync<ConfirmDeleteFelineDialog>("Confirm Delete", parameters);
+        if (result)
+        {
+            _isSaving = true;
+            await OnDelete.InvokeAsync(Feline.Id);
+            _isSaving = false;
+        }
     }
 
     /// <summary>
@@ -250,32 +284,32 @@ else
     /// </summary>
     private async Task InactivateAsync()
     {
-        var parameters = new DialogParameters { { nameof(ConfirmInactivateFelineDialog.Feline), _model } };
-
-        var dialog = await DialogService
-        .ShowAsync<ConfirmInactivateFelineDialog>("Confirm Inactivate", parameters);
-        var result = await dialog.Result;
-        if (result is null || result.Canceled)
+        var parameters = new Dictionary<string, object>()
         {
-            return;
-        }
+            { nameof(ConfirmInactivateFelineDialog.Feline), _model! }
+        };
 
-        _isSaving = true;
-        await OnInactivate.InvokeAsync((DateTimeOffset)result.Data!);
-        _isSaving = false;
+        DateTimeOffset? result = await DialogService
+            .OpenAsync<ConfirmInactivateFelineDialog>("Confirm Inactivate", parameters);
+        if (result.HasValue)
+        {
+            _isSaving = true;
+            await OnInactivate.InvokeAsync(result.Value);
+            _isSaving = false;
+        }
     }
 
-    private async Task OnFilesChangedAsync(IBrowserFile? file)
+    private async Task OnFilesChangedAsync(InputFileChangeEventArgs args)
     {
-        if (_model is not null && file is not null)
+        if (_model is not null)
         {
-            _model.Thumbnail = await file.ToThumbnailAsync(_model.Id);
+            _model.Thumbnail = await args.File.ToThumbnailAsync(_model.Id);
         }
     }
 
     private Task ResetAsync()
     {
-        _model = new FelineEditModel(Feline);
+        _model = new(Feline);
         _name = IsNew ? "Intake" : _model.Name;
         return Task.CompletedTask;
     }
@@ -286,4 +320,5 @@ else
         await OnSave.InvokeAsync(_model);
         _isSaving = false;
     }
+
 }

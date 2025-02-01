@@ -10,6 +10,6 @@ public class FosterRosterDbContextFactory
     {
         var optionsBuilder = new DbContextOptionsBuilder<FosterRosterDbContext>();
         optionsBuilder.UseNpgsql("Host=localhost;Database=mydb;Username=myuser;Password=mypassword");
-        return new FosterRosterDbContext(optionsBuilder.Options);
+        return new(optionsBuilder.Options);
     }
 }

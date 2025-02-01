@@ -1,7 +1,6 @@
-using FluentValidation;
-
 namespace FosterRoster.Domain.Validation;
 
+[UsedImplicitly]
 public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel>
 {
     public FelineEditModelValidator(TimeProvider timeProvider)
@@ -21,7 +20,7 @@ public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel
 
         RuleFor(feline => feline.IntakeDate)
             .NotNull()
-            .LessThanOrEqualTo(p => timeProvider.GetUtcNow().DateTime)
+            .LessThanOrEqualTo(p => DateOnly.FromDateTime(timeProvider.GetUtcNow().DateTime))
             .WithMessage("Intake date must be in the past.");
 
         RuleFor(feline => feline.Name)
@@ -29,7 +28,7 @@ public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel
             .MaximumLength(64);
 
         RuleFor(feline => feline.RegistrationDate)
-            .LessThanOrEqualTo(p => timeProvider.GetUtcNow().DateTime)
+            .LessThanOrEqualTo(p => DateOnly.FromDateTime(timeProvider.GetUtcNow().DateTime))
             .WithMessage("Registration date must be in the past.");
 
         RuleFor(feline => feline.Weaned).IsInEnum();

@@ -1,0 +1,7 @@
+﻿.thumbnail {
+    aspect-ratio: 1 / 1;
+    height: 180px;
+    max-width: 180px;
+    background-color: var(--rz-base-400, #bdbdbd);
+    border-radius: 1rem;
+}

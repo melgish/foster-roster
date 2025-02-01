@@ -1,7 +1,6 @@
-using FluentValidation;
-
 namespace FosterRoster.Domain.Validation;
 
+[UsedImplicitly]
 public sealed class CommentEditModelValidator : AbstractValidator<CommentEditModel>
 {
     public CommentEditModelValidator()
@@ -11,6 +10,7 @@ public sealed class CommentEditModelValidator : AbstractValidator<CommentEditMod
 
         RuleFor(model => model.Text)
             .NotEmpty()
-            .MaximumLength(4000);
+            .MaximumLength(4000)
+            .WithName("Comment");
     }
 }

@@ -1,4 +1,5 @@
 // spell-checker: ignore inactivatable
+
 namespace FosterRoster.Domain;
 
 public interface IInactivatable
@@ -13,4 +14,3 @@ public interface IInactivatable
     /// </summary>
     DateTimeOffset? InactivatedAtUtc { get; set; }
 }
-

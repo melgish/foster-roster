@@ -22,4 +22,3 @@ public class Feline : IInactivatable
     public Weaned Weaned { get; set; }
     public virtual ICollection<Weight> Weights { get; set; } = [];
 }
-

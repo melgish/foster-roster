@@ -1,19 +1,20 @@
 @page "/intake"
 @rendermode InteractiveWebAssembly
 @inject IFelineRepository FelineRepository
-@inject ISnackbar Snackbar
+@inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
 @inject TimeProvider TimeProvider
 
 <PageTitle>Intake</PageTitle>
-<MudStack>
-    <MudPaper Class="pa-2" Elevation="3">
-        <FelineEditForm Feline="@_feline" IsNew OnSave="OnSaveAsync" />
-    </MudPaper>
-</MudStack>
+<RadzenStack>
+    <RadzenPanel class="rz-shadow-3">
+        <FelineEditForm Feline="@_feline" IsNew OnSave="OnSaveAsync"/>
+    </RadzenPanel>
+</RadzenStack>
 
 @code {
     private Feline _feline = null!;
+
     protected override void OnInitialized()
     {
         _feline = new()
@@ -31,12 +32,13 @@
     /// </summary>
     private async Task OnSaveAsync(FelineEditModel model)
     {
-        var added = await FelineRepository.AddAsync(model.ToFeline());
-        if (added is null)
+        var result = await FelineRepository.AddAsync(model);
+        NotificationService.Notify(result, "Feline saved", "Failed to save feline");
+        if (result.IsSuccess)
         {
-            Snackbar.Add("Failed to save", Severity.Error);
-            return;
+            var feline = result.Value;
+            NavigationManager.NavigateTo($"/details/{feline.Id}");
         }
-        NavigationManager.NavigateTo($"/details/{added.Id}");
     }
+
 }

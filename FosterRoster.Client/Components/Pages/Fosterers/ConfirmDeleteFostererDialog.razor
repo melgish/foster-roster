@@ -1,0 +1,27 @@
+﻿@inject DialogService DialogService
+
+<RadzenStack>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenText Typo="Typo.body1">
+                If you click Yes, you will delete all data about @Model.Name.
+                Any cats linked to @Model.Name will not be deleted. Instead
+                the Fosterer link will be cleared.
+                <em>This action cannot be undone.</em>
+                <br/><br/>
+                NOTE: @Model.Name will not be harmed.
+            </RadzenText>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton ButtonStyle="ButtonStyle.Base" Click="@Cancel" Variant="Variant.Text">Cancel</RadzenButton>
+        <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@Confirm" Variant="Variant.Text">Yes</RadzenButton>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    [Parameter] public FostererEditModel Model { get; set; } = null!;
+
+    void Cancel() => DialogService.Close(false);
+    void Confirm() => DialogService.Close(true);
+}

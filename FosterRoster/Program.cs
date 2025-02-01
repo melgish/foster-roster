@@ -1,20 +1,18 @@
 // spell-checker: ignore npgsql
+
 using FosterRoster.Client.Components;
 using FosterRoster.Services;
-using MudBlazor.Services;
+using Radzen;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddMudServices(config =>
-{
-    config.SnackbarConfiguration.VisibleStateDuration = 2500;
-});
-
 // Add services to the container.
+builder.Services.AddProblemDetails();
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddRazorComponents()
     .AddInteractiveWebAssemblyComponents();
-
 
 builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
@@ -28,7 +26,9 @@ builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
 
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
+builder.Services.AddValidatorsFromAssemblyContaining<App>();
 
+builder.Services.AddRadzenComponents();
 
 var app = builder.Build();
 
@@ -48,7 +48,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseExceptionHandler("/Error", true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }

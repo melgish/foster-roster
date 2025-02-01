@@ -1,0 +1,193 @@
+@inject DialogService DialogService
+
+@if (_model is null)
+{
+    <Loading/>
+}
+else
+{
+    <EditForm FormName="editFosterer" Model="_model" OnValidSubmit="SaveAsync">
+        <FluentValidationValidator/>
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenText Text="@_name" TextStyle="TextStyle.DisplayH4"/>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <RadzenStack>
+                    <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
+                        <RadzenTextBox @bind-Value="_model.Name" Disabled="@_model.IsInactive"/>
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _model.Name)"/>
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="6">
+                <RadzenStack>
+                    <RadzenFormField AllowFloatingLabel="false" Text="Phone" Variant="Variant.Text">
+                        <RadzenMask @bind-Value="_model.Phone"
+                                    CharacterPattern="[0-9]"
+                                    Disabled="@_model.IsInactive"
+                                    Mask="***-***-****"
+                                    Placeholder="000-000-0000"/>
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _model.Phone)"/>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <RadzenStack>
+                    <RadzenFormField AllowFloatingLabel="false" Text="Email" Variant="Variant.Text">
+                        <RadzenTextBox @bind-Value="_model.Email"
+                                       Disabled="@_model.IsInactive"/>
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _model.Email)"/>
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="6">
+                <RadzenStack>
+                    <RadzenFormField AllowFloatingLabel="false" Text="Contact Method" Variant="Variant.Text">
+                        <RadzenDropDown @bind-Value="_model.ContactMethod"
+                                        Data="@ContactMethodChoices"
+                                        Disabled="@_model.IsInactive"/>
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _model.ContactMethod)"/>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow>
+            <RadzenColumn Size="6">
+                <RadzenStack>
+                    <RadzenFormField AllowFloatingLabel="false" Text="Address" Variant="Variant.Text">
+                        <RadzenTextArea @bind-Value="_model.Address"
+                                        Disabled="@_model.IsInactive"
+                                        Placeholder="@("Name\nStreet\nCity, State Zip")"
+                                        Rows="3"/>
+                    </RadzenFormField>
+                    <ValidationMessage For="@(() => _model.Address)"/>
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="6">
+                <RadzenStack></RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenRow class="rz-mt-2">
+            <RadzenColumn>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
+                             JustifyContent="JustifyContent.End">
+                    @if (_model.IsInactive)
+                    {
+                        <RadzenText>
+                            Inactive as of @_model.InactivatedAtUtc
+                        </RadzenText>
+                    }
+                    <div></div>
+                    @if (_isSaving)
+                    {
+                        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" ShowValue="false"
+                                                   Mode="ProgressBarMode.Indeterminate"/>
+                    }
+                    @if (!IsNew)
+                    {
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                      Click="@DeleteAsync"
+                                      Disabled="@(_isSaving || _model.IsInactive)"
+                                      Text="Delete"
+                                      Variant="Variant.Outlined"/>
+                    }
+                    <RadzenButton ButtonType="ButtonType.Submit"
+                                  Disabled="@(_isSaving || _model.IsInactive)"
+                                  Text="Save"
+                                  Variant="Variant.Outlined"/>
+
+                    <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                  Click="@ResetAsync"
+                                  Disabled="@(_isSaving || _model.IsInactive)"
+                                  Text="Reset"
+                                  Variant="Variant.Outlined"/>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </EditForm>
+}
+
+@code {
+
+    // must be Enum[] for RadzenDropDown to use Display Attribute instead of numeric values.
+    private static readonly Enum[] ContactMethodChoices =
+        [ContactMethod.Email, ContactMethod.Text, ContactMethod.Voice];
+
+    private bool _isSaving;
+    private FostererEditModel? _model;
+    private string _name = string.Empty;
+
+    [Parameter] public Fosterer Fosterer { get; set; } = null!;
+
+    [Parameter] public bool IsNew { get; set; }
+
+    [Parameter] public EventCallback OnDelete { get; set; } = EventCallback.Empty;
+
+    /// <summary>
+    ///     Event fired when save button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<FostererEditModel> OnSave { get; set; } =
+        EventCallback<FostererEditModel>.Empty;
+
+    /// <summary>
+    ///     Event fired when Add button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback OnAdd { get; set; } = EventCallback.Empty;
+
+    private Task ActivateAsync() => Task.CompletedTask;
+
+    private async Task DeleteAsync()
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(ConfirmDeleteFostererDialog.Model), _model! }
+        };
+
+        bool result = await DialogService
+            .OpenAsync<ConfirmDeleteFostererDialog>("Confirm Delete", parameters, new()
+            {
+                ShowClose = false,
+                Top = "10vh"
+            });
+
+        if (result)
+        {
+            _isSaving = true;
+            await OnDelete.InvokeAsync(Fosterer.Id);
+            _isSaving = false;
+        }
+    }
+
+    private Task InactivateAsync() => Task.CompletedTask;
+
+    /// <summary>
+    ///     Resets form any time the parent Feline is updated.
+    /// </summary>
+    protected override Task OnParametersSetAsync() => ResetAsync();
+
+    /// <summary>
+    ///     Resets the form back to it's initial state.
+    /// </summary>
+    /// <returns></returns>
+    private Task ResetAsync()
+    {
+        _model = new(Fosterer);
+        _name = IsNew ? "Create Fosterer" : _model.Name;
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveAsync()
+    {
+        _isSaving = true;
+        await OnSave.InvokeAsync(_model);
+        _isSaving = false;
+    }
+
+}

@@ -1,4 +1,3 @@
-
 namespace FosterRoster.Domain;
 
 public class Fosterer : IInactivatable

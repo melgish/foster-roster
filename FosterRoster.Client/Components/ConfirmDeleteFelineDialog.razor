@@ -1,38 +1,25 @@
-<MudDialog>
-    <TitleContent>
-        <MudText Typo="Typo.h6">Confirm Delete</MudText>
-    </TitleContent>
-    <DialogContent>
-        <MudText Typo="Typo.body1">
-            If you click Yes, you will delete all data about @Model.Name.
-            This action cannot be undone.
-            <br /><br />
-            NOTE: @Model.Name will not be harmed.
-        </MudText>
-    </DialogContent>
-    <DialogActions>
-        <MudButton Color="Color.Default"
-                   OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Error"
-                   OnClick="Confirm">Yes</MudButton>
-    </DialogActions>
-</MudDialog>
+@inject DialogService DialogService
+
+<RadzenStack>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenText Typo="Typo.body1">
+                If you click Yes, you will delete all data about @Model.Name.
+                This action cannot be undone.
+                <br/><br/>
+                NOTE: @Model.Name will not be harmed.
+            </RadzenText>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton ButtonStyle="ButtonStyle.Base" Click="@Cancel" Variant="Variant.Text">Cancel</RadzenButton>
+        <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@Confirm" Variant="Variant.Text">Yes</RadzenButton>
+    </RadzenStack>
+</RadzenStack>
 
 @code {
-    [CascadingParameter]
-    MudDialogInstance MudDialog { get; set; } = null!;
+    [Parameter] public FelineEditModel Model { get; set; } = null!;
 
-    [Parameter]
-    public FelineEditModel Model { get; set; } = null!;
-
-
-    void Cancel()
-    {
-        MudDialog.Cancel();
-    }
-
-    void Confirm()
-    {
-        MudDialog.Close(DialogResult.Ok(true));
-    }
+    void Cancel() => DialogService.Close(false);
+    void Confirm() => DialogService.Close(true);
 }

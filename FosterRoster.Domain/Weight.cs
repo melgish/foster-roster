@@ -8,4 +8,3 @@ public class Weight
     public WeightUnit Units { get; set; } = WeightUnit.g;
     public float Value { get; set; }
 }
-

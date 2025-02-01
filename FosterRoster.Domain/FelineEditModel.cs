@@ -11,9 +11,9 @@ public sealed class FelineEditModel()
     public int? IntakeAgeInWeeks { get; set; }
     public bool IsInactive { get; init; }
     public DateTimeOffset? InactivatedAtUtc { get; init; }
-    public DateTime? IntakeDate { get; set; }
+    public DateOnly? IntakeDate { get; set; }
     public string Name { get; set; } = string.Empty;
-    public DateTime? RegistrationDate { get; set; }
+    public DateOnly? RegistrationDate { get; set; }
     public int? SourceId { get; set; }
     public Thumbnail? Thumbnail { get; set; }
     public Weaned Weaned { get; set; }
@@ -27,13 +27,9 @@ public sealed class FelineEditModel()
         Gender = feline.Gender;
         Id = feline.Id;
         IntakeAgeInWeeks = feline.IntakeAgeInWeeks;
-        IntakeDate = feline.IntakeDate.ToDateTime(TimeOnly.MinValue);
+        IntakeDate = feline.IntakeDate;
         Name = feline.Name;
-        RegistrationDate = feline.RegistrationDate switch
-        {
-            var date when date.HasValue => date.Value.ToDateTime(TimeOnly.MinValue),
-            _ => null
-        };
+        RegistrationDate = feline.RegistrationDate;
         SourceId = feline.SourceId;
         Thumbnail = feline.Thumbnail;
         Weaned = feline.Weaned;
@@ -42,9 +38,8 @@ public sealed class FelineEditModel()
         InactivatedAtUtc = feline.InactivatedAtUtc;
     }
 
-    public Feline ToFeline()
-    {
-        return new()
+    public Feline ToFeline() =>
+        new()
         {
             Breed = string.IsNullOrWhiteSpace(Breed) ? null : Breed.Trim(),
             Category = Category,
@@ -53,18 +48,13 @@ public sealed class FelineEditModel()
             Gender = Gender,
             Id = Id,
             IntakeAgeInWeeks = IntakeAgeInWeeks,
-            IntakeDate = DateOnly.FromDateTime(IntakeDate!.Value),
+            IntakeDate = IntakeDate.GetValueOrDefault(),
             Name = Name.Trim(),
-            RegistrationDate = RegistrationDate switch
-            {
-                var date when date.HasValue => DateOnly.FromDateTime(date.Value),
-                _ => null
-            },
+            RegistrationDate = RegistrationDate,
             SourceId = SourceId,
             Thumbnail = Thumbnail,
             Weaned = Weaned,
             IsInactive = IsInactive,
             InactivatedAtUtc = InactivatedAtUtc
         };
-    }
 }

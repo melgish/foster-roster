@@ -1,44 +1,27 @@
 ﻿@inherits LayoutComponentBase
-<MudThemeProvider @rendermode="InteractiveWebAssembly" />
-<MudPopoverProvider @rendermode="InteractiveWebAssembly" />
-<MudDialogProvider @rendermode="InteractiveWebAssembly" />
-<MudSnackbarProvider @rendermode="InteractiveWebAssembly" />
-<MudLayout>
-    <MudAppBar Color="Color.Primary" Dense Elevation="3">
-        <MudStack Row AlignItems="AlignItems.Center">
-            <MudText Typo="Typo.h6">Foster&nbsp;Roster</MudText>
-            <MudNavLink Href="/">
-                <MudText>Dashboard</MudText>
-            </MudNavLink>
-            <MudNavLink Href="/intake">
-                <MudText>Intake</MudText>
-            </MudNavLink>
-            <MudNavLink Href="/weights">
-                <MudText>Weights</MudText>
-            </MudNavLink>
-            <MudNavLink Href="/fosterers">
-                <MudText>Fosterers</MudText>
-            </MudNavLink>
-        </MudStack>
-        <MudSpacer />
-        <MudIconButton Color="Color.Inherit"
-                        Href="https://github.com/melgish/foster-roster"
-                        Icon="@Icons.Custom.Brands.GitHub"
-                        Variant="Variant.Text"
-                        Target="_blank" />
-    </MudAppBar>
-    <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Medium"
-                      Class="pt-2">
-            @Body
-        </MudContainer>
-    </MudMainContent>
-    <MudAppBar Bottom="true" Fixed="true" Color="Color.Dark" Dense>
-        <Verison />
-    </MudAppBar>
-</MudLayout>
 
-
+<RadzenLayout>
+    <RadzenHeader Style="min-height: unset">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem"
+                     JustifyContent="JustifyContent.Start" Style="padding:0.5rem 1rem">
+            <RadzenText Text="Foster Roster" TextStyle="TextStyle.H4" Style="color: var(--rz-header-color)"/>
+            <RadzenLink Match="NavLinkMatch.All" Path="/" Text="Dashboard"/>
+            <RadzenLink Path="/intake" Text="Intake"/>
+            <RadzenLink Path="/weights" Text="Weights"/>
+            <RadzenLink Path="/fosterers" Text="Fosterers"/>
+            <div style="flex: auto"></div>
+            <RadzenAppearanceToggle @rendermode="InteractiveWebAssembly"/>
+            <RadzenLink Path="https://github.com/melgish/foster-roster" Target="_blank">Source</RadzenLink>
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenBody>
+        @Body
+    </RadzenBody>
+    <RadzenFooter class="rz-py-0 rz-background-secondary-light">
+        <Verison/>
+    </RadzenFooter>
+</RadzenLayout>
+<RadzenComponents @rendermode="InteractiveWebAssembly"/>
 <div id="blazor-error-ui">
     An unhandled error has occurred.
     <a href=""

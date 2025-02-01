@@ -1,7 +1,6 @@
-using FluentValidation;
-
 namespace FosterRoster.Domain.Validation;
 
+[UsedImplicitly]
 public sealed class FostererEditModelValidator : AbstractValidator<FostererEditModel>
 {
     public FostererEditModelValidator()

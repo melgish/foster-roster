@@ -3,9 +3,10 @@ using System.Net.Mime;
 
 namespace FosterRoster.Client.Extensions;
 
-static class ThumbnailExtensions
+internal static class ThumbnailExtensions
 {
-    const string NoImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewPort='0 0 200 200'%3E%3Ctext x='50%25' y='50%25' font-size='1rem' dominant-baseline='middle' text-anchor='middle'%3ENO IMAGE%3C/text%3E%3C/svg%3E";
+    private const string NoImage =
+        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewPort='0 0 200 200'%3E%3Ctext x='50%25' y='50%25' font-size='1rem' dominant-baseline='middle' text-anchor='middle'%3ENO IMAGE%3C/text%3E%3C/svg%3E";
 
 
     /// <summary>
@@ -16,10 +17,7 @@ static class ThumbnailExtensions
     /// <returns></returns>
     public static async Task<Thumbnail?> ToThumbnailAsync(this IBrowserFile? file, int felineId = 0)
     {
-        if (file is null)
-        {
-            return null;
-        }
+        if (file is null) return null;
         // Request a resized image as a PNG
         var image = await file.RequestImageFileAsync(MediaTypeNames.Image.Png, 256, 256);
 
@@ -28,7 +26,7 @@ static class ThumbnailExtensions
         using var stream = image.OpenReadStream();
         await stream.CopyToAsync(memory);
 
-        return new Thumbnail
+        return new()
         {
             FelineId = felineId,
             ImageData = memory.ToArray(),
@@ -41,7 +39,8 @@ static class ThumbnailExtensions
         {
             null => NoImage,
             { ImageData: { Length: 0 } } => $"api/thumbnails/{thumbnail.FelineId}?v={thumbnail.Version}",
-            { ImageData: { Length: > 0 } } => $"data:{thumbnail.ContentType};base64,{Convert.ToBase64String(thumbnail.ImageData)}",
+            { ImageData: { Length: > 0 } } =>
+                $"data:{thumbnail.ContentType};base64,{Convert.ToBase64String(thumbnail.ImageData)}",
             _ => NoImage
         };
 }
