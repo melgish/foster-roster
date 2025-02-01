@@ -1,30 +1,35 @@
 ﻿@inherits LayoutComponentBase
 
-<RadzenLayout>
-    <RadzenHeader Style="min-height: unset">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem"
-                     JustifyContent="JustifyContent.Start" Style="padding:0.5rem 1rem">
-            <RadzenText Text="Foster Roster" TextStyle="TextStyle.H4" Style="color: var(--rz-header-color)"/>
-            <RadzenLink Match="NavLinkMatch.All" Path="/" Text="Dashboard"/>
-            <RadzenLink Path="/intake" Text="Intake"/>
-            <RadzenLink Path="/weights" Text="Weights"/>
-            <RadzenLink Path="/fosterers" Text="Fosterers"/>
-            <div style="flex: auto"></div>
-            <RadzenAppearanceToggle @rendermode="InteractiveWebAssembly"/>
-            <RadzenLink Path="https://github.com/melgish/foster-roster" Target="_blank">Source</RadzenLink>
-        </RadzenStack>
-    </RadzenHeader>
-    <RadzenBody>
-        @Body
-    </RadzenBody>
-    <RadzenFooter class="rz-py-0 rz-background-secondary-light">
-        <Verison/>
-    </RadzenFooter>
-</RadzenLayout>
-<RadzenComponents @rendermode="InteractiveWebAssembly"/>
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href=""
-       class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+<RadzenRow>
+    <RadzenColumn OffsetXX="4" SizeXX="4" OffsetXL="3" SizeXL="6" OffsetLG="2" SizeLG="8" OffsetMD="1" SizeMD="10"
+                  SizeSM="12">
+        <RadzenLayout>
+            <RadzenHeader Style="min-height: unset">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem"
+                             JustifyContent="JustifyContent.Start" Style="padding:0.25rem 1rem">
+                    <RadzenText Text="Foster Roster" TextStyle="TextStyle.H4" Style="color: var(--rz-header-color)"/>
+                    <RadzenLink Match="NavLinkMatch.All" Path="/" Text="Dashboard"/>
+                    <RadzenLink Path="/intake" Text="Intake"/>
+                    <RadzenLink Path="/weights" Text="Weights"/>
+                    <RadzenLink Path="/fosterers" Text="Fosterers"/>
+                    <div style="flex: auto"></div>
+                    <RadzenAppearanceToggle @rendermode="InteractiveWebAssembly"/>
+                    <RadzenLink Path="https://github.com/melgish/foster-roster" Target="_blank">Source</RadzenLink>
+                </RadzenStack>
+            </RadzenHeader>
+            <RadzenBody>
+                @Body
+            </RadzenBody>
+            <RadzenFooter class="rz-py-0 rz-background-secondary-light">
+                <Verison/>
+            </RadzenFooter>
+        </RadzenLayout>
+        <RadzenComponents @rendermode="InteractiveWebAssembly"/>
+        <div id="blazor-error-ui">
+            An unhandled error has occurred.
+            <a href=""
+               class="reload">Reload</a>
+            <a class="dismiss">🗙</a>
+        </div>
+    </RadzenColumn>
+</RadzenRow>

@@ -30,7 +30,7 @@ else
                         <RadzenColumn SizeXS="12" SizeSM="6">
                             <RadzenStack Gap="0rem">
                                 <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
-                                    <FelineSelect @bind-Value="_model.FelineId"/>
+                                    <FelineSelect Value="@_model.FelineId" ValueChanged="@OnFelineSelected"/>
                                 </RadzenFormField>
                                 <ValidationMessage For="@(() => _model.FelineId)"/>
                             </RadzenStack>
@@ -96,7 +96,11 @@ else
             <RadzenText Text="Weights" TextStyle="TextStyle.DisplayH4" class="rz-px-4"/>
             <RadzenDataGrid TItem="Weight" Data="_filteredWeights">
                 <Columns>
-                    <RadzenDataGridColumn Property="DateTime" Title="Date" FormatString="{0:MMM dd \a\t hh:mm tt}"/>
+                    <RadzenDataGridColumn Property="DateTime" Title="Date">
+                        <Template Context="data">
+                            @(data.DateTime.ToLocalTime().ToString("MMM dd \\a\\t hh:mm tt"))
+                        </Template>
+                    </RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="Feline.Name" Title="Name"/>
                     <RadzenDataGridColumn Property="Value" Title="Weight">
                         <Template Context="data">@data.Format(_units)</Template>
@@ -148,9 +152,9 @@ else
         Reset();
     }
 
-    private void OnFelineSelected(int? felineId)
+    private void OnFelineSelected(int felineId)
     {
-        _model.FelineId = felineId ?? 0;
+        _model.FelineId = felineId;
         _filteredWeights = felineId switch
         {
             0 => _allWeights ?? [],

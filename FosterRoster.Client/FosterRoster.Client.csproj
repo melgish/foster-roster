@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
-
     <PropertyGroup>
         <TargetFramework>net9.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <NoDefaultLaunchSettingsFile>true</NoDefaultLaunchSettingsFile>
         <StaticWebAssetProjectMode>Default</StaticWebAssetProjectMode>
+        <RuntimeFrameworkVersion>9.0.1</RuntimeFrameworkVersion>
         <Version>1.0.0</Version>
     </PropertyGroup>
 
@@ -17,142 +17,4 @@
     <ItemGroup>
         <ProjectReference Include="..\FosterRoster.Domain\FosterRoster.Domain.csproj"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <AdditionalFiles Include="Components\Pages\Dashboard\Dashboard.razor"/>
-        <AdditionalFiles Include="Components\Pages\Dashboard\FelineCard.razor"/>
-        <AdditionalFiles Include="Components\Pages\Fosterers\ConfirmDeleteFostererDialog.razor"/>
-        <AdditionalFiles Include="Components\Pages\Fosterers\FostererForm.razor"/>
-        <AdditionalFiles Include="Components\Pages\Fosterers\Fosterers.razor"/>
-        <AdditionalFiles Include="Components\Pages\Fosterers\FosterersGrid.razor"/>
-        <AdditionalFiles Include="Components\Pages\Weights\FelineSelect.razor"/>
-        <AdditionalFiles Include="Components\Pages\Weights\Weights.razor"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\icons\default\icons.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\langs\README.md"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\license.md"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\models\dom\model.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\accordion\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\advlist\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\anchor\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\autolink\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\autoresize\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\autosave\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\charmap\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\codesample\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\code\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\directionality\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\emoticons\js\emojiimages.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\emoticons\js\emojiimages.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\emoticons\js\emojis.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\emoticons\js\emojis.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\emoticons\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\fullscreen\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\ar.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\bg_BG.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\ca.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\cs.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\da.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\de.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\el.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\en.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\es.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\eu.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\fa.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\fi.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\fr_FR.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\he_IL.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\hi.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\hr.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\hu_HU.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\id.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\it.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\ja.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\kk.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\ko_KR.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\ms.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\nb_NO.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\nl.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\pl.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\pt_BR.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\pt_PT.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\ro.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\ru.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\sk.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\sl_SI.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\sv_SE.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\th_TH.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\tr.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\uk.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\vi.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\zh_CN.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\js\i18n\keynav\zh_TW.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\help\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\image\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\importcss\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\insertdatetime\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\link\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\lists\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\media\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\nonbreaking\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\pagebreak\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\preview\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\quickbars\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\save\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\searchreplace\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\table\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\visualblocks\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\visualchars\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\plugins\wordcount\plugin.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\dark\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\dark\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\default\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\default\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\document\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\document\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\tinymce-5-dark\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\tinymce-5-dark\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\tinymce-5\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\tinymce-5\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\writer\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\content\writer\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide-dark\content.inline.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide-dark\content.inline.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide-dark\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide-dark\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide-dark\skin.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide-dark\skin.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide-dark\skin.shadowdom.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide-dark\skin.shadowdom.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide\content.inline.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide\content.inline.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide\skin.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide\skin.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide\skin.shadowdom.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\oxide\skin.shadowdom.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5-dark\content.inline.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5-dark\content.inline.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5-dark\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5-dark\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5-dark\skin.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5-dark\skin.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5-dark\skin.shadowdom.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5-dark\skin.shadowdom.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5\content.inline.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5\content.inline.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5\content.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5\content.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5\skin.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5\skin.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5\skin.shadowdom.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\skins\ui\tinymce-5\skin.shadowdom.min.css"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\themes\silver\theme.min.js"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\tinymce.d.ts"/>
-        <_ContentIncludedByDefault Remove="wwwroot\tinymce\tinymce.min.js"/>
-    </ItemGroup>
-
 </Project>
