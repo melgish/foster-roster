@@ -7,6 +7,7 @@
                 Disabled="@Disabled"
                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 FilterOperator="StringFilterOperator.StartsWith"
+                FilterPlaceholder="Search..."
                 TextProperty="@nameof(ListItem<int>.Name)"
                 Value="@Value.GetValueOrDefault()"
                 ValueChanged="@ValueChanged"
@@ -36,5 +37,4 @@
         // of the associated text.
         await InvokeAsync(StateHasChanged);
     }
-
 }

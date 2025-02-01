@@ -8,107 +8,108 @@ else
 {
     <EditForm FormName="editFosterer" Model="_model" OnValidSubmit="SaveAsync">
         <FluentValidationValidator/>
-        <RadzenRow>
-            <RadzenColumn Size="12">
-                <RadzenText Text="@_name" TextStyle="TextStyle.DisplayH4"/>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
-                        <RadzenTextBox @bind-Value="_model.Name" Disabled="@_model.IsInactive"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Name)"/>
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Phone" Variant="Variant.Text">
-                        <RadzenMask @bind-Value="_model.Phone"
-                                    CharacterPattern="[0-9]"
-                                    Disabled="@_model.IsInactive"
-                                    Mask="***-***-****"
-                                    Placeholder="000-000-0000"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Phone)"/>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Email" Variant="Variant.Text">
-                        <RadzenTextBox @bind-Value="_model.Email"
-                                       Disabled="@_model.IsInactive"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Email)"/>
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Contact Method" Variant="Variant.Text">
-                        <RadzenDropDown @bind-Value="_model.ContactMethod"
-                                        Data="@ContactMethodChoices"
-                                        Disabled="@_model.IsInactive"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.ContactMethod)"/>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow>
-            <RadzenColumn Size="6">
-                <RadzenStack>
-                    <RadzenFormField AllowFloatingLabel="false" Text="Address" Variant="Variant.Text">
-                        <RadzenTextArea @bind-Value="_model.Address"
+        <RadzenStack Gap="0.5rem">
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn Size="12">
+                    <RadzenText Text="@_name" TextStyle="TextStyle.DisplayH4"/>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSm="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.Name" Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Name)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSm="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Phone" Variant="Variant.Text">
+                            <RadzenMask @bind-Value="_model.Phone"
+                                        CharacterPattern="[0-9]"
                                         Disabled="@_model.IsInactive"
-                                        Placeholder="@("Name\nStreet\nCity, State Zip")"
-                                        Rows="3"/>
-                    </RadzenFormField>
-                    <ValidationMessage For="@(() => _model.Address)"/>
-                </RadzenStack>
-            </RadzenColumn>
-            <RadzenColumn Size="6">
-                <RadzenStack></RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
-        <RadzenRow class="rz-mt-2">
-            <RadzenColumn>
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center"
-                             JustifyContent="JustifyContent.End">
-                    @if (_model.IsInactive)
-                    {
-                        <RadzenText>
-                            Inactive as of @_model.InactivatedAtUtc
-                        </RadzenText>
-                    }
-                    <div></div>
-                    @if (_isSaving)
-                    {
-                        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" ShowValue="false"
-                                                   Mode="ProgressBarMode.Indeterminate"/>
-                    }
-                    @if (!IsNew)
-                    {
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                      Click="@DeleteAsync"
+                                        Mask="***-***-****"
+                                        Placeholder="000-000-0000"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Phone)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSm="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Email" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.Email"
+                                           Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Email)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSm="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Contact Method" Variant="Variant.Text">
+                            <RadzenDropDown @bind-Value="_model.ContactMethod"
+                                            Data="@ContactMethodChoices"
+                                            Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.ContactMethod)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSm="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Address" Variant="Variant.Text">
+                            <RadzenTextArea @bind-Value="_model.Address"
+                                            Disabled="@_model.IsInactive"
+                                            Placeholder="@("Name\nStreet\nCity, State Zip")"
+                                            Rows="3"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Address)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn Size="12">
+                    <RadzenStack AlignItems="AlignItems.Center"
+                                 JustifyContent="JustifyContent.End"
+                                 Orientation="Orientation.Horizontal">
+                        @if (_model.IsInactive)
+                        {
+                            <RadzenText>
+                                Inactive as of @_model.InactivatedAtUtc
+                            </RadzenText>
+                        }
+                        <div></div>
+                        @if (_isSaving)
+                        {
+                            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate"
+                                                       ProgressBarStyle="ProgressBarStyle.Primary" 
+                                                       ShowValue="false" />
+                        }
+                        @if (!IsNew)
+                        {
+                            <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                          Click="@DeleteAsync"
+                                          Disabled="@(_isSaving || _model.IsInactive)"
+                                          Text="Delete"
+                                          Variant="Variant.Outlined"/>
+                        }
+                        <RadzenButton ButtonType="ButtonType.Submit"
                                       Disabled="@(_isSaving || _model.IsInactive)"
-                                      Text="Delete"
+                                      Text="Save"
                                       Variant="Variant.Outlined"/>
-                    }
-                    <RadzenButton ButtonType="ButtonType.Submit"
-                                  Disabled="@(_isSaving || _model.IsInactive)"
-                                  Text="Save"
-                                  Variant="Variant.Outlined"/>
 
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                  Click="@ResetAsync"
-                                  Disabled="@(_isSaving || _model.IsInactive)"
-                                  Text="Reset"
-                                  Variant="Variant.Outlined"/>
-                </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                      Click="@ResetAsync"
+                                      Disabled="@(_isSaving || _model.IsInactive)"
+                                      Text="Reset"
+                                      Variant="Variant.Outlined"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
     </EditForm>
 }
 
