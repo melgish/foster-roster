@@ -13,6 +13,7 @@ public sealed class ServerFelineRepository(
         f => new()
         {
             Id = f.Id,
+            AnimalId = f.AnimalId,
             Breed = f.Breed,
             Category = f.Category,
             Color = f.Color,
@@ -240,6 +241,7 @@ public sealed class ServerFelineRepository(
             .SingleOrDefaultAsync(e => e.Id == felineId);
         if (existing == null) return Result.Fail(new NotFoundError());
 
+        existing.AnimalId = feline.AnimalId;
         existing.Breed = feline.Breed;
         existing.Category = feline.Category;
         existing.Color = feline.Color;

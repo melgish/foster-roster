@@ -19,7 +19,7 @@ dotnet ef database update --project FosterRoster.Data
 dotnet ef migrations add {Migration Name} --project FosterRoster.Data
 ```
 
-### publish to docker
+### publish to docker\
 ```sh
 dotnet publish ./FosterRoster/FosterRoster.csproj -c Release --os linux --arch x64 /t:PublishContainer
 ```

@@ -2,6 +2,7 @@ namespace FosterRoster.Domain;
 
 public class Feline : IInactivatable
 {
+    public string? AnimalId { get; set; }
     public string? Breed { get; set; }
     public Category Category { get; set; }
     public string? Color { get; set; }

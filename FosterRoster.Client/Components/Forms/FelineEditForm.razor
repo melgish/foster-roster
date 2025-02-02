@@ -128,18 +128,17 @@ else
                         <ValidationMessage For="@(() => _model.Category)"/>
                     </RadzenStack>
                 </RadzenColumn>
-                <RadzenColumn SizeSM="6" SizeXS="12">
-                    <RadzenStack Gap="0rem">
-                        <RadzenFormField AllowFloatingLabel="false" Text="Registration Date" Variant="Variant.Text">
-                            <RadzenDatePicker @bind-Value="_model.RegistrationDate"
-                                              Disabled="@_model.IsInactive"
-                                              Placeholder="mm/dd/yyyy"/>
-                        </RadzenFormField>
-                        <ValidationMessage For="@(() => _model.RegistrationDate)"/>
-                    </RadzenStack>
-                </RadzenColumn>
             </RadzenRow>
             <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Animal ID" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.AnimalId"
+                                           Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.AnimalId)"/>
+                    </RadzenStack>
+                </RadzenColumn>
                 <RadzenColumn SizeSM="6" SizeXS="12">
                     <RadzenStack Gap="0rem">
                         <RadzenFormField
