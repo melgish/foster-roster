@@ -9,17 +9,17 @@ dotnet build
 dotnet watch --project FosterRoster
 ```
 
-### update database
-```sh
-dotnet ef database update --project FosterRoster.Data
-```
-
 ### create database migration
 ```sh
 dotnet ef migrations add {Migration Name} --project FosterRoster.Data
 ```
 
-### publish to docker\
+### update dev database
+```sh
+dotnet ef database update --project FosterRoster.Data
+```
+
+### publish to docker
 ```sh
 dotnet publish ./FosterRoster/FosterRoster.csproj -c Release --os linux --arch x64 /t:PublishContainer
 ```
