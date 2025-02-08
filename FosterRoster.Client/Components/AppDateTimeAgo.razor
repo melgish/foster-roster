@@ -1,0 +1,27 @@
+﻿@using System.Globalization
+@inject TimeProvider TimeProvider
+
+@if (Value is not null)
+{
+    <RadzenText>@Label: @_text <small>(@_ago)</small></RadzenText>
+}
+
+@code {
+    [Parameter] public DateTimeOffset? Value { get; set; }
+
+    [Parameter] public string Label { get; set; } = "Added";
+
+    private string _text = string.Empty;
+    private string _ago = string.Empty;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        await base.SetParametersAsync(parameters);
+        if (Value is not null)
+        {
+            var now = TimeProvider.GetUtcNow();
+            _text = Value.Value.ToLocalTime().DateTime.ToString("g", CultureInfo.CurrentCulture);
+            _ago = Value.Value.FormatAgo(now);
+        }
+    }
+}
