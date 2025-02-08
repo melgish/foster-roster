@@ -38,4 +38,32 @@ public sealed class ServerCommentRepository(
                 _ => Result.Fail(new MultipleChangesError())
             };
     }
+    
+    /// <summary>
+    ///     Update an existing comment. 
+    /// </summary>
+    /// <param name="commentId">ID of the comment to update.</param>
+    /// <param name="comment">New data for the comment.</param>
+    /// <returns>A Result instance indicating success or failure.</returns>
+    public async Task<Result<Comment>> UpdateAsync(int commentId, Comment comment)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        var existing = await context.Comments.FirstOrDefaultAsync(e => e.Id == commentId);
+        if (existing is null)
+        {
+            return Result.Fail<Comment>(new NotFoundError());
+        }
+
+        // Only update if comment text has actually been changed.
+        if (existing.Text.Equals(comment.Text))
+        {
+            return Result.Ok(existing);
+        }
+        
+        existing.Text = comment.Text;
+        existing.Modified = timeProvider.GetUtcNow().UtcDateTime;
+        await context.SaveChangesAsync();
+
+        return Result.Ok(existing);
+    }
 }
