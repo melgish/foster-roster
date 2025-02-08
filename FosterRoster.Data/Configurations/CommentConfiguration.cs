@@ -17,6 +17,11 @@ internal sealed class CommentConfiguration : IEntityTypeConfiguration<Comment>
             .UseIdentityAlwaysColumn();
 
         builder
+            .Property(e => e.Modified)
+            .HasColumnType("timestamp with time zone")
+            .IsRequired(false);
+
+        builder
             .Property(e => e.Text)
             .IsRequired()
             .HasColumnType("text")
