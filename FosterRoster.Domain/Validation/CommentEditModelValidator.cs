@@ -13,13 +13,9 @@ public sealed class CommentEditModelValidator : AbstractValidator<CommentEditMod
             .GreaterThan(0);
 
         RuleFor(model => model.Text)
-            .NotEmpty()
-            .WithMessage("{PropertyName} must not be empty.")
             .Must((value) =>
-            {
-                var stripped = AnyTag.Replace(value, string.Empty);
-                return !string.IsNullOrWhiteSpace(stripped);
-            })
+                !string.IsNullOrWhiteSpace(value) &&
+                !string.IsNullOrWhiteSpace(AnyTag.Replace(value, string.Empty)))
             .WithMessage("{PropertyName} must not be empty.")
             .MaximumLength(4000)
             .WithName("Comment");
