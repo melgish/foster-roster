@@ -18,19 +18,23 @@ else
         <RadzenPanel class="rz-shadow-3">
             <FelineEditForm Feline="@_feline"
                             OnActivate="OnActivateAsync"
-                            OnDelete="OnDeleteAsync"
+                            OnDelete="DeleteFelineAsync"
                             OnInactivate="OnInactivateAsync"
-                            OnSave="OnSaveAsync"/>
+                            OnSave="SaveFelineAsync"/>
         </RadzenPanel>
         <RadzenPanel class="rz-p-0 rz-shadow-3">
             <RadzenTabs>
                 <Tabs>
                     <RadzenTabsItem Text="Journal" Icon="edit">
                         <RadzenStack Gap="1rem" Style="margin:-1rem;">
-                            <CommentForm FelineId="@FelineId" CommentAdded="OnCommentAdded"/>
+                            <CommentForm OnSave="AddCommentAsync" Model="@_newComment"/>
                             @foreach (var comment in _feline.Comments)
                             {
-                                <CommentCard @key="comment.Id" Comment="comment" OnDelete="OnDeleteCommentAsync"/>
+                                <CommentCard
+                                    @key="comment.Id"
+                                    Comment="comment"
+                                    OnSave="UpdateCommentAsync"
+                                    OnDelete="DeleteCommentAsync"/>
                             }
                         </RadzenStack>
                     </RadzenTabsItem>
@@ -47,6 +51,7 @@ else
 @code {
     private IDisposable? _stateSubscription;
     private Feline? _feline;
+    private CommentEditModel? _newComment;
 
     private string Name => _feline?.Name ?? string.Empty;
 
@@ -55,12 +60,11 @@ else
     private async Task<Feline?> LoadAsync()
         => (await FelineRepository.GetByKeyAsync(FelineId)).ValueOrDefault;
 
-    void OnCommentAdded(Comment comment)
-    {
-        _feline!.Comments = _feline.Comments.Prepend(comment).ToArray();
-    }
-
-    async Task OnDeleteCommentAsync(Comment comment)
+    /// <summary>
+    /// Delete the supplied comment from the current feline.
+    /// </summary>
+    /// <param name="comment">Comment to delete</param>
+    async Task DeleteCommentAsync(Comment comment)
     {
         var rs = await CommentRepository.DeleteByKeyAsync(comment.Id);
         NotificationService.Notify(rs, "Comment Deleted", "Failed to delete comment");
@@ -79,6 +83,8 @@ else
         {
             NavigationManager.NavigateTo("/not-found");
         }
+
+        _newComment = new() { FelineId = FelineId };
     }
 
     private Task PersistStateAsync()
@@ -105,7 +111,7 @@ else
     /// <summary>
     /// Handle when user clicks delete button.
     /// </summary>
-    private async Task OnDeleteAsync()
+    private async Task DeleteFelineAsync()
     {
         var rs = await FelineRepository.DeleteByKeyAsync(FelineId);
         NotificationService.Notify(rs, "Deleted", "Failed to Delete");
@@ -132,7 +138,7 @@ else
     /// <summary>
     /// Save event handler for the FelineEditForm
     /// </summary>
-    private async Task OnSaveAsync(FelineEditModel model)
+    private async Task SaveFelineAsync(FelineEditModel model)
     {
         var rs = await FelineRepository.UpdateAsync(FelineId, model.ToFeline());
         NotificationService.Notify(rs, "Saved", "Failed to save");
@@ -142,6 +148,32 @@ else
         }
 
         await RefreshAsync();
+    }
+
+    /// <summary>
+    /// Add a new comment to the current feline.
+    /// </summary>
+    /// <param name="model"></param>
+    private async Task AddCommentAsync(CommentEditModel model)
+    {
+        var rs = await CommentRepository.AddAsync(model.ToComment());
+        NotificationService.Notify(rs, "Comment Added", "Failed to add comment");
+        if (rs.IsSuccess)
+        {
+            _feline!.Comments = _feline.Comments.Prepend(rs.Value).ToArray();
+            _newComment = new() { FelineId = FelineId };
+        }
+    }
+
+    private async Task UpdateCommentAsync(Comment comment)
+    {
+        var rs = await CommentRepository.UpdateAsync(comment.Id, comment);
+        NotificationService.Notify(rs, "Comment Updated", "Failed to update comment");
+        if (rs.IsSuccess)
+        {
+            _feline!.Comments = _feline.Comments.Select(c => c.Id == rs.Value.Id ? rs.Value : c).ToArray();
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
 }

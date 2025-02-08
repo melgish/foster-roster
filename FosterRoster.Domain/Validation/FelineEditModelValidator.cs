@@ -7,7 +7,7 @@ public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel
     {
         RuleFor(feline => feline.AnimalId)
             .MaximumLength(24);
-        
+
         RuleFor(feline => feline.Breed)
             .MaximumLength(48);
 

@@ -6,7 +6,7 @@ public sealed class CommentEditModel()
 
     public int Id { get; init; }
 
-    public DateTimeOffset? Modified { get; set; }
+    public DateTimeOffset? Modified { get; init; }
 
     public string Text { get; set; } = string.Empty;
 
