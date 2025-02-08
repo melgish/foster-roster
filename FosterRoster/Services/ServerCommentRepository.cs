@@ -38,7 +38,7 @@ public sealed class ServerCommentRepository(
                 _ => Result.Fail(new MultipleChangesError())
             };
     }
-    
+
     /// <summary>
     ///     Update an existing comment. 
     /// </summary>
@@ -49,17 +49,11 @@ public sealed class ServerCommentRepository(
     {
         await using var context = await contextFactory.CreateDbContextAsync();
         var existing = await context.Comments.FirstOrDefaultAsync(e => e.Id == commentId);
-        if (existing is null)
-        {
-            return Result.Fail<Comment>(new NotFoundError());
-        }
+        if (existing is null) return Result.Fail<Comment>(new NotFoundError());
 
         // Only update if comment text has actually been changed.
-        if (existing.Text.Equals(comment.Text))
-        {
-            return Result.Ok(existing);
-        }
-        
+        if (existing.Text.Equals(comment.Text)) return Result.Ok(existing);
+
         existing.Text = comment.Text;
         existing.Modified = timeProvider.GetUtcNow().UtcDateTime;
         await context.SaveChangesAsync();

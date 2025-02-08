@@ -30,7 +30,7 @@ public sealed class ClientCommentRepository(
         => await Result
             .Try(() => httpClient.DeleteAsync($"{Route}/{commentId}"))
             .Bind(rs => Result.OkIf(rs.IsSuccessStatusCode, FailedToDelete));
-    
+
     /// <summary>
     ///     Update an existing comment. 
     /// </summary>

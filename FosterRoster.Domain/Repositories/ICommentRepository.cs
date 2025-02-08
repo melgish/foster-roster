@@ -15,7 +15,7 @@ public interface ICommentRepository
     /// <param name="commentId">ID of comment to delete.</param>
     /// <returns>A Result instance indicating success or failure.</returns>
     public Task<Result> DeleteByKeyAsync(int commentId);
-    
+
     /// <summary>
     ///     Update an existing comment. 
     /// </summary>

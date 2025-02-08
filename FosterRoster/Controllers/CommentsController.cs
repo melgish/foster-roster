@@ -31,7 +31,7 @@ public sealed class CommentsController(
             { IsSuccess: true } => NoContent(),
             { } err => this.Unprocessable(err)
         };
-    
+
     /// <summary>
     ///     Updates an existing comment in the database.
     /// </summary>
