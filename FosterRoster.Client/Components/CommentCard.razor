@@ -1,31 +1,57 @@
-@using System.Globalization
 @inject TimeProvider TimeProvider
+@inject ILogger<CommentCard> Logger
 
-<RadzenCard Variant="Variant.Outlined">
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-        <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                      Click="() => OnDelete.InvokeAsync(Comment)"
-                      Icon="delete"
-                      Size="ButtonSize.Small"
-                      Variant="Variant.Outlined"/>
-        <RadzenText>@Comment.TimeStamp.ToLocalTime().DateTime.ToString(CultureInfo.CurrentUICulture) <small>(@Comment.FormatAgo(_now))</small>
-        </RadzenText>
-    </RadzenStack>
-    <RadzenHtml>@_html</RadzenHtml>
-</RadzenCard>
+@if (_model is null)
+{
+    <RadzenCard Variant="Variant.Outlined" class="rz-pt-1 rz-px-2">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                          Click="@(() => OnDelete.InvokeAsync(Comment))"
+                          Size="ButtonSize.Small"
+                          Text="Delete"
+                          Variant="Variant.Outlined"/>
+            <RadzenButton ButtonStyle="ButtonStyle.Primary"
+                          Click="@(() => _model = new(Comment))"
+                          Size="ButtonSize.Small"
+                          Text="Edit"
+                          Variant="Variant.Outlined"/>
+            <AppDateTimeAgo Value="@Comment.TimeStamp"/>
+            @if (Comment.Modified.HasValue)
+            {
+                <AppDateTimeAgo Value="@Comment.Modified" Label="Revised"/>
+            }
+        </RadzenStack>
+        <RadzenHtml>@_html</RadzenHtml>
+    </RadzenCard>
+}
+else
+{
+    <CommentForm Model="_model"
+                 OnCancel="@(() => _model = null)"
+                 OnDelete="@(() => OnDelete.InvokeAsync(Comment))"
+                 OnSave="@SaveAsync"/>
+}
 
 @code {
     [Parameter] public Comment Comment { get; set; } = null!;
 
     [Parameter] public EventCallback<Comment> OnDelete { get; set; }
 
-    private MarkupString? _html = null;
-    private DateTimeOffset _now;
+    [Parameter] public EventCallback<Comment> OnSave { get; set; }
 
-    protected override void OnInitialized()
+    private MarkupString? _html = null;
+    private CommentEditModel? _model = null;
+
+    protected override void OnParametersSet()
     {
-        _now = TimeProvider.GetUtcNow();
         _html = new(Comment.Text);
+        _model = null;
+    }
+
+    private async Task SaveAsync(CommentEditModel model)
+    {
+        await OnSave.InvokeAsync(model.ToComment());
+        _model = null;
     }
 
 }

@@ -3,7 +3,10 @@ namespace FosterRoster.Client.Extensions;
 public static class CommentExtensions
 {
     public static string FormatAgo(this Comment comment, DateTimeOffset asOfDate)
-        => (asOfDate - comment.TimeStamp) switch
+        => comment.TimeStamp.FormatAgo(asOfDate);
+
+    public static string FormatAgo(this DateTimeOffset date, DateTimeOffset asOfDate)
+        => (asOfDate - date) switch
         {
             { Days: > 1 } d => $"{d.Days:F0} days ago",
             { Hours: > 1 } d => $"{d.Hours:F0} hours ago",
