@@ -2,6 +2,7 @@ namespace FosterRoster.Domain;
 
 public sealed class FelineEditModel()
 {
+    public string? AnimalId { get; set; }
     public string? Breed { get; set; }
     public Category Category { get; set; }
     public string? Color { get; set; } = string.Empty;
@@ -20,6 +21,7 @@ public sealed class FelineEditModel()
 
     public FelineEditModel(Feline feline) : this()
     {
+        AnimalId = feline.AnimalId;
         Breed = feline.Breed;
         Category = feline.Category;
         Color = feline.Color;
@@ -41,6 +43,7 @@ public sealed class FelineEditModel()
     public Feline ToFeline() =>
         new()
         {
+            AnimalId = string.IsNullOrWhiteSpace(AnimalId) ? null : AnimalId.Trim(),
             Breed = string.IsNullOrWhiteSpace(Breed) ? null : Breed.Trim(),
             Category = Category,
             Color = string.IsNullOrWhiteSpace(Color) ? null : Color.Trim(),

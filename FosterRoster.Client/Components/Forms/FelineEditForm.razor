@@ -55,7 +55,7 @@ else
                                 Variant="Variant.Text">
                                 <RadzenRadioButtonList TValue="Gender" @bind-Value="_model.Gender"
                                                        Disabled="@_model.IsInactive"
-                                                       class="rz-pt-2">
+                                                       class="rz-pt-3">
                                     <Items>
                                         <RadzenRadioButtonListItem Text="Female" Value="@Gender.Female"
                                                                    TValue="Gender"/>
@@ -142,13 +142,22 @@ else
             <RadzenRow Gap="1rem" RowGap="0.5rem">
                 <RadzenColumn SizeSM="6" SizeXS="12">
                     <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Animal ID" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.AnimalId"
+                                           Disabled="@_model.IsInactive"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.AnimalId)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn SizeSM="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
                         <RadzenFormField
                             AllowFloatingLabel="false"
                             Text="Weaned"
                             Variant="Variant.Text">
                             <RadzenRadioButtonList TValue="Weaned" @bind-Value="_model.Weaned"
                                                    Disabled="@_model.IsInactive"
-                                                   class="rz-pt-2">
+                                                   class="rz-pt-3">
                                 <Items>
                                     <RadzenRadioButtonListItem Text="No" Value="@Weaned.No" TValue="Weaned"/>
                                     <RadzenRadioButtonListItem Text="In Progress" Value="@Weaned.InProgress"

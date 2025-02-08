@@ -13,6 +13,11 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
         builder.HasKey(e => e.Id);
 
         builder
+            .Property(e => e.AnimalId)
+            .HasMaxLength(24)
+            .IsRequired(false);
+
+        builder
             .Property(e => e.Breed)
             .HasMaxLength(48)
             .IsRequired(false);
