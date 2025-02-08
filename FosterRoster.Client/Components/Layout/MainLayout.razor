@@ -7,14 +7,14 @@
             <RadzenHeader Style="min-height: unset">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem"
                              JustifyContent="JustifyContent.Start" Style="padding:0.25rem 1rem">
-                    <RadzenText Text="Foster Roster" TextStyle="TextStyle.H4" Style="color: var(--rz-header-color)"/>
+                    <RadzenText Text="Foster Roster" TextStyle="TextStyle.DisplayH4" Style="color: var(--rz-header-color)"/>
                     <RadzenLink Match="NavLinkMatch.All" Path="/" Text="Dashboard"/>
                     <RadzenLink Path="/intake" Text="Intake"/>
                     <RadzenLink Path="/weights" Text="Weights"/>
                     <RadzenLink Path="/fosterers" Text="Fosterers"/>
                     <div style="flex: auto"></div>
                     <RadzenAppearanceToggle @rendermode="InteractiveWebAssembly"/>
-                    <RadzenLink Path="https://github.com/melgish/foster-roster" Target="_blank">Source</RadzenLink>
+                    <GitHubLink Repository="https://github.com/melgish/foster-roster"/> 
                 </RadzenStack>
             </RadzenHeader>
             <RadzenBody>
