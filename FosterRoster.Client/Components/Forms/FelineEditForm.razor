@@ -172,57 +172,32 @@ else
             </RadzenRow>
             <RadzenRow Gap="1rem" RowGap="0.5rem">
                 <RadzenColumn Size="12">
-                    <RadzenStack AlignItems="AlignItems.Center"
-                                 JustifyContent="JustifyContent.End"
-                                 Orientation="Orientation.Horizontal">
+                    <AppFormButtons
+                        Busy="_isSaving"
+                        CanDelete="(Feline.Id != 0)"
+                        Disabled="_model.IsInactive"
+                        OnDelete="DeleteAsync"
+                        OnReset="ResetAsync">
                         @if (_model.IsInactive)
                         {
-                            <RadzenText>
-                                Inactive as of @_model.InactivatedAtUtc
-                            </RadzenText>
-                        }
-                        <div></div>
-                        @if (_isSaving)
-                        {
-                            <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" ShowValue="false"
-                                                       Mode="ProgressBarMode.Indeterminate"/>
-                        }
-                        @if (!IsNew)
-                        {
-                            @if (_model.IsInactive)
-                            {
-                                <RadzenButton ButtonStyle="ButtonStyle.Info"
-                                              Click="@ActivateAsync"
-                                              Disabled="@(_isSaving || !_model.IsInactive)"
-                                              Text="Activate"
-                                              Variant="Variant.Outlined"/>
-                            }
-                            else
-                            {
-                                <RadzenButton ButtonStyle="ButtonStyle.Info"
-                                              Click="@InactivateAsync"
-                                              Disabled="@(_isSaving || _model.IsInactive)"
-                                              Text="Inactivate"
-                                              Variant="Variant.Outlined"/>
-                            }
-
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                          Click="@DeleteAsync"
-                                          Disabled="@(_isSaving || _model.IsInactive)"
-                                          Text="Delete"
+                            <AppDateTimeAgo Value="_model.InactivatedAtUtc" Label="Inactive since"/>
+                            <RadzenButton ButtonStyle="ButtonStyle.Info"
+                                          Click="@ActivateAsync"
+                                          Disabled="@(_isSaving || !_model.IsInactive)"
+                                          Size="ButtonSize.Small"
+                                          Text="Activate"
                                           Variant="Variant.Outlined"/>
                         }
-                        <RadzenButton ButtonType="ButtonType.Submit"
-                                      Disabled="@(_isSaving || _model.IsInactive)"
-                                      Text="Save"
-                                      Variant="Variant.Outlined"/>
-
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                      Click="@ResetAsync"
-                                      Disabled="@(_isSaving || _model.IsInactive)"
-                                      Text="Reset"
-                                      Variant="Variant.Outlined"/>
-                    </RadzenStack>
+                        else
+                        {
+                            <RadzenButton ButtonStyle="ButtonStyle.Info"
+                                          Click="@InactivateAsync"
+                                          Disabled="@(_isSaving || _model.IsInactive)"
+                                          Size="ButtonSize.Small"
+                                          Text="Inactivate"
+                                          Variant="Variant.Outlined"/>
+                        }
+                    </AppFormButtons>
                 </RadzenColumn>
             </RadzenRow>
         </RadzenStack>
@@ -239,6 +214,7 @@ else
     private string _name = string.Empty;
     private FelineEditModel? _model = null;
 
+    [EditorRequired]
     [Parameter] public Feline Feline { get; set; } = null!;
 
     [Parameter] public bool IsNew { get; set; }
@@ -329,5 +305,4 @@ else
         await OnSave.InvokeAsync(_model);
         _isSaving = false;
     }
-
 }

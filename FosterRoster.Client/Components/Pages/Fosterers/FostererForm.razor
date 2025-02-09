@@ -72,41 +72,12 @@ else
             </RadzenRow>
             <RadzenRow Gap="1rem" RowGap="0.5rem">
                 <RadzenColumn Size="12">
-                    <RadzenStack AlignItems="AlignItems.Center"
-                                 JustifyContent="JustifyContent.End"
-                                 Orientation="Orientation.Horizontal">
-                        @if (_model.IsInactive)
-                        {
-                            <RadzenText>
-                                Inactive as of @_model.InactivatedAtUtc
-                            </RadzenText>
-                        }
-                        <div></div>
-                        @if (_isSaving)
-                        {
-                            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate"
-                                                       ProgressBarStyle="ProgressBarStyle.Primary"
-                                                       ShowValue="false"/>
-                        }
-                        @if (!IsNew)
-                        {
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                          Click="@DeleteAsync"
-                                          Disabled="@(_isSaving || _model.IsInactive)"
-                                          Text="Delete"
-                                          Variant="Variant.Outlined"/>
-                        }
-                        <RadzenButton ButtonType="ButtonType.Submit"
-                                      Disabled="@(_isSaving || _model.IsInactive)"
-                                      Text="Save"
-                                      Variant="Variant.Outlined"/>
-
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                      Click="@ResetAsync"
-                                      Disabled="@(_isSaving || _model.IsInactive)"
-                                      Text="Reset"
-                                      Variant="Variant.Outlined"/>
-                    </RadzenStack>
+                    <AppFormButtons
+                        Busy="_isSaving"
+                        CanDelete="(Fosterer.Id != 0)"
+                        Disabled="_model.IsInactive"
+                        OnDelete="DeleteAsync"
+                        OnReset="ResetAsync"/>
                 </RadzenColumn>
             </RadzenRow>
         </RadzenStack>
@@ -123,50 +94,38 @@ else
     private FostererEditModel? _model;
     private string _name = string.Empty;
 
+    /// <summary>
+    ///     Fosterer to edit.
+    /// </summary>
+    [EditorRequired]
     [Parameter] public Fosterer Fosterer { get; set; } = null!;
 
-    [Parameter] public bool IsNew { get; set; }
-
-    [Parameter] public EventCallback OnDelete { get; set; } = EventCallback.Empty;
+    /// <summary>
+    ///     Event fired when delete button is clicked
+    /// </summary>
+    [Parameter] 
+    public EventCallback<int> OnDelete { get; set; }
 
     /// <summary>
     ///     Event fired when save button is clicked.
     /// </summary>
     [Parameter]
-    public EventCallback<FostererEditModel> OnSave { get; set; } =
-        EventCallback<FostererEditModel>.Empty;
+    public EventCallback<Fosterer> OnSave { get; set; }
 
     /// <summary>
-    ///     Event fired when Add button is clicked.
+    ///     Handles click event for the delete button.
     /// </summary>
-    [Parameter]
-    public EventCallback OnAdd { get; set; } = EventCallback.Empty;
-
-    private Task ActivateAsync() => Task.CompletedTask;
-
     private async Task DeleteAsync()
     {
-        var parameters = new Dictionary<string, object>
-        {
-            { nameof(ConfirmDeleteFostererDialog.Model), _model! }
-        };
-
-        bool result = await DialogService
-            .OpenAsync<ConfirmDeleteFostererDialog>("Confirm Delete", parameters, new()
-            {
-                ShowClose = false,
-                Top = "10vh"
-            });
-
-        if (result)
+        var rs = await DialogService
+            .Confirm($"Are you sure you want to delete fosterer named \"{Fosterer.Name}\"?");
+        if (rs.GetValueOrDefault())
         {
             _isSaving = true;
             await OnDelete.InvokeAsync(Fosterer.Id);
             _isSaving = false;
         }
     }
-
-    private Task InactivateAsync() => Task.CompletedTask;
 
     /// <summary>
     ///     Resets form any time the parent Feline is updated.
@@ -180,15 +139,17 @@ else
     private Task ResetAsync()
     {
         _model = new(Fosterer);
-        _name = IsNew ? "Create Fosterer" : _model.Name;
+        _name = Fosterer.Id == 0 ? "Create New Fosterer" : _model.Name;
         return Task.CompletedTask;
     }
 
     private async Task SaveAsync()
     {
-        _isSaving = true;
-        await OnSave.InvokeAsync(_model);
-        _isSaving = false;
+        if (_model is not null)
+        {
+            _isSaving = true;
+            await OnSave.InvokeAsync(_model.ToFosterer());
+            _isSaving = false;
+        }
     }
-
 }

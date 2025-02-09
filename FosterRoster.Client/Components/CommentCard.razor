@@ -6,19 +6,19 @@
     <RadzenCard Variant="Variant.Outlined" class="rz-pt-1 rz-px-2">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
             <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                          Click="@(() => OnDelete.InvokeAsync(Comment))"
+                          Click="DeleteAsync"
                           Size="ButtonSize.Small"
                           Text="Delete"
                           Variant="Variant.Outlined"/>
             <RadzenButton ButtonStyle="ButtonStyle.Primary"
-                          Click="@(() => _model = new(Comment))"
+                          Click="EditAsync"
                           Size="ButtonSize.Small"
                           Text="Edit"
                           Variant="Variant.Outlined"/>
-            <AppDateTimeAgo Value="@Comment.TimeStamp"/>
+            <AppDateTimeAgo Value="Comment.TimeStamp"/>
             @if (Comment.Modified.HasValue)
             {
-                <AppDateTimeAgo Value="@Comment.Modified" Label="Revised"/>
+                <AppDateTimeAgo Value="Comment.Modified" Label="Revised"/>
             }
         </RadzenStack>
         <RadzenHtml>@_html</RadzenHtml>
@@ -27,20 +27,35 @@
 else
 {
     <CommentForm Model="_model"
-                 OnCancel="@(() => _model = null)"
-                 OnDelete="@(() => OnDelete.InvokeAsync(Comment))"
-                 OnSave="@SaveAsync"/>
+                 OnCancel="CancelAsync"
+                 OnDelete="DeleteAsync"
+                 OnSave="SaveAsync"/>
 }
 
 @code {
+    private MarkupString? _html = null;
+    private CommentEditModel? _model = null;
+
+    [EditorRequired]
     [Parameter] public Comment Comment { get; set; } = null!;
 
     [Parameter] public EventCallback<Comment> OnDelete { get; set; }
 
     [Parameter] public EventCallback<Comment> OnSave { get; set; }
 
-    private MarkupString? _html = null;
-    private CommentEditModel? _model = null;
+    private async Task DeleteAsync() => await OnDelete.InvokeAsync(Comment);
+
+    private Task CancelAsync()
+    {
+        _model = null;
+        return Task.CompletedTask;
+    }
+    
+    private Task EditAsync()
+    {
+        _model = new(Comment);
+        return Task.CompletedTask;
+    }
 
     protected override void OnParametersSet()
     {
@@ -53,5 +68,4 @@ else
         await OnSave.InvokeAsync(model.ToComment());
         _model = null;
     }
-
 }
