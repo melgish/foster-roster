@@ -2,7 +2,6 @@
              Gap="0.5rem"
              JustifyContent="JustifyContent.End"
              Orientation="Orientation.Horizontal">
-    <div></div>
     @if (Busy)
     {
         <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate"
@@ -55,6 +54,4 @@
     [Parameter] public EventCallback OnReset { get; set; }
 
     [Parameter] public RenderFragment? ChildContent { get; set; }
-
-    [Parameter] public RenderFragment? Text { get; set; }
 }
