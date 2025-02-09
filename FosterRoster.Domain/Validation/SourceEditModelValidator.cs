@@ -1,9 +1,9 @@
 ﻿namespace FosterRoster.Domain.Validation;
 
 [UsedImplicitly]
-public sealed class SourceValidator : AbstractValidator<Source>
+public sealed class SourceEditModelValidator : AbstractValidator<SourceEditModel>
 {
-    public SourceValidator()
+    public SourceEditModelValidator()
     {
         RuleFor(model => model.Name)
             .NotEmpty()

@@ -72,41 +72,12 @@ else
             </RadzenRow>
             <RadzenRow Gap="1rem" RowGap="0.5rem">
                 <RadzenColumn Size="12">
-                    <RadzenStack AlignItems="AlignItems.Center"
-                                 JustifyContent="JustifyContent.End"
-                                 Orientation="Orientation.Horizontal">
-                        @if (_model.IsInactive)
-                        {
-                            <RadzenText>
-                                Inactive as of @_model.InactivatedAtUtc
-                            </RadzenText>
-                        }
-                        <div></div>
-                        @if (_isSaving)
-                        {
-                            <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate"
-                                                       ProgressBarStyle="ProgressBarStyle.Primary"
-                                                       ShowValue="false"/>
-                        }
-                        @if (!IsNew)
-                        {
-                            <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                          Click="@DeleteAsync"
-                                          Disabled="@(_isSaving || _model.IsInactive)"
-                                          Text="Delete"
-                                          Variant="Variant.Outlined"/>
-                        }
-                        <RadzenButton ButtonType="ButtonType.Submit"
-                                      Disabled="@(_isSaving || _model.IsInactive)"
-                                      Text="Save"
-                                      Variant="Variant.Outlined"/>
-
-                        <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                      Click="@ResetAsync"
-                                      Disabled="@(_isSaving || _model.IsInactive)"
-                                      Text="Reset"
-                                      Variant="Variant.Outlined"/>
-                    </RadzenStack>
+                    <AppFormButtons
+                        Busy="_isSaving"
+                        Disabled="_model.IsInactive"
+                        IsNew="Fosterer?.Id == 0"
+                        OnDelete="DeleteAsync"
+                        OnReset="ResetAsync"/>
                 </RadzenColumn>
             </RadzenRow>
         </RadzenStack>
@@ -124,8 +95,6 @@ else
     private string _name = string.Empty;
 
     [Parameter] public Fosterer Fosterer { get; set; } = null!;
-
-    [Parameter] public bool IsNew { get; set; }
 
     [Parameter] public EventCallback OnDelete { get; set; } = EventCallback.Empty;
 
@@ -180,7 +149,7 @@ else
     private Task ResetAsync()
     {
         _model = new(Fosterer);
-        _name = IsNew ? "Create Fosterer" : _model.Name;
+        _name = Fosterer.Id == 0 ? "Create Fosterer" : _model.Name;
         return Task.CompletedTask;
     }
 

@@ -58,6 +58,12 @@ public sealed class ClientFostererRepository(
             .Try(() => httpClient.GetFromJsonAsync<Fosterer>($"{Route}/{fostererId}"))
             .Bind(fosterer => Result.Ok(fosterer!));
 
+    /// <summary>
+    ///     Updates an existing Fosterer in the database.
+    /// </summary>
+    /// <param name="fostererId">ID of Fosterer to update</param>
+    /// <param name="fosterer">Data to assign to Fosterer</param>
+    /// <returns>Result with updated Fosterer if found, or Errors on failure.</returns>
     public async Task<Result<Fosterer>> UpdateAsync(int fostererId, Fosterer fosterer)
     {
         var model = new FostererEditModel(fosterer);
