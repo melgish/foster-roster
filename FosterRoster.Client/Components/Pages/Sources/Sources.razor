@@ -11,7 +11,6 @@
     <RadzenPanel class="rz-shadow-3">
         <SourceForm
             Source="_source"
-            IsNew="@(_source.Id == 0)"
             OnDelete="DeleteAsync"
             OnSave="SaveAsync"
         />
@@ -32,14 +31,9 @@
         return Task.CompletedTask;
     }
 
-    private async Task DeleteAsync()
+    private async Task DeleteAsync(int sourceId)
     {
-        if (_source.Id == 0)
-        {
-            return;
-        }
-
-        var rs = await SourceRepository.DeleteByKeyAsync(_source.Id);
+        var rs = await SourceRepository.DeleteByKeyAsync(sourceId);
         NotificationService.Notify(rs, "Deleted source", "Failed to delete source");
         if (rs.IsSuccess)
         {
@@ -80,30 +74,27 @@
         await base.OnInitializedAsync();
     }
 
+    private Task PersistStateAsync()
+    {
+        ComponentState.PersistAsJson("sources", _sources);
+        return Task.CompletedTask;
+    }
+    
     private async Task RefreshAsync(int sourceId)
     {
         _sources = (await SourceRepository.GetAllAsync()).ValueOrDefault ?? [];
         _source = _sources.FirstOrDefault(e => e.Id == sourceId) ?? new();
     }
 
-    private async Task SaveAsync(SourceEditModel model)
+    private async Task SaveAsync(Source source)
     {
-        var rs = model.ToSource() switch
-        {
-            { Id: 0 } s => await SourceRepository.AddAsync(s),
-            { } s => await SourceRepository.UpdateAsync(s.Id, s)
-        };
+        var rs = source.Id == 0
+            ? await SourceRepository.AddAsync(source)
+            : await SourceRepository.UpdateAsync(source.Id, source);
         NotificationService.Notify(rs, "Saved source", "Failed to save source");
         if (rs.IsSuccess)
         {
             await RefreshAsync(rs.Value.Id);
         }
     }
-
-    private Task PersistStateAsync()
-    {
-        ComponentState.PersistAsJson("sources", _sources);
-        return Task.CompletedTask;
-    }
-
 }

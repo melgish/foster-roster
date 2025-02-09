@@ -1,6 +1,6 @@
 @page "/fosterers"
 @rendermode InteractiveWebAssembly
-@implements IDisposable
+@implements IAsyncDisposable
 @inject PersistentComponentState ComponentState
 @inject IFostererRepository FostererRepository
 @inject NavigationManager NavigationManager
@@ -11,12 +11,12 @@
     <RadzenPanel class="rz-shadow-3">
         <FostererForm
             Fosterer="_fosterer"
-            OnDelete="OnDeleteAsync"
-            OnSave="OnSaveAsync"
+            OnDelete="DeleteAsync"
+            OnSave="SaveAsync"
         />
     </RadzenPanel>
     <RadzenPanel class="rz-p-0 rz-shadow-3">
-        <FosterersGrid Items="_fosterers" OnAdd="@OnAddAsync" OnEdit="@OnEditAsync"/>
+        <FosterersGrid Items="_fosterers" OnAdd="@AddAsync" OnEdit="@EditAsync"/>
     </RadzenPanel>
 </RadzenStack>
 
@@ -25,37 +25,15 @@
     private ICollection<Fosterer>? _fosterers = [];
     private IDisposable? _stateSubscription;
 
-    private Task OnAddAsync()
+    private Task AddAsync()
     {
         _fosterer = new();
         return Task.CompletedTask;
     }
 
-    public void Dispose() => _stateSubscription?.Dispose();
-
-    private async Task RefreshAsync(int fostererId)
+    private async Task DeleteAsync(int fostererId)
     {
-        _fosterers = (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
-        _fosterer = _fosterers.FirstOrDefault(e => e.Id == fostererId) ?? new();
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
-        ComponentState.TryTakeFromJson("fosterers", out _fosterers);
-        _fosterers ??= (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
-        _fosterer = new();
-        await base.OnInitializedAsync();
-    }
-
-    private async Task OnDeleteAsync()
-    {
-        if (_fosterer.Id != 0)
-        {
-            return;
-        }
-
-        var rs = await FostererRepository.DeleteByKeyAsync(_fosterer.Id);
+        var rs = await FostererRepository.DeleteByKeyAsync(fostererId);
         NotificationService.Notify(rs, "Deleted Fosterer", "Failed to Delete Fosterer");
         if (rs.IsSuccess)
         {
@@ -63,7 +41,19 @@
         }
     }
 
-    private async Task OnEditAsync(int fostererId)
+    public async ValueTask DisposeAsync()
+    {
+        if (_stateSubscription is IAsyncDisposable sub)
+        {
+            await sub.DisposeAsync();
+        }
+        else
+        {
+            _stateSubscription?.Dispose();
+        }
+    }
+
+    private async Task EditAsync(int fostererId)
     {
         var rs = await FostererRepository.GetByKeyAsync(fostererId);
         if (rs.IsFailed)
@@ -75,16 +65,13 @@
         _fosterer = rs.Value;
     }
 
-    private async Task OnSaveAsync(FostererEditModel model)
+    protected override async Task OnInitializedAsync()
     {
-        var rs = model.Id == 0
-            ? await FostererRepository.AddAsync(model.ToFosterer())
-            : await FostererRepository.UpdateAsync(model.Id, model.ToFosterer());
-        NotificationService.Notify(rs, "Saved Fosterer", "Failed to Save Fosterer");
-        if (rs.IsSuccess)
-        {
-            await RefreshAsync(rs.Value.Id);
-        }
+        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
+        ComponentState.TryTakeFromJson("fosterers", out _fosterers);
+        _fosterers ??= (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
+        _fosterer = new();
+        await base.OnInitializedAsync();
     }
 
     private Task PersistStateAsync()
@@ -93,4 +80,21 @@
         return Task.CompletedTask;
     }
 
+    private async Task RefreshAsync(int fostererId)
+    {
+        _fosterers = (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
+        _fosterer = _fosterers.FirstOrDefault(e => e.Id == fostererId) ?? new();
+    }
+
+    private async Task SaveAsync(Fosterer fosterer)
+    {
+        var rs = fosterer.Id == 0
+            ? await FostererRepository.AddAsync(fosterer)
+            : await FostererRepository.UpdateAsync(fosterer.Id, fosterer);
+        NotificationService.Notify(rs, "Saved Fosterer", "Failed to Save Fosterer");
+        if (rs.IsSuccess)
+        {
+            await RefreshAsync(rs.Value.Id);
+        }
+    }
 }

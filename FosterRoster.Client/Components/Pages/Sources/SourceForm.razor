@@ -28,8 +28,8 @@ else
                 <RadzenColumn Size="12">
                     <AppFormButtons
                         Busy="_isSaving"
-                        IsNew="IsNew"
-                        OnDelete="OnDelete"
+                        CanDelete="@(Source.Id != 0)"
+                        OnDelete="DeleteAsync"
                         OnReset="ResetAsync">
                     </AppFormButtons>
                 </RadzenColumn>
@@ -44,20 +44,39 @@ else
     private string _name = string.Empty;
     private SourceEditModel? _model;
 
-    [Parameter] public bool IsNew { get; set; }
-    [Parameter] public Source Source { get; set; } = null!;
+    /// <summary>
+    ///     Source to edit.
+    /// </summary>
+    [EditorRequired]
+    [Parameter] 
+    public Source Source { get; set; } = null!;
 
     /// <summary>
     ///     Event fired when delete button is clicked.
     /// </summary>
     [Parameter]
-    public EventCallback OnDelete { get; set; }
+    public EventCallback<int> OnDelete { get; set; }
 
     /// <summary>
     ///     Event fired when save button is clicked.
     /// </summary>
     [Parameter]
-    public EventCallback<SourceEditModel> OnSave { get; set; }
+    public EventCallback<Source> OnSave { get; set; }
+
+    /// <summary>
+    ///     Handles click event for the delete button.
+    /// </summary>
+    private async Task DeleteAsync()
+    {
+        var rs = await DialogService
+            .Confirm($"Are you sure you want to delete the source named \"{Source.Name}\"?");
+        if (rs.GetValueOrDefault())
+        {
+            _isSaving = true;
+            await OnDelete.InvokeAsync(Source.Id);
+            _isSaving = false;
+        }
+    }
 
     /// <summary>
     ///     Resets form any time the parent Source is updated.
@@ -70,16 +89,20 @@ else
     private Task ResetAsync()
     {
         _model = new(Source);
-        _name = IsNew ? "Create Source" : Source.Name;
+        _name = Source.Id == 0 ? "Create New Source" : Source.Name;
         return Task.CompletedTask;
     }
 
-
+    /// <summary>
+    ///     Saves current source.
+    /// </summary>
     private async Task SaveAsync()
     {
-        _isSaving = true;
-        await OnSave.InvokeAsync(_model);
-        _isSaving = false;
+        if (_model is not null)
+        {
+            _isSaving = true;
+            await OnSave.InvokeAsync(_model.ToSource());
+            _isSaving = false;
+        }
     }
-
 }
