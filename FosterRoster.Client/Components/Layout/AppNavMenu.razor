@@ -9,8 +9,11 @@
     <RadzenMenuItem Path="/" Text="Dashboard" Match="NavLinkMatch.All"/>
     <RadzenMenuItem Path="/weights" Text="Weights"/>
     <RadzenMenuItem Path="/intake" Text="Intake"/>
-    <RadzenMenuItem Path="/fosterers" Text="Fosterers"/>
-    <RadzenMenuItem Path="/sources" Text="Sources"/>
+    <RadzenMenuItem Text="Admin">
+        <RadzenMenuItem Path="/felines" Text="Felines"/>
+        <RadzenMenuItem Path="/fosterers" Text="Fosterers"/>
+        <RadzenMenuItem Path="/sources" Text="Sources"/>
+    </RadzenMenuItem>
     <RadzenMenuItem>
         <Template>
             <RadzenAppearanceToggle/>

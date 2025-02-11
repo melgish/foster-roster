@@ -119,4 +119,15 @@ public sealed class ClientFelineRepository(
         var rs = await httpClient.PutAsJsonAsync($"{Route}/{felineId}", model);
         return Result.Ok((await rs.Content.ReadFromJsonAsync<Feline>())!);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="top"></param>
+    /// <param name="skip"></param>
+    /// <param name="orderBy"></param>
+    /// <returns>A Result with data for Radzen Grid</returns>
+    public async Task<Result<QueryResults<Feline>>> QueryAsync(string? filter, int? top, int? skip, string? orderBy)
+        => await httpClient.QueryAsync<Feline>($"{Route}/query", filter, top, skip, orderBy);
 }

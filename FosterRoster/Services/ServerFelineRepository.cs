@@ -1,5 +1,4 @@
 namespace FosterRoster.Services;
-
 using System.Linq.Expressions;
 
 public sealed class ServerFelineRepository(
@@ -270,5 +269,25 @@ public sealed class ServerFelineRepository(
 
         // Remove thumbnail data from the returned object.
         return Result.Ok(FelineProjection.Compile().Invoke(existing));
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="orderBy"></param>
+    /// <param name="skip"></param>
+    /// <param name="top"></param>
+    /// <returns></returns>
+    public async Task<Result<QueryResults<Feline>>> QueryAsync(string? filter = null, int? top = null, int? skip = null, string? orderBy = null)
+    {
+        await using var context = await contextFactory.CreateDbContextAsync();
+        return Result.Ok(
+            await context
+                .Felines
+                .AsNoTracking()
+                .IgnoreQueryFilters()
+                .ToQueryResultsAsync(filter, top, skip, orderBy)
+        );
     }
 }

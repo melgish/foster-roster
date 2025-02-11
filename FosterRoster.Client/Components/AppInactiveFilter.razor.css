@@ -1,0 +1,6 @@
+﻿.inactive-filter {
+    display: contents;
+}
+.inactive-filter ::deep .rz-dropdown {
+    display: flex;
+}

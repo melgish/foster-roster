@@ -72,4 +72,14 @@ public interface IFelineRepository
     /// <param name="feline">Data to assign to feline</param>
     /// <returns>A Result with Feline if updated, or errors on failure.</returns>
     public Task<Result<Feline>> UpdateAsync(int felineId, Feline feline);
+    
+    /// <summary>
+    ///     Query for data
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="orderBy"></param>
+    /// <param name="skip"></param>
+    /// <param name="top"></param>
+    /// <returns></returns>
+    public Task<Result<QueryResults<Feline>>> QueryAsync(string? filter = null, int? top = null, int? skip = null, string? orderBy = null);
 }

@@ -1,0 +1,27 @@
+﻿<div class="inactive-filter">
+    <RadzenDropDown
+        AllowClear="AllowClear"
+        Data="@(AppInactiveValue.Values)"
+        Placeholder="Select..."
+        Value="Value"
+        ValueChanged="ValueChanged"
+        ValueProperty="Value">
+        <Template>
+            <AppInactiveValue Value="@(context.Value)"/>
+        </Template>
+        <ValueTemplate>
+            <AppInactiveValue Value="@(context.Value)"/>
+        </ValueTemplate>
+    </RadzenDropDown>
+</div>
+@code {
+    [Parameter] 
+    public bool? Value { get; set; }
+    
+    [Parameter]
+    public EventCallback<bool?> ValueChanged { get; set; }
+    
+    [Parameter]
+    public bool AllowClear { get; set; } = true;
+   
+}
