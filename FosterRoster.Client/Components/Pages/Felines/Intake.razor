@@ -37,7 +37,7 @@
         if (result.IsSuccess)
         {
             var feline = result.Value;
-            NavigationManager.NavigateTo($"/details/{feline.Id}");
+            NavigationManager.NavigateTo($"/felines/{feline.Id}");
         }
     }
 

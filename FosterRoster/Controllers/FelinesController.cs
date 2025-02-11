@@ -142,4 +142,24 @@ public sealed class FelinesController(
             { } err when err.HasError<NotFoundError>() => NotFound(),
             { } err => this.Unprocessable(err)
         };
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="skip"></param>
+    /// <param name="top"></param>
+    /// <param name="orderBy"></param>
+    /// <returns></returns>
+    [HttpGet("query")]
+    public async Task<ActionResult<QueryResults<Feline>>> QueryAsync(
+        string? filter = null,
+        int? top = null,
+        int? skip = null,
+        string? orderBy = null)
+        => await felineRepository.QueryAsync(filter, top, skip, orderBy) switch
+        {
+            { IsSuccess: true } ok => Ok(ok.Value),
+            { } err => this.Unprocessable(err)
+        };
 }

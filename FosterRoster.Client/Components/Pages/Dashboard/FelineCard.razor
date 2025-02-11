@@ -19,7 +19,7 @@ else
                             Style="margin-bottom: 0"/>
                 <AppFileInput OnChange="@OnFilesChangedAsync" Size="ButtonSize.Small" Rounded="true"/>
             </RadzenStack>
-            <RadzenLink Path=@($"/details/{Feline!.Id}")>
+            <RadzenLink Path=@($"/felines/{Feline!.Id}")>
                 <RadzenImage AlternateText="@Feline.Name"
                              Path="@Feline.Thumbnail.GetUrl()"
                              Style="width:180px;height:180px;background-color:var(--rz-primary-lighter);border-radius: 1rem;"/>

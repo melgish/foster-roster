@@ -17,4 +17,18 @@
     <ItemGroup>
         <ProjectReference Include="..\FosterRoster.Domain\FosterRoster.Domain.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Layout\GitHubLink.razor" />
+      <AdditionalFiles Include="Components\Layout\Verison.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\CommentCard.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\CommentForm.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\ConfirmDeleteFelineDialog.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\ConfirmInactivateFelineDialog.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\FelineDetails.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\FelineEditForm.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\FostererSelect.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\Intake.razor" />
+      <AdditionalFiles Include="Components\Pages\Felines\SourceSelect.razor" />
+    </ItemGroup>
 </Project>

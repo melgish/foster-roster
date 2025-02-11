@@ -2,7 +2,6 @@
 
 using FosterRoster.Client.Components;
 using FosterRoster.Services;
-using Microsoft.Extensions.Options;
 using Radzen;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
@@ -60,8 +59,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+app.MapStaticAssets();
 app.MapControllers();
-
 app.MapRazorComponents<App>()
     .AddInteractiveWebAssemblyRenderMode();
 

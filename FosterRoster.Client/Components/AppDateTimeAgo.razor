@@ -3,7 +3,7 @@
 
 @if (Value is not null)
 {
-    <RadzenText>@Label: @_text <small>(@_ago)</small></RadzenText>
+    <div>@Label: @_text <small>(@_ago)</small></div>
 }
 
 @code {
@@ -24,5 +24,4 @@
             _ago = Value.Value.FormatAgo(now);
         }
     }
-
 }

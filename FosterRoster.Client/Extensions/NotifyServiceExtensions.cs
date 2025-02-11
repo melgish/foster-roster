@@ -31,4 +31,21 @@ public static class NotifyServiceExtensions
             Summary = errorSummary
         }
     });
+
+    public static void NotifyIfFailed(
+        this NotificationService service,
+        IResultBase result,
+        string errorSummary = "Error"
+    )
+    {
+        if (result.IsFailed)
+        {
+            service.Notify(new()
+            {
+                Detail = result.Errors.FirstOrDefault()?.Message,
+                Severity = NotificationSeverity.Error,
+                Summary = errorSummary
+            });
+        }
+    }
 }
