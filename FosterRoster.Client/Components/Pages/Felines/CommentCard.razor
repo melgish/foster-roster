@@ -36,8 +36,7 @@ else
     private MarkupString? _html = null;
     private CommentEditModel? _model = null;
 
-    [EditorRequired]
-    [Parameter] public Comment Comment { get; set; } = null!;
+    [EditorRequired] [Parameter] public Comment Comment { get; set; } = null!;
 
     [Parameter] public EventCallback<Comment> OnDelete { get; set; }
 
@@ -50,7 +49,7 @@ else
         _model = null;
         return Task.CompletedTask;
     }
-    
+
     private Task EditAsync()
     {
         _model = new(Comment);
@@ -68,4 +67,5 @@ else
         await OnSave.InvokeAsync(model.ToComment());
         _model = null;
     }
+
 }

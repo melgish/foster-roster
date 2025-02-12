@@ -1,4 +1,5 @@
 namespace FosterRoster.Services;
+
 using System.Linq.Expressions;
 
 public sealed class ServerFelineRepository(
@@ -18,11 +19,13 @@ public sealed class ServerFelineRepository(
             Color = f.Color,
             Comments = f.Comments.OrderByDescending(c => c.TimeStamp).ToList(),
             // Just include the name for grid layout.
-            Fosterer = f.Fosterer == null ? null : new Fosterer() 
-            { 
-                Id = f.Fosterer!.Id,
-                Name = f.Fosterer!.Name,
-            },
+            Fosterer = f.Fosterer == null
+                ? null
+                : new Fosterer()
+                {
+                    Id = f.Fosterer!.Id,
+                    Name = f.Fosterer!.Name
+                },
             FostererId = f.FostererId,
             Gender = f.Gender,
             IntakeAgeInWeeks = f.IntakeAgeInWeeks,
@@ -286,7 +289,8 @@ public sealed class ServerFelineRepository(
     /// <param name="skip"></param>
     /// <param name="top"></param>
     /// <returns></returns>
-    public async Task<Result<QueryResults<Feline>>> QueryAsync(string? filter = null, int? top = null, int? skip = null, string? orderBy = null)
+    public async Task<Result<QueryResults<Feline>>> QueryAsync(string? filter = null, int? top = null, int? skip = null,
+        string? orderBy = null)
     {
         // Default sort when not supplied. 
         orderBy = string.IsNullOrWhiteSpace(orderBy) ? "Name asc" : orderBy;

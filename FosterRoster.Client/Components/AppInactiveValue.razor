@@ -7,23 +7,24 @@
 }
 
 @code {
+
     public sealed record Visual(bool? Value, string Icon, string Text, IconStyle Style);
+
     private static readonly Visual Clear = new(null, "close", "Clear", IconStyle.Info);
     private static readonly Visual Active = new(false, "visibility", "Active", IconStyle.Success);
     private static readonly Visual Inactive = new(true, "visibility_off", "Inactive", IconStyle.Danger);
     public static readonly Visual[] Values = [Active, Inactive];
 
-    [Parameter]
-    public bool? Value { get; set; }
-    
-    [Parameter]
-    public bool ShowClear { get; set; }
+    [Parameter] public bool? Value { get; set; }
+
+    [Parameter] public bool ShowClear { get; set; }
 
     private Visual _visual = Clear;
-   
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         _visual = Values.FirstOrDefault(x => x.Value == Value) ?? Clear;
     }
+
 }

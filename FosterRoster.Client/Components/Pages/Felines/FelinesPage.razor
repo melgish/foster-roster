@@ -21,7 +21,7 @@
             PagerHorizontalAlign="HorizontalAlign.Center"
             PagerPosition="PagerPosition.Top"
             PageSize="20"
-            PageSizeOptions="@([10, 20, 50, 100])"
+            PageSizeOptions="@( [10, 20, 50, 100])"
             PagingSummaryFormat="Showing {0} to {1} of {2}"
             ShowPagingSummary="true">
             <HeaderTemplate>
@@ -58,15 +58,15 @@
                         </RadzenLink>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn 
-                    Property="@nameof(Feline.Name)"  
-                    SortOrder="SortOrder.Ascending" 
-                    
-                    Title="Name" />
-                <RadzenDataGridColumn 
-                    Property="Fosterer.Name" 
-                    Title="Fosterer" 
-                    />
+                <RadzenDataGridColumn
+                    Property="@nameof(Feline.Name)"
+                    SortOrder="SortOrder.Ascending"
+
+                    Title="Name"/>
+                <RadzenDataGridColumn
+                    Property="Fosterer.Name"
+                    Title="Fosterer"
+                />
                 <RadzenDataGridColumn
                     FilterValue="_isInactiveFilter"
                     Property="@nameof(Feline.IsInactive)"
@@ -83,19 +83,19 @@
         </RadzenDataGrid>
     </RadzenPanel>
 </RadzenStack>
+
 @code {
     private bool _isLoading;
     private int _count;
     private IEnumerable<Feline>? _data;
     private bool? _isInactiveFilter = false;
-    
-    
-    private async Task LoadDataAsync(LoadDataArgs obj)
+
+    private async Task LoadDataAsync(LoadDataArgs args)
     {
         _isLoading = true;
         try
         {
-            var rs = await FelineRepository.QueryAsync(obj.Filter, obj.Top, obj.Skip, obj.OrderBy);
+            var rs = await FelineRepository.QueryAsync(args.Filter, args.Top, args.Skip, args.OrderBy);
             NotificationService.NotifyIfFailed(rs, "Failed to load data");
             if (rs.IsSuccess)
             {
@@ -108,4 +108,5 @@
             _isLoading = false;
         }
     }
+
 }

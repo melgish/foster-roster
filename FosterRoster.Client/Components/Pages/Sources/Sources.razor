@@ -79,7 +79,7 @@
         ComponentState.PersistAsJson("sources", _sources);
         return Task.CompletedTask;
     }
-    
+
     private async Task RefreshAsync(int sourceId)
     {
         _sources = (await SourceRepository.GetAllAsync()).ValueOrDefault ?? [];
@@ -97,4 +97,5 @@
             await RefreshAsync(rs.Value.Id);
         }
     }
+
 }

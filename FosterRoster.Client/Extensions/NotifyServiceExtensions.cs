@@ -39,13 +39,11 @@ public static class NotifyServiceExtensions
     )
     {
         if (result.IsFailed)
-        {
             service.Notify(new()
             {
                 Detail = result.Errors.FirstOrDefault()?.Message,
                 Severity = NotificationSeverity.Error,
                 Summary = errorSummary
             });
-        }
     }
 }

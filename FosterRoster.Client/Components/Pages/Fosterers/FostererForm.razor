@@ -74,7 +74,7 @@ else
                 <RadzenColumn Size="12">
                     <AppFormButtons
                         Busy="_isSaving"
-                        CanDelete="(Fosterer.Id != 0)"
+                        CanDelete="Fosterer.Id != 0"
                         Disabled="_model.IsInactive"
                         OnDelete="DeleteAsync"
                         OnReset="ResetAsync"/>
@@ -98,12 +98,13 @@ else
     ///     Fosterer to edit.
     /// </summary>
     [EditorRequired]
-    [Parameter] public Fosterer Fosterer { get; set; } = null!;
+    [Parameter]
+    public Fosterer Fosterer { get; set; } = null!;
 
     /// <summary>
     ///     Event fired when delete button is clicked
     /// </summary>
-    [Parameter] 
+    [Parameter]
     public EventCallback<int> OnDelete { get; set; }
 
     /// <summary>
@@ -152,4 +153,5 @@ else
             _isSaving = false;
         }
     }
+
 }

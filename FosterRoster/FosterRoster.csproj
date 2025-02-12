@@ -13,11 +13,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.1" />
-        <ProjectReference Include="..\FosterRoster.Client\FosterRoster.Client.csproj" />
-        <ProjectReference Include="..\FosterRoster.Data\FosterRoster.Data.csproj" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.1" />
+        <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0"/>
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.1"/>
+        <ProjectReference Include="..\FosterRoster.Client\FosterRoster.Client.csproj"/>
+        <ProjectReference Include="..\FosterRoster.Data\FosterRoster.Data.csproj"/>
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.1"/>
     </ItemGroup>
 
 </Project>

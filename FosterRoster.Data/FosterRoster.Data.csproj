@@ -13,12 +13,12 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
-        <PackageReference Include="HtmlSanitizer" Version="9.0.876" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3"/>
+        <PackageReference Include="HtmlSanitizer" Version="9.0.876"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FosterRoster.Domain\FosterRoster.Domain.csproj" />
+        <ProjectReference Include="..\FosterRoster.Domain\FosterRoster.Domain.csproj"/>
     </ItemGroup>
 
 </Project>
