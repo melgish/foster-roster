@@ -8,13 +8,15 @@
     <RadzenPanel class="rz-p-0 rz-shadow-3">
         <RadzenDataGrid
             TItem="Feline"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowSorting="true"
             Count="_count"
             Data="_data"
+            Density="Density.Compact"
+            FilterMode="FilterMode.Simple"
             IsLoading="_isLoading"
             LoadData="LoadDataAsync"
-            AllowFiltering="true"
-            AllowSorting="true"
-            AllowPaging="true"
             PageNumbersCount="1"
             PagerHorizontalAlign="HorizontalAlign.Center"
             PagerPosition="PagerPosition.Top"
@@ -45,7 +47,7 @@
                     Filterable="false"
                     Sortable="false"
                     Property="@nameof(Feline.Id)"
-                    Width="16ch">
+                    Width="8ch">
                     <Template>
                         <RadzenLink Path="@($"/felines/{context.Id}")">
                             <RadzenButton
@@ -56,12 +58,20 @@
                         </RadzenLink>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn Property="@nameof(Feline.Name)" Title="Name"/>
+                <RadzenDataGridColumn
+                    Property="@nameof(Feline.Name)"
+                    SortOrder="SortOrder.Ascending"
+
+                    Title="Name"/>
+                <RadzenDataGridColumn
+                    Property="Fosterer.Name"
+                    Title="Fosterer"
+                />
                 <RadzenDataGridColumn
                     FilterValue="_isInactiveFilter"
                     Property="@nameof(Feline.IsInactive)"
                     Title="Inactive"
-                    Width="24ch">
+                    Width="20ch">
                     <FilterTemplate>
                         <AppInactiveFilter @bind-Value="_isInactiveFilter"/>
                     </FilterTemplate>
@@ -73,19 +83,19 @@
         </RadzenDataGrid>
     </RadzenPanel>
 </RadzenStack>
+
 @code {
     private bool _isLoading;
     private int _count;
     private IEnumerable<Feline>? _data;
     private bool? _isInactiveFilter = false;
-    
-    
-    private async Task LoadDataAsync(LoadDataArgs obj)
+
+    private async Task LoadDataAsync(LoadDataArgs args)
     {
         _isLoading = true;
         try
         {
-            var rs = await FelineRepository.QueryAsync(obj.Filter, obj.Top, obj.Skip, obj.OrderBy);
+            var rs = await FelineRepository.QueryAsync(args.Filter, args.Top, args.Skip, args.OrderBy);
             NotificationService.NotifyIfFailed(rs, "Failed to load data");
             if (rs.IsSuccess)
             {
@@ -98,4 +108,5 @@
             _isLoading = false;
         }
     }
+
 }

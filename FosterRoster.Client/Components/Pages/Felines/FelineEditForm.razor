@@ -174,7 +174,7 @@ else
                 <RadzenColumn Size="12">
                     <AppFormButtons
                         Busy="_isSaving"
-                        CanDelete="(Feline.Id != 0)"
+                        CanDelete="Feline.Id != 0"
                         Disabled="_model.IsInactive"
                         OnDelete="DeleteAsync"
                         OnReset="ResetAsync">
@@ -214,8 +214,7 @@ else
     private string _name = string.Empty;
     private FelineEditModel? _model = null;
 
-    [EditorRequired]
-    [Parameter] public Feline Feline { get; set; } = null!;
+    [EditorRequired] [Parameter] public Feline Feline { get; set; } = null!;
 
     [Parameter] public bool IsNew { get; set; }
 
@@ -305,4 +304,5 @@ else
         await OnSave.InvokeAsync(_model);
         _isSaving = false;
     }
+
 }

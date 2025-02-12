@@ -14,14 +14,12 @@
         </ValueTemplate>
     </RadzenDropDown>
 </div>
+
 @code {
-    [Parameter] 
-    public bool? Value { get; set; }
-    
-    [Parameter]
-    public EventCallback<bool?> ValueChanged { get; set; }
-    
-    [Parameter]
-    public bool AllowClear { get; set; } = true;
-   
+    [Parameter] public bool? Value { get; set; }
+
+    [Parameter] public EventCallback<bool?> ValueChanged { get; set; }
+
+    [Parameter] public bool AllowClear { get; set; } = true;
+
 }

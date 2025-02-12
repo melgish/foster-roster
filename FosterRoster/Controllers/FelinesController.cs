@@ -142,7 +142,7 @@ public sealed class FelinesController(
             { } err when err.HasError<NotFoundError>() => NotFound(),
             { } err => this.Unprocessable(err)
         };
-    
+
     /// <summary>
     /// 
     /// </summary>
