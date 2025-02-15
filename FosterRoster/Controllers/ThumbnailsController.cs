@@ -1,7 +1,7 @@
 namespace FosterRoster.Controllers;
 
 [ApiController]
-[Route("api/thumbnails")]
+[Route("thumbnails")]
 public sealed class ThumbnailsController(
     IFelineRepository felineRepository
 ) : ControllerBase

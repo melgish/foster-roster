@@ -1,0 +1,111 @@
+﻿@page "/felines"
+@inject IFelineRepository FelineRepository
+@inject NotificationService NotificationService
+
+<PageTitle>Felines</PageTitle>
+<RadzenStack>
+    <RadzenPanel class="rz-p-0 rz-shadow-3">
+        <RadzenDataGrid
+            TItem="Feline"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowSorting="true"
+            Count="_count"
+            Data="_data"
+            Density="Density.Compact"
+            FilterMode="FilterMode.Simple"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="1"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            PagerPosition="PagerPosition.Top"
+            PageSize="20"
+            PageSizeOptions="@( [10, 20, 50, 100])"
+            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            ShowPagingSummary="true">
+            <HeaderTemplate>
+                <RadzenStack
+                    AlignItems="AlignItems.Center"
+                    class="rz-w-100"
+                    JustifyContent="JustifyContent.SpaceBetween"
+                    Orientation="Orientation.Horizontal">
+                    <RadzenText Text="Felines" TextStyle="TextStyle.DisplayH6" Style="margin: 0"/>
+                    <div style="margin-right: auto"></div>
+                    <RadzenLink Path="/intake">
+                        <RadzenButton
+                            ButtonStyle="ButtonStyle.Primary"
+                            Icon="add"
+                            Size="ButtonSize.Small"
+                            Text="Intake"
+                            Variant="Variant.Outlined"/>
+                    </RadzenLink>
+                </RadzenStack>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn
+                    Filterable="false"
+                    Sortable="false"
+                    Property="@nameof(Feline.Id)"
+                    Width="8ch">
+                    <Template>
+                        <RadzenLink Path="@($"/felines/{context.Id}")">
+                            <RadzenButton
+                                ButtonStyle="ButtonStyle.Secondary"
+                                Size="ButtonSize.ExtraSmall"
+                                Text="Edit"
+                                Variant="Variant.Outlined"/>
+                        </RadzenLink>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="@nameof(Feline.Name)"
+                    SortOrder="SortOrder.Ascending"
+
+                    Title="Name"/>
+                <RadzenDataGridColumn
+                    Property="Fosterer.Name"
+                    Title="Fosterer"
+                />
+                <RadzenDataGridColumn
+                    FilterValue="_isInactiveFilter"
+                    Property="@nameof(Feline.IsInactive)"
+                    Title="Inactive"
+                    Width="20ch">
+                    <FilterTemplate>
+                        <AppInactiveFilter @bind-Value="_isInactiveFilter"/>
+                    </FilterTemplate>
+                    <Template>
+                        <AppInactiveValue Value="context.IsInactive"/>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenPanel>
+</RadzenStack>
+
+@code {
+    private bool _isLoading;
+    private int _count;
+    private IEnumerable<Feline>? _data;
+    private bool? _isInactiveFilter = false;
+
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        _isLoading = true;
+        try
+        {
+            var rs = await FelineRepository.QueryAsync(args.Filter, args.Top, args.Skip, args.OrderBy);
+            NotificationService.NotifyIfFailed(rs, "Failed to load data");
+            if (rs.IsSuccess)
+            {
+                _count = rs.Value.Count;
+                _data = rs.Value.Items;
+            }
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+}

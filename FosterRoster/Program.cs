@@ -1,6 +1,6 @@
 // spell-checker: ignore npgsql
 
-using FosterRoster.Client.Components;
+using FosterRoster.Components;
 using FosterRoster.Services;
 using Radzen;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
@@ -14,12 +14,14 @@ builder.Services
     .AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; });
 builder.Services.AddFluentValidationAutoValidation();
+
 builder.Services.AddRazorComponents()
-    .AddInteractiveWebAssemblyComponents();
+    .AddInteractiveServerComponents();
 
 builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
 );
+
 
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
@@ -31,7 +33,13 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
 builder.Services.AddValidatorsFromAssemblyContaining<App>();
 
-builder.Services.AddRadzenComponents();
+builder.Services
+    .AddRadzenComponents()
+    .AddRadzenCookieThemeService(options =>
+    {
+        options.Name = "FosterRosterTheme";
+        options.Duration = TimeSpan.FromDays(30);
+    });
 
 var app = builder.Build();
 
@@ -52,19 +60,17 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Error", true);
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
 app.UseAntiforgery();
-
 app.MapStaticAssets();
 app.MapControllers();
 app.MapRazorComponents<App>()
-    .AddInteractiveWebAssemblyRenderMode();
+    .AddInteractiveServerRenderMode();
 
 await app.RunAsync();

@@ -1,0 +1,32 @@
+﻿@page "/"
+@inject IFelineRepository FelineRepository
+
+<PageTitle>Dashboard</PageTitle>
+@if (_felines is null)
+{
+    <Loading/>
+}
+else
+{
+    <div class="deck">
+        @foreach (var feline in _felines)
+        {
+            <FelineCard @key="feline.Id"
+                        Feline="@feline"
+                        FelineChanged="@OnFelineChanged"/>
+        }
+    </div>
+}
+
+@code {
+    private ICollection<Feline>? _felines;
+
+    private void OnFelineChanged(Feline feline)
+        => _felines = _felines!.Select(f => f.Id == feline.Id ? feline : f).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _felines = (await FelineRepository.GetAllAsync()).ValueOrDefault ?? [];
+        await base.OnInitializedAsync();
+    }
+}
