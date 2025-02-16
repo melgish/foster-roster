@@ -89,6 +89,10 @@
     private IEnumerable<Feline>? _data;
     private bool? _isInactiveFilter = false;
 
+    /// <summary>
+    ///     Called by grid to fetch data. 
+    /// </summary>
+    /// <param name="args">Arguments supplied by grid.</param>
     private async Task LoadDataAsync(LoadDataArgs args)
     {
         _isLoading = true;

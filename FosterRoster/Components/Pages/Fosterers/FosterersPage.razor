@@ -1,6 +1,4 @@
 @page "/fosterers"
-@implements IAsyncDisposable
-@inject PersistentComponentState ComponentState
 @inject IFostererRepository FostererRepository
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
@@ -22,7 +20,6 @@
 @code {
     private Fosterer _fosterer = new();
     private ICollection<Fosterer>? _fosterers = [];
-    private IDisposable? _stateSubscription;
 
     private Task AddAsync()
     {
@@ -40,18 +37,6 @@
         }
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        if (_stateSubscription is IAsyncDisposable sub)
-        {
-            await sub.DisposeAsync();
-        }
-        else
-        {
-            _stateSubscription?.Dispose();
-        }
-    }
-
     private async Task EditAsync(int fostererId)
     {
         var rs = await FostererRepository.GetByKeyAsync(fostererId);
@@ -66,17 +51,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
-        ComponentState.TryTakeFromJson("fosterers", out _fosterers);
-        _fosterers ??= (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
+        _fosterers = (await FostererRepository.GetAllAsync()).ValueOrDefault ?? [];
         _fosterer = new();
         await base.OnInitializedAsync();
-    }
-
-    private Task PersistStateAsync()
-    {
-        ComponentState.PersistAsJson("fosterers", _fosterers);
-        return Task.CompletedTask;
     }
 
     private async Task RefreshAsync(int fostererId)

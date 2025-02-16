@@ -1,8 +1,6 @@
 @page "/weights"
-@implements IDisposable
 @inject NotificationService NotificationService
 @inject IWeightRepository WeightRepository
-@inject PersistentComponentState ComponentState;
 @inject TimeProvider TimeProvider
 
 <PageTitle>Weights</PageTitle>
@@ -137,16 +135,11 @@ else
     private IEnumerable<Weight>? _filteredWeights;
     private bool _isSaving;
     private WeightEditModel _model = new();
-    private IDisposable? _stateSubscription;
     private WeightUnit _units = WeightUnit.g;
-
-    public void Dispose() => _stateSubscription?.Dispose();
 
     protected override async Task OnInitializedAsync()
     {
-        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
-        ComponentState.TryTakeFromJson("allWeights", out _allWeights);
-        _allWeights ??= (await WeightRepository.GetAllAsync()).ValueOrDefault ?? [];
+        _allWeights = (await WeightRepository.GetAllAsync()).ValueOrDefault ?? [];
         _filteredWeights = _allWeights;
         Reset();
     }
@@ -210,12 +203,6 @@ else
         }
 
         _isSaving = false;
-    }
-
-    private Task PersistStateAsync()
-    {
-        ComponentState.PersistAsJson("allWeights", _allWeights);
-        return Task.CompletedTask;
     }
 
 }

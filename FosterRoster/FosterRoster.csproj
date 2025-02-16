@@ -13,7 +13,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Radzen.Blazor" Version="6.0.6" />
+        <PackageReference Include="Radzen.Blazor" Version="6.0.6"/>
         <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0"/>
         <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.1"/>
         <ProjectReference Include="..\FosterRoster.Data\FosterRoster.Data.csproj"/>
@@ -21,30 +21,30 @@
     </ItemGroup>
 
     <ItemGroup>
-      <AdditionalFiles Include="Components\App.razor" />
-      <AdditionalFiles Include="Components\AppDateTimeAgo.razor" />
-      <AdditionalFiles Include="Components\AppFileInput.razor" />
-      <AdditionalFiles Include="Components\AppFormButtons.razor" />
-      <AdditionalFiles Include="Components\AppInactiveFilter.razor" />
-      <AdditionalFiles Include="Components\AppInactiveValue.razor" />
-      <AdditionalFiles Include="Components\AppThumbnail.razor" />
-      <AdditionalFiles Include="Components\Layout\AppNavMenu.razor" />
-      <AdditionalFiles Include="Components\Layout\MainLayout.razor" />
-      <AdditionalFiles Include="Components\Loading.razor" />
-      <AdditionalFiles Include="Components\Pages\Dashboard\Dashboard.razor" />
-      <AdditionalFiles Include="Components\Pages\Dashboard\FelineCard.razor" />
-      <AdditionalFiles Include="Components\Pages\Felines\FelinesPage.razor" />
-      <AdditionalFiles Include="Components\Pages\Fosterers\ConfirmDeleteFostererDialog.razor" />
-      <AdditionalFiles Include="Components\Pages\Fosterers\FostererForm.razor" />
-      <AdditionalFiles Include="Components\Pages\Fosterers\Fosterers.razor" />
-      <AdditionalFiles Include="Components\Pages\Fosterers\FosterersGrid.razor" />
-      <AdditionalFiles Include="Components\Pages\NotFound.razor" />
-      <AdditionalFiles Include="Components\Pages\Sources\SourceForm.razor" />
-      <AdditionalFiles Include="Components\Pages\Sources\Sources.razor" />
-      <AdditionalFiles Include="Components\Pages\Sources\SourcesGrid.razor" />
-      <AdditionalFiles Include="Components\Pages\Weights\FelineSelect.razor" />
-      <AdditionalFiles Include="Components\Pages\Weights\Weights.razor" />
-      <AdditionalFiles Include="Components\Routes.razor" />
+        <AdditionalFiles Include="Components\App.razor"/>
+        <AdditionalFiles Include="Components\AppDateTimeAgo.razor"/>
+        <AdditionalFiles Include="Components\AppFileInput.razor"/>
+        <AdditionalFiles Include="Components\AppFormButtons.razor"/>
+        <AdditionalFiles Include="Components\AppInactiveFilter.razor"/>
+        <AdditionalFiles Include="Components\AppInactiveValue.razor"/>
+        <AdditionalFiles Include="Components\AppThumbnail.razor"/>
+        <AdditionalFiles Include="Components\Layout\AppNavMenu.razor"/>
+        <AdditionalFiles Include="Components\Layout\MainLayout.razor"/>
+        <AdditionalFiles Include="Components\Loading.razor"/>
+        <AdditionalFiles Include="Components\Pages\Dashboard\Dashboard.razor"/>
+        <AdditionalFiles Include="Components\Pages\Dashboard\FelineCard.razor"/>
+        <AdditionalFiles Include="Components\Pages\Felines\FelinesPage.razor"/>
+        <AdditionalFiles Include="Components\Pages\Fosterers\ConfirmDeleteFostererDialog.razor"/>
+        <AdditionalFiles Include="Components\Pages\Fosterers\FostererForm.razor"/>
+        <AdditionalFiles Include="Components\Pages\Fosterers\Fosterers.razor"/>
+        <AdditionalFiles Include="Components\Pages\Fosterers\FosterersGrid.razor"/>
+        <AdditionalFiles Include="Components\Pages\NotFound.razor"/>
+        <AdditionalFiles Include="Components\Pages\Sources\SourceForm.razor"/>
+        <AdditionalFiles Include="Components\Pages\Sources\Sources.razor"/>
+        <AdditionalFiles Include="Components\Pages\Sources\SourcesGrid.razor"/>
+        <AdditionalFiles Include="Components\Pages\Weights\FelineSelect.razor"/>
+        <AdditionalFiles Include="Components\Pages\Weights\Weights.razor"/>
+        <AdditionalFiles Include="Components\Routes.razor"/>
     </ItemGroup>
 
 </Project>
