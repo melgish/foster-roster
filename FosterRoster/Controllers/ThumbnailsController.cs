@@ -1,5 +1,7 @@
 namespace FosterRoster.Controllers;
 
+using Microsoft.AspNetCore.Authorization;
+
 [ApiController]
 [Route("thumbnails")]
 public sealed class ThumbnailsController(
@@ -11,6 +13,7 @@ public sealed class ThumbnailsController(
     /// </summary>
     /// <param name="felineId">ID of feline thumbnail to fetch.</param>
     /// <returns>File if found, otherwise 404</returns>
+    [AllowAnonymous]
     [HttpGet("{felineId:int}")]
     public async Task<IActionResult> GetThumbnailAsync(int felineId)
     {

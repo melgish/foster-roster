@@ -1,7 +1,9 @@
 // spell-checker: ignore npgsql
-
 using FosterRoster.Components;
+using FosterRoster.Components.Account;
 using FosterRoster.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Radzen;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Text.Json.Serialization;
@@ -21,7 +23,27 @@ builder.Services.AddRazorComponents()
 builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
 );
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// Identity
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<IdentityUserAccessor>();
+builder.Services.AddScoped<IdentityRedirectManager>();
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddIdentityCookies();
+builder.Services
+    .AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<ApplicationRole>()
+    .AddEntityFrameworkStores<FosterRosterDbContext>()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
@@ -33,11 +55,10 @@ builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
 builder.Services.AddValidatorsFromAssemblyContaining<App>();
 
-builder.Services
-    .AddRadzenComponents()
-    .AddRadzenCookieThemeService(options =>
+builder.Services.AddRadzenComponents();
+builder.Services.AddRadzenCookieThemeService(options =>
     {
-        options.Name = "FosterRosterTheme";
+        options.Name = "RadzenTheme";
         options.Duration = TimeSpan.FromDays(30);
     });
 
@@ -56,7 +77,7 @@ if (builder.Configuration.GetValue("AutoMigrate", false))
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseWebAssemblyDebugging();
+    app.UseMigrationsEndPoint();
 }
 else
 {
@@ -68,9 +89,13 @@ else
 app.UseHttpsRedirection();
 
 app.UseAntiforgery();
+
 app.MapStaticAssets();
 app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+// Add additional endpoints required by the Identity /Account Razor components.
+app.MapAdditionalIdentityEndpoints();
 
 await app.RunAsync();

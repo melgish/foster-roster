@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FosterRoster.Data;
 
-public class FosterRosterDbContext : DbContext
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
+public class FosterRosterDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
 {
     public FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options) : base(options)
     {

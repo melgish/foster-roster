@@ -8,9 +8,9 @@
     <base href="/"/>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           rel="stylesheet"/>
+    <RadzenTheme @rendermode="PageRenderMode" Theme="@Theme" Wcag="Wcag"/>
     <link rel="stylesheet" href="@Assets["app.css"]"/>
     <link rel="stylesheet" href="@Assets["FosterRoster.styles.css"]"/>
-    <RadzenTheme @rendermode="PageRenderMode" Theme="@Theme" Wcag="Wcag"/>
     <link rel="icon" type="image/png" href="@Assets["favicon.png"]"/>
     <HeadOutlet @rendermode="PageRenderMode"/>
 </head>
@@ -24,12 +24,26 @@
 </html>
 
 @code {
-    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+    [CascadingParameter] private HttpContext? HttpContext { get; set; } = null;
 
     private IComponentRenderMode? PageRenderMode =>
-        HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
+        HttpContext?.AcceptsInteractiveRouting() == true ? InteractiveServer : null;
 
-    private string Theme => "material";
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (HttpContext is null)
+        {
+            return;
+        }
+        var theme = HttpContext.Request.Cookies["RadzenTheme"];
+        if (!string.IsNullOrWhiteSpace(theme))
+        {
+            Theme = theme;
+        }
+    }
+
+    private string Theme { get; set; } = "material";
 
     private bool Wcag => true;
 }
