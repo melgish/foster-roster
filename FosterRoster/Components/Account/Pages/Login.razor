@@ -1,26 +1,27 @@
 ﻿@page "/Account/Login"
+@using Radzen.Blazor.Rendering
 @attribute [AllowAnonymous]
-@using System.ComponentModel.DataAnnotations
-@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Identity
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject IdentityRedirectManager RedirectManager
 
 <PageTitle>Log in</PageTitle>
-<div class="rz-display-flex rz-row">
-    <div
-        class="rz-col rz-col-sm-12 rz-col-md-10 rz-offset-md-1 rz-col-lg-8 rz-offset-lg-2 rz-col-xl-6 rz-offset-xl-3 rz-col-xx-4 rz-offset-xx-4">
-        <div class="rz-panel rz-shadow-3">
-            <StatusMessage Message="@_errorMessage"/>
-            <div class="rz-panel-titlebar">
-                <h2 class="rz-panel-title">Log In</h2>
-            </div>
-            <div class="rz-panel-content">
+<RadzenRow>
+    <RadzenColumn
+        SizeSM="12"
+        SizeMD="10" OffsetMD="1"
+        SizeLG="8" OffsetLG="2"
+        SizeXL="6" OffsetXL="3"
+        SizeXX="4" OffsetXX="4">
+        <RadzenPanel class="rz-shadow-3">
+            <HeaderTemplate>
+                <RadzenText TextStyle="TextStyle.H6">Log In</RadzenText>
+            </HeaderTemplate>
+            <ChildContent>
+                <StatusMessage Message="@_errorMessage"/>
                 <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                     <DataAnnotationsValidator/>
-                    <ValidationSummary class="text-danger" role="alert"/>
                     <RadzenStack Gap="1rem">
                         <RadzenStack Gap="0rem">
                             <RadzenFormField
@@ -34,7 +35,7 @@
                                            class="rz-textbox"
                                            id="Input.Email"
                                            placeholder="name@example.com"
-                                           type="text" />
+                                           type="text"/>
                             </RadzenFormField>
                             <ValidationMessage For="() => Input.Email"/>
                         </RadzenStack>
@@ -50,9 +51,9 @@
                                            class="rz-textbox"
                                            id="Input.Password"
                                            placeholder="password"
-                                           type="password" />
+                                           type="password"/>
                             </RadzenFormField>
-                            <ValidationMessage For="() => Input.Password" />
+                            <ValidationMessage For="() => Input.Password"/>
                         </RadzenStack>
 
                         <RadzenStack
@@ -60,8 +61,10 @@
                             Gap="0.5rem"
                             JustifyContent="JustifyContent.SpaceBetween"
                             Orientation="Orientation.Horizontal">
-                            <RadzenStack AlignItems="AlignItems.Center" Gap="0.25rem" Orientation="Orientation.Horizontal">
-                                <InputCheckbox @bind-Value="Input.RememberMe" id="Input.RememberMe" style="transform:scale(1.5);"/>
+                            <RadzenStack AlignItems="AlignItems.Center" Gap="0.25rem"
+                                         Orientation="Orientation.Horizontal">
+                                <InputCheckbox @bind-Value="Input.RememberMe" id="Input.RememberMe"
+                                               style="transform:scale(1.5);"/>
                                 <label for="Input.RememberMe">Remember me</label>
                             </RadzenStack>
                             <RadzenButton
@@ -72,16 +75,16 @@
                                 Variant="Variant.Outlined"/>
                         </RadzenStack>
                     </RadzenStack>
-@*
+                    @*
 <a href="Account/ForgotPassword">Forgot your password?</a>
 <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
 <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
 *@
-                </EditForm>                
-            </div>
-        </div>
-    </div>
-</div>
+                </EditForm>
+            </ChildContent>
+        </RadzenPanel>
+    </RadzenColumn>
+</RadzenRow>
 
 
 @code {
@@ -106,7 +109,7 @@
     {
         // This doesn't count login failures towards account lockout
         // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, false);
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
@@ -139,4 +142,5 @@
 
         [Display(Name = "Remember me?")] public bool RememberMe { get; set; }
     }
+
 }

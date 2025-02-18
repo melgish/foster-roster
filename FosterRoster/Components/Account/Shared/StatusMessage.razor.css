@@ -1,5 +1,5 @@
 ﻿.status-message {
-    color: var(--rz-info-darker);
+    color: var(--rz-on-info-darker);
     background-color: var(--rz-info-lighter);
     border-color: var(--rz-info);
     
@@ -7,16 +7,17 @@
     border-style: solid;
     border-radius: 0.25rem;
     padding: 0.25rem 0.5rem;
+    margin-bottom: 0.5rem;
 }
 
 .status-message.success {
-    color: var(--rz-success-darker);
+    color: var(--rz-on-success-lighter);
     background-color: var(--rz-success-lighter);
     border-color: var(--rz-success);
 }
 
 .status-message.danger {
-    color: var(--rz-danger-darker);
+    color: var(--rz-on-danger-darker);
     background-color: var(--rz-danger-lighter);
     border-color: var(--rz-danger);    
 }
