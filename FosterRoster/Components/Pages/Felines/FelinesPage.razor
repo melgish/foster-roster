@@ -89,7 +89,7 @@
     private IEnumerable<GridRow>? _data;
     private bool? _isInactiveFilter = false;
 
-    private sealed class GridRow()
+    private sealed class GridRow
     {
         public int Id { get; init; }
         public string Name { get; init; } = string.Empty;
