@@ -1,7 +1,7 @@
 ﻿namespace FosterRoster.Services;
 
 // Don't allow Dynamic to cover up EF Core's IQueryable
-using Dynamic = System.Linq.Dynamic.Core.DynamicQueryableExtensions;
+using Dynamic = System.Linq.Dynamic.Core.DynamicExtensions;
 
 public static class RepositoryExtensions
 {

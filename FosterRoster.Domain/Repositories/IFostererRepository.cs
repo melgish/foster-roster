@@ -1,6 +1,6 @@
 namespace FosterRoster.Domain.Repositories;
 
-public interface IFostererRepository
+public interface IFostererRepository : IRepository
 {
     /// <summary>
     ///     Adds a new fosterer to the database.

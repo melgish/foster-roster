@@ -8,7 +8,7 @@
     <base href="/"/>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           rel="stylesheet"/>
-    <RadzenTheme @rendermode="PageRenderMode" Theme="@Theme" Wcag="Wcag"/>
+    <RadzenTheme @rendermode="PageRenderMode" Theme="@_theme" Wcag="_wcag"/>
     <link rel="stylesheet" href="@Assets["app.css"]"/>
     <link rel="stylesheet" href="@Assets["FosterRoster.styles.css"]"/>
     <link rel="icon" type="image/png" href="@Assets["favicon.png"]"/>
@@ -24,7 +24,11 @@
 </html>
 
 @code {
-    [CascadingParameter] private HttpContext? HttpContext { get; set; } = null;
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+
+    private string _theme = "material";
+
+    private readonly bool _wcag = true;
 
     private IComponentRenderMode? PageRenderMode =>
         HttpContext?.AcceptsInteractiveRouting() == true ? InteractiveServer : null;
@@ -39,11 +43,7 @@
         var theme = HttpContext.Request.Cookies["RadzenTheme"];
         if (!string.IsNullOrWhiteSpace(theme))
         {
-            Theme = theme;
+            _theme = theme;
         }
     }
-
-    private string Theme { get; set; } = "material";
-
-    private bool Wcag => true;
 }

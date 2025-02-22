@@ -1,6 +1,6 @@
 namespace FosterRoster.Domain.Repositories;
 
-public interface IFelineRepository
+public interface IFelineRepository : IRepository
 {
     /// <summary>
     ///     Restores identified feline to active status.

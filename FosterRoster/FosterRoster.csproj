@@ -14,9 +14,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.2" />
-        <PackageReference Include="Radzen.Blazor" Version="6.0.6"/>
+        <PackageReference Include="Radzen.Blazor" Version="6.0.20" />
         <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0"/>
-        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.1"/>
         <ProjectReference Include="..\FosterRoster.Data\FosterRoster.Data.csproj"/>
     </ItemGroup>
 </Project>
