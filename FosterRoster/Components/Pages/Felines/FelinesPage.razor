@@ -1,12 +1,12 @@
 ﻿@page "/felines"
-@inject IFelineRepository FelineRepository
 @inject NotificationService NotificationService
+@inject IDbContextFactory<FosterRosterDbContext> ContextFactory
 
 <PageTitle>Felines</PageTitle>
 <RadzenStack>
     <RadzenPanel class="rz-p-0 rz-shadow-3">
         <RadzenDataGrid
-            TItem="Feline"
+            TItem="GridRow"
             AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
@@ -45,7 +45,7 @@
                 <RadzenDataGridColumn
                     Filterable="false"
                     Sortable="false"
-                    Property="@nameof(Feline.Id)"
+                    Property="@nameof(GridRow.Id)"
                     Width="8ch">
                     <Template>
                         <RadzenLink Path="@($"/felines/{context.Id}")">
@@ -58,17 +58,17 @@
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
-                    Property="@nameof(Feline.Name)"
+                    Property="@nameof(GridRow.Name)"
                     SortOrder="SortOrder.Ascending"
 
                     Title="Name"/>
                 <RadzenDataGridColumn
-                    Property="Fosterer.Name"
+                    Property="@nameof(GridRow.FostererName)"
                     Title="Fosterer"
                 />
                 <RadzenDataGridColumn
                     FilterValue="_isInactiveFilter"
-                    Property="@nameof(Feline.IsInactive)"
+                    Property="@nameof(GridRow.IsInactive)"
                     Title="Inactive"
                     Width="20ch">
                     <FilterTemplate>
@@ -86,9 +86,17 @@
 @code {
     private bool _isLoading;
     private int _count;
-    private IEnumerable<Feline>? _data;
+    private IEnumerable<GridRow>? _data;
     private bool? _isInactiveFilter = false;
 
+    private sealed class GridRow()
+    {
+        public int Id { get; init; }
+        public string Name { get; init; } = string.Empty;
+        public string FostererName { get; init; } = string.Empty;
+        public bool IsInactive { get; init; }
+    }
+    
     /// <summary>
     ///     Called by grid to fetch data. 
     /// </summary>
@@ -98,18 +106,27 @@
         _isLoading = true;
         try
         {
-            var rs = await FelineRepository.QueryAsync(args.Filter, args.Top, args.Skip, args.OrderBy);
-            NotificationService.NotifyIfFailed(rs, "Failed to load data");
-            if (rs.IsSuccess)
-            {
-                _count = rs.Value.Count;
-                _data = rs.Value.Items;
-            }
+            await using var context = await ContextFactory.CreateDbContextAsync();
+            (_data, _count) = await context.Felines
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Include(f => f.Fosterer)
+                .Select(f => new GridRow()
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    IsInactive = f.IsInactive,
+                    FostererName = f.Fosterer != null ? f.Fosterer.Name : ""
+                })
+                .ToQueryResultsAsync(args, "Name asc");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
         }
         finally
         {
             _isLoading = false;
         }
     }
-
 }

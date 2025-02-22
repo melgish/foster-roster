@@ -37,7 +37,12 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 builder.Services
-    .AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddIdentityCore<ApplicationUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+        options.Password.RequireDigit = false;
+        options.Password.RequireUppercase = false;
+    })
     .AddRoles<ApplicationRole>()
     .AddEntityFrameworkStores<FosterRosterDbContext>()
     .AddSignInManager()

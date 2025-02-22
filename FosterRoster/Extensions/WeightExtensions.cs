@@ -6,7 +6,7 @@ public static class WeightExtensions
     private const float PerOz = 28.3495f;
     private const float PerLb = 453.592f;
 
-    private static float Convert(float value, WeightUnit from, WeightUnit to)
+    public static float Convert(this float value, WeightUnit from, WeightUnit to)
         => from switch
         {
             WeightUnit.g => to switch
@@ -43,6 +43,20 @@ public static class WeightExtensions
             },
             _ => throw new InvalidOperationException($"Unknown weight unit: {from}")
         };
+
+    public static string Format(this float value, WeightUnit from, WeightUnit to)
+    {
+        value = value.Convert(from, to);
+        var format = to switch
+        {
+            WeightUnit.g => "N0",
+            WeightUnit.kg => "N2",
+            WeightUnit.oz => "N0",
+            WeightUnit.lbs => "N2",
+            _ => throw new InvalidOperationException($"Unknown weight unit: {to}")
+        };
+        return $"{value.ToString(format)} {to}";
+    }
 
     private static Weight Copy(this Weight weight, float value, WeightUnit units)
         => new()
