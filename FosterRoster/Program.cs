@@ -67,6 +67,9 @@ builder.Services.AddRadzenCookieThemeService(options =>
         options.Duration = TimeSpan.FromDays(30);
     });
 
+builder.Services.AddOutputCache();
+builder.Services.AddResponseCaching();
+
 var app = builder.Build();
 
 // Apply database migrations when requested by configuration.
@@ -92,7 +95,8 @@ else
 }
 
 app.UseHttpsRedirection();
-
+app.UseOutputCache();
+app.UseResponseCaching();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
