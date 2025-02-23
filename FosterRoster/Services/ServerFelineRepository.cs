@@ -210,13 +210,15 @@ public sealed class ServerFelineRepository(
             };
     }
 
+    
+    
     /// <summary>
     ///     Sets the thumbnail for a feline.
     /// </summary>
     /// <param name="felineId">ID of feline to change</param>
     /// <param name="thumbnail">Thumbnail to assign to feline</param>
     /// <returns>A Result with Feline if updated, or errors on failure.</returns>
-    public async Task<Result<Feline>> SetThumbnailAsync(int felineId, Thumbnail thumbnail)
+    public async Task<Result<SetThumbnailResponse>> SetThumbnailAsync(int felineId, Thumbnail thumbnail)
     {
         await using var context = await contextFactory.CreateDbContextAsync();
 
@@ -232,7 +234,7 @@ public sealed class ServerFelineRepository(
 
         await context.SaveChangesAsync();
 
-        return Result.Ok(feline);
+        return Result.Ok(new SetThumbnailResponse(feline.Id, feline.Thumbnail.Version));
     }
 
     /// <summary>
@@ -279,29 +281,5 @@ public sealed class ServerFelineRepository(
 
         // Remove thumbnail data from the returned object.
         return Result.Ok(FelineProjection.Compile().Invoke(existing));
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="skip"></param>
-    /// <param name="top"></param>
-    /// <returns></returns>
-    public async Task<Result<QueryResults<Feline>>> QueryAsync(string? filter = null, int? top = null, int? skip = null,
-        string? orderBy = null)
-    {
-        // Default sort when not supplied. 
-        orderBy = string.IsNullOrWhiteSpace(orderBy) ? "Name asc" : orderBy;
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return Result.Ok(
-            await context
-                .Felines
-                .IgnoreQueryFilters()
-                .AsNoTracking()
-                .Include(f => f.Fosterer)
-                .ToQueryResultsAsync(filter, top, skip, orderBy)
-        );
     }
 }

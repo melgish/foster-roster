@@ -4,7 +4,7 @@
 
 @if (Feline is null)
 {
-    <RadzenCard>
+    <RadzenCard Variant="Variant.Filled">
         <RadzenText Text="Loading..."/>
     </RadzenCard>
 }
@@ -23,7 +23,7 @@ else
             </RadzenStack>
             <RadzenLink Path=@($"/felines/{Feline!.Id}")>
                 <RadzenImage AlternateText="@Feline.Name"
-                             Path="@Feline.Thumbnail.GetUrl()"
+                             Path="@Feline.GetThumbnailUrl()"
                              Style="width:180px;height:180px;background-color:var(--rz-primary-lighter);border-radius: 1rem;"/>
             </RadzenLink>
             <RadzenStack Gap="0rem">
@@ -40,7 +40,7 @@ else
     /// Feline to display.
     /// </summary>
     [Parameter]
-    public Feline? Feline { get; set; }
+    public FelineCardDto? Feline { get; set; }
 
     /// <summary>
     /// Gender and category of the feline.
@@ -51,7 +51,7 @@ else
     /// Fired if Feline is updated.
     /// </summary>
     [Parameter]
-    public EventCallback<Feline> FelineChanged { get; set; }
+    public EventCallback<FelineCardDto> FelineChanged { get; set; }
 
     /// <summary>
     /// Handles quick change of the thumbnail from the dashboard.
@@ -65,10 +65,8 @@ else
             var rs = await FelineRepository.SetThumbnailAsync(Feline.Id, thumbnail);
             if (rs.IsSuccess)
             {
-                Feline = rs.Value;
-                await FelineChanged.InvokeAsync(Feline);
+                await FelineChanged.InvokeAsync(Feline with { ThumbnailVersion = rs.Value.Version });
             }
         }
     }
-
 }

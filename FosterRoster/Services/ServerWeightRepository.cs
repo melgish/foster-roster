@@ -53,33 +53,4 @@ public sealed class ServerWeightRepository(
                 _ => Result.Fail(new MultipleChangesError())
             };
     }
-
-    /// <summary>
-    /// Get last 2 weeks of weights for all felines in the database.
-    /// </summary>
-    /// <returns>A Result with list of Weights success, or Errors on failure.</returns>
-    public async Task<Result<List<Weight>>> GetAllAsync()
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return Result.Ok(await context
-            .Felines
-            .Include(f => f.Weights)
-            .SelectMany(f => f
-                .Weights
-                .OrderByDescending(w => w.DateTime)
-                .Select(w => new Weight
-                {
-                    FelineId = w.FelineId,
-                    DateTime = w.DateTime,
-                    Value = w.Value,
-                    Units = w.Units,
-                    Feline = new() { Name = f.Name }
-                })
-                .Take(14)
-            )
-            .OrderByDescending(w => w.DateTime)
-            .ThenBy(w => w.Feline.Name)
-            .ToListAsync()
-        );
-    }
 }

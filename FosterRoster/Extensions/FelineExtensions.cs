@@ -2,7 +2,7 @@ namespace FosterRoster.Extensions;
 
 public static class FelineExtensions
 {
-    private static string FormatAge(int? ageInWeeks, DateOnly? intakeDate, DateTimeOffset asOfDate)
+    public static string FormatAge(int? ageInWeeks, DateOnly? intakeDate, DateTimeOffset asOfDate)
         => FormatAge(ageInWeeks, intakeDate?.ToDateTime(TimeOnly.MinValue), asOfDate);
 
     private static string FormatAge(int? ageInWeeks, DateTime? intakeDate, DateTimeOffset asOfDate)
@@ -19,10 +19,4 @@ public static class FelineExtensions
             _ => "Age unknown"
         };
     }
-
-    public static string FormatAge(this FelineEditModel? feline, DateTimeOffset asOfDate)
-        => FormatAge(feline?.IntakeAgeInWeeks, feline?.IntakeDate, asOfDate);
-
-    public static string FormatAge(this Feline? feline, DateTimeOffset asOfDate)
-        => FormatAge(feline?.IntakeAgeInWeeks, feline?.IntakeDate.ToDateTime(TimeOnly.MinValue), asOfDate);
 }

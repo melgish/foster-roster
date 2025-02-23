@@ -1,5 +1,13 @@
 namespace FosterRoster.Domain.Repositories;
 
+/// <summary>
+///     Response for SetThumbnailAsync method.
+/// </summary>
+/// <param name="FelineId">ID of feline with updated thumbnail.</param>
+/// <param name="Version">Updated row version for the thumbnail.</param>
+public sealed record SetThumbnailResponse(int FelineId, uint Version);
+
+
 public interface IFelineRepository : IRepository
 {
     /// <summary>
@@ -32,12 +40,6 @@ public interface IFelineRepository : IRepository
     public Task<Result> DeleteByKeyAsync(int felineId);
 
     /// <summary>
-    ///     Get list of all felines in the database.
-    /// </summary>
-    /// <returns>A Result with list of felines, or errors on failure.</returns>
-    public Task<Result<List<Feline>>> GetAllAsync();
-
-    /// <summary>
     ///     Get list of all felines in the database, with only their names and ids.
     /// </summary>
     /// <returns>A Result with list of items, or errors on failure.</returns>
@@ -51,19 +53,12 @@ public interface IFelineRepository : IRepository
     public Task<Result<Feline>> GetByKeyAsync(int felineId);
 
     /// <summary>
-    ///     Gets the thumbnail for a single feline.
-    /// </summary>
-    /// <param name="felineId">ID of the feline</param>
-    /// <returns>A Result with Thumbnail if found, or errors on failure.</returns>
-    public Task<Result<Thumbnail>> GetThumbnailAsync(int felineId);
-
-    /// <summary>
     ///     Sets the thumbnail for a feline.
     /// </summary>
     /// <param name="felineId">ID of feline to change</param>
     /// <param name="thumbnail">Thumbnail to assign to feline</param>
     /// <returns>A Result with Feline if updated, or errors on failure.</returns>
-    public Task<Result<Feline>> SetThumbnailAsync(int felineId, Thumbnail thumbnail);
+    public Task<Result<SetThumbnailResponse>> SetThumbnailAsync(int felineId, Thumbnail thumbnail);
 
     /// <summary>
     ///     Updates a feline in the database.
@@ -72,15 +67,4 @@ public interface IFelineRepository : IRepository
     /// <param name="feline">Data to assign to feline</param>
     /// <returns>A Result with Feline if updated, or errors on failure.</returns>
     public Task<Result<Feline>> UpdateAsync(int felineId, Feline feline);
-
-    /// <summary>
-    ///     Query for data
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="orderBy"></param>
-    /// <param name="skip"></param>
-    /// <param name="top"></param>
-    /// <returns></returns>
-    public Task<Result<QueryResults<Feline>>> QueryAsync(string? filter = null, int? top = null, int? skip = null,
-        string? orderBy = null);
 }

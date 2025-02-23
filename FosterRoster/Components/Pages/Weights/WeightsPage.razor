@@ -209,7 +209,7 @@
         _isSaving = false;
     }
 
-    private sealed class GridRow
+    private sealed record GridRow
     {
         public int FelineId { get; init; }
         public DateTimeOffset DateTime { get; init; }
