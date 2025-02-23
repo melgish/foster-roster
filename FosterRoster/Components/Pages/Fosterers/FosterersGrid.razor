@@ -1,18 +1,29 @@
-﻿<RadzenDataGrid TItem="Fosterer" Data="@Items">
+﻿<RadzenDataGrid
+    TItem="Fosterer"
+    Data="@Items"
+    Density="Density.Compact">
+    <HeaderTemplate>
+        <RadzenStack
+            AlignItems="AlignItems.Center"
+            class="rz-w-100"
+            JustifyContent="JustifyContent.SpaceBetween"
+            Orientation="Orientation.Horizontal">
+            <RadzenText Text="Fosterers" TextStyle="TextStyle.DisplayH6" Style="margin: 0"/>
+            <div style="margin-right: auto"></div>
+            <RadzenButton
+                ButtonStyle="ButtonStyle.Primary"
+                Click="@(() => OnAdd.InvokeAsync())"
+                Icon="add"
+                Size="ButtonSize.Small"
+                Text="Add"
+                Variant="Variant.Outlined"/>
+        </RadzenStack>
+    </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Width="14ch">
-            <HeaderTemplate>
-                <RadzenButton ButtonStyle="ButtonStyle.Info"
-                              Click="@(() => OnAdd.InvokeAsync())"
-                              Icon="add"
-                              Size="ButtonSize.Small"
-                              Text="Add"
-                              Variant="Variant.Outlined"/>
-            </HeaderTemplate>
+        <RadzenDataGridColumn Width="12ch">
             <Template Context="data">
-                <RadzenButton ButtonStyle="ButtonStyle.Info"
+                <RadzenButton ButtonStyle="ButtonStyle.Secondary"
                               Click="@(() => OnEdit.InvokeAsync(data.Id))"
-                              Icon="edit"
                               Size="ButtonSize.Small"
                               Text="Edit"
                               Variant="Variant.Outlined"/>
@@ -23,7 +34,6 @@
         <RadzenDataGridColumn Property="@nameof(Fosterer.Phone)" Title="@nameof(Fosterer.Phone)"/>
     </Columns>
 </RadzenDataGrid>
-
 
 @code {
     [Parameter] public ICollection<Fosterer> Items { get; set; } = [];
