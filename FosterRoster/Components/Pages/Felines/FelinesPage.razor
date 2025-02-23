@@ -1,0 +1,132 @@
+﻿@page "/felines"
+@inject NotificationService NotificationService
+@inject IDbContextFactory<FosterRosterDbContext> ContextFactory
+
+<PageTitle>Felines</PageTitle>
+<RadzenStack>
+    <RadzenPanel class="rz-p-0 rz-shadow-3">
+        <RadzenDataGrid
+            TItem="GridRow"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowSorting="true"
+            Count="_count"
+            Data="_data"
+            Density="Density.Compact"
+            FilterMode="FilterMode.Simple"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="1"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            PagerPosition="PagerPosition.Top"
+            PageSize="20"
+            PageSizeOptions="@( [10, 20, 50, 100])"
+            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            ShowPagingSummary="true">
+            <HeaderTemplate>
+                <RadzenStack
+                    AlignItems="AlignItems.Center"
+                    class="rz-w-100"
+                    JustifyContent="JustifyContent.SpaceBetween"
+                    Orientation="Orientation.Horizontal">
+                    <RadzenText Text="Felines" TextStyle="TextStyle.DisplayH6" Style="margin: 0"/>
+                    <div style="margin-right: auto"></div>
+                    <RadzenLink Path="/intake">
+                        <RadzenButton
+                            ButtonStyle="ButtonStyle.Primary"
+                            Icon="add"
+                            Size="ButtonSize.Small"
+                            Text="Intake"
+                            Variant="Variant.Outlined"/>
+                    </RadzenLink>
+                </RadzenStack>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn
+                    Filterable="false"
+                    Sortable="false"
+                    Property="@nameof(GridRow.Id)"
+                    Width="8ch">
+                    <Template>
+                        <RadzenLink Path="@($"/felines/{context.Id}")">
+                            <RadzenButton
+                                ButtonStyle="ButtonStyle.Secondary"
+                                Size="ButtonSize.ExtraSmall"
+                                Text="Edit"
+                                Variant="Variant.Outlined"/>
+                        </RadzenLink>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="@nameof(GridRow.Name)"
+                    SortOrder="SortOrder.Ascending"
+
+                    Title="Name"/>
+                <RadzenDataGridColumn
+                    Property="@nameof(GridRow.FostererName)"
+                    Title="Fosterer"
+                />
+                <RadzenDataGridColumn
+                    FilterValue="_isInactiveFilter"
+                    Property="@nameof(GridRow.IsInactive)"
+                    Title="Inactive"
+                    Width="20ch">
+                    <FilterTemplate>
+                        <AppInactiveFilter @bind-Value="_isInactiveFilter"/>
+                    </FilterTemplate>
+                    <Template>
+                        <AppInactiveValue Value="context.IsInactive"/>
+                    </Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenPanel>
+</RadzenStack>
+
+@code {
+    private bool _isLoading;
+    private int _count;
+    private IEnumerable<GridRow>? _data;
+    private bool? _isInactiveFilter = false;
+
+    private sealed class GridRow
+    {
+        public int Id { get; init; }
+        public string Name { get; init; } = string.Empty;
+        public string FostererName { get; init; } = string.Empty;
+        public bool IsInactive { get; init; }
+    }
+    
+    /// <summary>
+    ///     Called by grid to fetch data. 
+    /// </summary>
+    /// <param name="args">Arguments supplied by grid.</param>
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        _isLoading = true;
+        try
+        {
+            await using var context = await ContextFactory.CreateDbContextAsync();
+            (_data, _count) = await context.Felines
+                .IgnoreQueryFilters()
+                .AsNoTracking()
+                .Include(f => f.Fosterer)
+                .Select(f => new GridRow()
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    IsInactive = f.IsInactive,
+                    FostererName = f.Fosterer != null ? f.Fosterer.Name : ""
+                })
+                .ToQueryResultsAsync(args, "Name asc");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

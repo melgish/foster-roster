@@ -1,6 +1,6 @@
 namespace FosterRoster.Domain.Repositories;
 
-public interface IWeightRepository
+public interface IWeightRepository : IRepository
 {
     /// <summary>
     /// Adds a new weight to the database for a given feline.
@@ -16,10 +16,4 @@ public interface IWeightRepository
     /// <param name="dateTime">Date and Time of weight to remove.</param>
     /// <returns>A Result instance indicating success or failure.</returns>
     public Task<Result> DeleteByKeyAsync(int felineId, DateTimeOffset dateTime);
-
-    /// <summary>
-    /// Get last 2 weeks of weights for all felines in the database.
-    /// </summary>
-    /// <returns>A Result with list of Weights success, or Errors on failure.</returns>
-    public Task<Result<List<Weight>>> GetAllAsync();
 }

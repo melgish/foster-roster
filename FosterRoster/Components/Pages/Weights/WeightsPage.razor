@@ -1,0 +1,250 @@
+@page "/weights"
+@inject NotificationService NotificationService
+@inject IWeightRepository WeightRepository
+@inject TimeProvider TimeProvider
+@inject IDbContextFactory<FosterRosterDbContext> ContextFactory
+
+<PageTitle>Weights</PageTitle>
+
+<RadzenStack>
+    <RadzenPanel class="rz-shadow-3">
+        <EditForm FormName="weightForm"
+                  Model="_model"
+                  OnValidSubmit="OnSaveAsync">
+            <FluentValidationValidator/>
+            <RadzenStack Gap="0.5rem">
+                <RadzenRow Gap="1rem" RowGap="0.5rem">
+                    <RadzenColumn Size="12">
+                        <RadzenText Text="Enter Weight" TextStyle="TextStyle.DisplayH4"/>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow Gap="1rem" RowGap="0.5rem">
+                    <RadzenColumn SizeXS="12" SizeSM="6">
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
+                                <FelineSelect Value="@_model.FelineId" ValueChanged="@OnFelineSelected"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.FelineId)"/>
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn SizeXS="12" SizeSM="6">
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField AllowFloatingLabel="false" Text="Date" Variant="Variant.Text">
+                                <RadzenDatePicker @bind-Value="_model.DateTime"
+                                                  DateFormat="MM/dd/yyyy h:mm tt"
+                                                  HourFormat="12"
+                                                  Placeholder="MM/DD/YYYY hh:mm am"
+                                                  ShowTime="true"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.DateTime)"/>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow Gap="1rem" RowGap="0.5rem">
+                    <RadzenColumn SizeXS="12" SizeSM="6">
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField AllowFloatingLabel="false" Text="Weight" Variant="Variant.Text">
+                                <RadzenNumeric TValue="float"
+                                               @bind-Value="_model.Value"
+                                               Step="0.1f"
+                                               Min="0.0m"
+                                               ShowUpDown="false"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.Value)"/>
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn SizeSM="6" SizeXS="12">
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField AllowFloatingLabel="false" Text="Units" Variant="Variant.Text">
+                                <RadzenDropDown TValue="Enum" Value="@((Enum)_model.Units)" Data="@UnitChoices"
+                                                ValueChanged="@((args) => OnUnitsSelected((WeightUnit)args))"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="@(() => _model.Units)"/>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow Gap="1rem" RowGap="0.5rem">
+                    <RadzenColumn Size="12">
+                        <RadzenStack JustifyContent="JustifyContent.End" Orientation="Orientation.Horizontal">
+                            <RadzenButton BusyText="Saving..."
+                                          ButtonStyle="ButtonStyle.Primary"
+                                          ButtonType="ButtonType.Submit"
+                                          Disabled="_isSaving"
+                                          IsBusy="_isSaving"
+                                          Size="ButtonSize.Small"
+                                          Text="Save"
+                                          Variant="Variant.Outlined"/>
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary"
+                                          Click="@Reset"
+                                          Disabled="_isSaving"
+                                          Size="ButtonSize.Small"
+                                          Text="Reset"
+                                          Variant="Variant.Outlined"/>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </EditForm>
+    </RadzenPanel>
+    <RadzenPanel class="rz-px-0 rz-pb-0 rz-shadow-3">
+        <RadzenText Text="Weights" TextStyle="TextStyle.DisplayH4" class="rz-px-4"/>
+        <RadzenDataGrid 
+            @ref="_grid"
+            TItem="GridRow"
+            AllowPaging="true"
+            AllowSorting="true"
+            Count="_count"
+            Data="_data" 
+            Density="Density.Compact"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="1"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            PagerPosition="PagerPosition.Top"
+            PageSize="20"
+            PageSizeOptions="@( [10, 20, 50, 100])"
+            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            ShowPagingSummary="true">
+            <Columns>
+                <RadzenDataGridColumn Title="Actions" Width="12ch">
+                    <Template>
+                        <RadzenButton ButtonStyle="ButtonStyle.Danger"
+                                      Click="@(() => OnDeleteAsync(context))"
+                                      Size="ButtonSize.ExtraSmall"
+                                      Text="Delete"
+                                      Variant="Variant.Outlined"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(GridRow.DateTime)" Title="Date" Width="20ch">
+                    <Template Context="data">
+                        @(data.DateTime.ToLocalTime().ToString("MMM dd \\a\\t hh:mm tt"))
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(GridRow.Name)" Title="Name"/>
+                <RadzenDataGridColumn Property="@nameof(GridRow.Value)" Title="Weight" Width="16ch">
+                    <Template Context="data">@data.Value.Format(data.Units, _units)</Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </RadzenPanel>
+</RadzenStack>
+
+@code {
+
+    /// <summary>
+    /// Choices used by the Units dropdown(s)
+    /// </summary>
+    private static readonly Enum[] UnitChoices =
+    [
+        WeightUnit.g,
+        WeightUnit.oz,
+        WeightUnit.lbs,
+        WeightUnit.kg
+    ];
+
+    private RadzenDataGrid<GridRow>? _grid;
+    private bool _isSaving;
+    private WeightEditModel _model = new();
+    private WeightUnit _units = WeightUnit.g;
+    private bool _isLoading;
+    private int _count;
+    private IEnumerable<GridRow>? _data;
+
+    private void OnFelineSelected(int felineId)
+    {
+        _model.FelineId = felineId;
+        _grid?.RefreshDataAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        Reset();
+    }
+
+    private void OnUnitsSelected(WeightUnit unit)
+    {
+        _model.Units = unit;
+        _units = unit;
+    }
+
+    private void Reset()
+    {
+        // Start a new form, but keep the selected unit type
+        _model = new()
+        {
+            DateTime = TimeProvider.GetLocalNow(),
+            Units = _units
+        };
+    }
+
+    private async Task OnSaveAsync()
+    {
+        _isSaving = true;
+        var rs = await WeightRepository.AddAsync(_model.ToWeight());
+        NotificationService.Notify(rs, "Weight saved", "Failed to save weight");
+        if (rs.IsSuccess)
+        {
+            Reset();
+            OnFelineSelected(_model.FelineId);
+        }
+
+        _isSaving = false;
+    }
+
+    private async Task OnDeleteAsync(GridRow? weight)
+    {
+        if (weight is null)
+        {
+            return;
+        }
+
+        _isSaving = true;
+        var rs = await WeightRepository.DeleteByKeyAsync(weight.FelineId, weight.DateTime);
+        NotificationService.Notify(rs, "Weight deleted", "Failed to delete weight");
+        if (rs.IsSuccess)
+        {
+            OnFelineSelected(weight.FelineId);
+        }
+
+        _isSaving = false;
+    }
+
+    private sealed record GridRow
+    {
+        public int FelineId { get; init; }
+        public DateTimeOffset DateTime { get; init; }
+        public string Name { get; init; } = string.Empty;
+        public float Value { get; init; }
+        public WeightUnit Units { get; init; }
+    }
+    
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        _isLoading = true;
+        try
+        {
+            await using var context = await ContextFactory.CreateDbContextAsync();
+            var query = context.Weights
+                .AsNoTracking()
+                .Include(w => w.Feline)
+                .Select(w => new GridRow()
+                {
+                    FelineId = w.FelineId,
+                    DateTime = w.DateTime,
+                    Name = w.Feline.Name,
+                    Value = w.Value,
+                    Units = w.Units
+                });
+            if (_model.FelineId != 0)
+            {
+                query = query.Where(r => r.FelineId == _model.FelineId);
+            }
+
+            (_data, _count) = await query.ToQueryResultsAsync(args, "DateTime desc");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

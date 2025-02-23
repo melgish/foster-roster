@@ -1,6 +1,6 @@
 namespace FosterRoster.Domain.Repositories;
 
-public interface ICommentRepository
+public interface ICommentRepository: IRepository
 {
     /// <summary>
     ///     Adds a new comment to the database.

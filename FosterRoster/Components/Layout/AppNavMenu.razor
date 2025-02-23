@@ -1,0 +1,78 @@
+﻿@implements IDisposable
+@inject NavigationManager NavigationManager
+
+<RadzenMenu Responsive="true">
+    <li class="rz-navigation-item">
+        <div class="rz-navigation-item-wrapper">
+            <h4 class="rz-px-2 rz-py-0 rz-ma-0">Foster Roster</h4>
+        </div>
+    </li>
+    <RadzenMenuItem Path="/" Text="Dashboard" Match="NavLinkMatch.All"/>
+    <AuthorizeView>
+        <Authorized>
+            <RadzenMenuItem Path="/weights" Text="Weights"/>
+            <RadzenMenuItem Path="/intake" Text="Intake"/>
+            <RadzenMenuItem Text="Admin">
+                <RadzenMenuItem Path="/felines" Text="Felines"/>
+                <AuthorizeView Roles="Admin" Context="admin">
+                    <RadzenMenuItem Path="/fosterers" Text="Fosterers"/>
+                    <RadzenMenuItem Path="/sources" Text="Sources"/>
+                </AuthorizeView>
+            </RadzenMenuItem>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
+            <RadzenProfileMenu Style="margin-left: auto;padding-left: 0">
+                <Template>@context.User.Identity?.Name</Template>
+                <ChildContent>
+                    <form action="account/logout" method="post" name="logoutForm">
+                        <AntiforgeryToken/>
+                        <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
+                    </form>
+                    <RadzenProfileMenuItem Text="Logout" Path="javascript:document.forms['logoutForm'].submit();" />
+                    <RadzenProfileMenuItem Path="/account/manage/changePassword" Text="Change Password"/>
+                </ChildContent>
+            </RadzenProfileMenu>
+        </Authorized>
+        <NotAuthorized>
+            <RadzenMenuItem Path="/account/login" Text="Login" Match="NavLinkMatch.All" Style="margin-left:auto"/>
+        </NotAuthorized>
+    </AuthorizeView>
+    <RadzenMenuItem>
+        <Template>
+            <RadzenAppearanceToggle Variant="Variant.Text" />
+        </Template>
+    </RadzenMenuItem>
+    <RadzenMenuItem Path="https://github.com/melgish/foster-roster" Target="_blank">
+        <Template>
+            <GitHubIcon />
+        </Template>
+    </RadzenMenuItem>
+</RadzenMenu>
+
+@code {
+    private string? _currentUrl;
+    
+    [CascadingParameter] private HttpContext? HttpContext { get; set; } = null;
+    
+    private bool IsInteractive => HttpContext?.AcceptsInteractiveRouting() ?? false;
+
+    protected override void OnInitialized()
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+    
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

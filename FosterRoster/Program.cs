@@ -1,7 +1,9 @@
 // spell-checker: ignore npgsql
-
-using FosterRoster.Client.Components;
+using FosterRoster.Components;
+using FosterRoster.Components.Account;
 using FosterRoster.Services;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Radzen;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Text.Json.Serialization;
@@ -14,12 +16,39 @@ builder.Services
     .AddControllers()
     .AddJsonOptions(options => { options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles; });
 builder.Services.AddFluentValidationAutoValidation();
+
 builder.Services.AddRazorComponents()
-    .AddInteractiveWebAssemblyComponents();
+    .AddInteractiveServerComponents();
 
 builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
 );
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+// Identity
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<IdentityUserAccessor>();
+builder.Services.AddScoped<IdentityRedirectManager>();
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddIdentityCookies();
+builder.Services
+    .AddIdentityCore<ApplicationUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = true;
+        options.Password.RequireDigit = false;
+        options.Password.RequireUppercase = false;
+    })
+    .AddRoles<ApplicationRole>()
+    .AddEntityFrameworkStores<FosterRosterDbContext>()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
@@ -32,6 +61,14 @@ builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
 builder.Services.AddValidatorsFromAssemblyContaining<App>();
 
 builder.Services.AddRadzenComponents();
+builder.Services.AddRadzenCookieThemeService(options =>
+    {
+        options.Name = "RadzenTheme";
+        options.Duration = TimeSpan.FromDays(30);
+    });
+
+builder.Services.AddOutputCache();
+builder.Services.AddResponseCaching();
 
 var app = builder.Build();
 
@@ -48,7 +85,7 @@ if (builder.Configuration.GetValue("AutoMigrate", false))
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseWebAssemblyDebugging();
+    app.UseMigrationsEndPoint();
 }
 else
 {
@@ -58,13 +95,16 @@ else
 }
 
 app.UseHttpsRedirection();
-
-app.UseStaticFiles();
+app.UseOutputCache();
+app.UseResponseCaching();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapControllers();
 app.MapRazorComponents<App>()
-    .AddInteractiveWebAssemblyRenderMode();
+    .AddInteractiveServerRenderMode();
+
+// Add additional endpoints required by the Identity /Account Razor components.
+app.MapAdditionalIdentityEndpoints();
 
 await app.RunAsync();

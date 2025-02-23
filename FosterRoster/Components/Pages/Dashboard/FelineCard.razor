@@ -1,0 +1,72 @@
+@inject TimeProvider TimeProvider
+@inject IFelineRepository FelineRepository
+@inject ILogger<FelineCard> Logger
+
+@if (Feline is null)
+{
+    <RadzenCard Variant="Variant.Filled">
+        <RadzenText Text="Loading..."/>
+    </RadzenCard>
+}
+else
+{
+    <RadzenCard Variant="Variant.Filled">
+        <RadzenStack Gap="1rem" AlignItems="AlignItems.Center">
+            <RadzenStack AlignItems="AlignItems.Center"
+                         JustifyContent="JustifyContent.SpaceBetween"
+                         Orientation="Orientation.Horizontal">
+                <RadzenText Text="@Feline.Name" TextStyle="TextStyle.DisplayH6" TagName="TagName.Div"
+                            Style="margin-bottom: 0"/>
+                <AuthorizeView>
+                    <AppFileInput OnChange="@OnFilesChangedAsync" Size="ButtonSize.Small" Rounded="true"/>
+                </AuthorizeView>
+            </RadzenStack>
+            <RadzenLink Path=@($"/felines/{Feline!.Id}")>
+                <RadzenImage AlternateText="@Feline.Name"
+                             Path="@Feline.GetThumbnailUrl()"
+                             Style="width:180px;height:180px;background-color:var(--rz-primary-lighter);border-radius: 1rem;"/>
+            </RadzenLink>
+            <RadzenStack Gap="0rem">
+                <RadzenText Text="@GenderCategory" TextStyle="TextStyle.Body1"/>
+                <RadzenText Text="@Feline.FormatAge(TimeProvider.GetUtcNow())"/>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+}
+
+@code {
+
+    /// <summary>
+    /// Feline to display.
+    /// </summary>
+    [Parameter]
+    public FelineCardDto? Feline { get; set; }
+
+    /// <summary>
+    /// Gender and category of the feline.
+    /// </summary>
+    private string GenderCategory => $"{Feline?.Gender} {Feline?.Category}";
+
+    /// <summary>
+    /// Fired if Feline is updated.
+    /// </summary>
+    [Parameter]
+    public EventCallback<FelineCardDto> FelineChanged { get; set; }
+
+    /// <summary>
+    /// Handles quick change of the thumbnail from the dashboard.
+    /// </summary>
+    /// <param name="args"></param>
+    private async Task OnFilesChangedAsync(InputFileChangeEventArgs args)
+    {
+        var thumbnail = await args.File.ToThumbnailAsync(Feline!.Id);
+        if (thumbnail is not null)
+        {
+            var rs = await FelineRepository.SetThumbnailAsync(Feline.Id, thumbnail);
+            if (rs.IsSuccess)
+            {
+                await FelineChanged.InvokeAsync(Feline with { ThumbnailVersion = rs.Value.Version });
+            }
+        }
+    }
+}

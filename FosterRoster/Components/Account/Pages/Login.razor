@@ -1,0 +1,145 @@
+﻿@page "/Account/Login"
+@attribute [AllowAnonymous]
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject ILogger<Login> Logger
+@inject IdentityRedirectManager RedirectManager
+
+<PageTitle>Log in</PageTitle>
+<RadzenRow>
+    <RadzenColumn
+        SizeSM="12"
+        SizeMD="10" OffsetMD="1"
+        SizeLG="8" OffsetLG="2"
+        SizeXL="6" OffsetXL="3"
+        SizeXX="4" OffsetXX="4">
+        <RadzenPanel class="rz-shadow-3">
+            <HeaderTemplate>
+                <RadzenText TextStyle="TextStyle.H6">Log In</RadzenText>
+            </HeaderTemplate>
+            <ChildContent>
+                <StatusMessage Message="@_errorMessage"/>
+                <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+                    <DataAnnotationsValidator/>
+                    <RadzenStack Gap="1rem">
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Component="Input.Email"
+                                Text="Email"
+                                Variant="Variant.Text">
+                                <InputText @bind-Value="Input.Email"
+                                           aria-required="true"
+                                           autocomplete="username"
+                                           class="rz-textbox"
+                                           id="Input.Email"
+                                           placeholder="name@example.com"
+                                           type="text"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="() => Input.Email"/>
+                        </RadzenStack>
+                        <RadzenStack Gap="0rem">
+                            <RadzenFormField
+                                AllowFloatingLabel="false"
+                                Component="Input.Password"
+                                Text="Password"
+                                Variant="Variant.Text">
+                                <InputText @bind-Value="Input.Password"
+                                           aria-required="true"
+                                           autocomplete="current-password"
+                                           class="rz-textbox"
+                                           id="Input.Password"
+                                           placeholder="password"
+                                           type="password"/>
+                            </RadzenFormField>
+                            <ValidationMessage For="() => Input.Password"/>
+                        </RadzenStack>
+
+                        <RadzenStack
+                            AlignItems="AlignItems.Center"
+                            Gap="0.5rem"
+                            JustifyContent="JustifyContent.SpaceBetween"
+                            Orientation="Orientation.Horizontal">
+                            <RadzenStack AlignItems="AlignItems.Center" Gap="0.25rem"
+                                         Orientation="Orientation.Horizontal">
+                                <InputCheckbox @bind-Value="Input.RememberMe" id="Input.RememberMe"
+                                               style="transform:scale(1.5);"/>
+                                <label for="Input.RememberMe">Remember me</label>
+                            </RadzenStack>
+                            <RadzenButton
+                                ButtonStyle="ButtonStyle.Primary"
+                                ButtonType="ButtonType.Submit"
+                                Size="ButtonSize.Small"
+                                Text="Log In"
+                                Variant="Variant.Outlined"/>
+                        </RadzenStack>
+                    </RadzenStack>
+                    @*
+<a href="Account/ForgotPassword">Forgot your password?</a>
+<a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
+<a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
+*@
+                </EditForm>
+            </ChildContent>
+        </RadzenPanel>
+    </RadzenColumn>
+</RadzenRow>
+
+
+@code {
+    private string? _errorMessage;
+
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
+
+    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
+
+    [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (HttpMethods.IsGet(HttpContext.Request.Method))
+        {
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+        }
+    }
+
+    public async Task LoginUser()
+    {
+        // This doesn't count login failures towards account lockout
+        // To enable password failures to trigger account lockout, set lockoutOnFailure: true
+        var result = await SignInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, false);
+        if (result.Succeeded)
+        {
+            Logger.LogInformation("User logged in.");
+            RedirectManager.RedirectTo(ReturnUrl);
+        }
+        else if (result.RequiresTwoFactor)
+        {
+            RedirectManager.RedirectTo(
+                "Account/LoginWith2fa",
+                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+        }
+        else if (result.IsLockedOut)
+        {
+            Logger.LogWarning("User account locked out.");
+            RedirectManager.RedirectTo("Account/Lockout");
+        }
+        else
+        {
+            _errorMessage = "Error: Invalid login attempt.";
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required] [EmailAddress] public string Email { get; set; } = "";
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        [Display(Name = "Remember me?")] public bool RememberMe { get; set; }
+    }
+
+}

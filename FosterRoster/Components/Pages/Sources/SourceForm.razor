@@ -1,0 +1,108 @@
+﻿@inject DialogService DialogService
+
+@if (_model is null)
+{
+    <Loading/>
+}
+else
+{
+    <EditForm FormName="editSource" Model="_model" OnValidSubmit="SaveAsync">
+        <FluentValidationValidator/>
+        <RadzenStack Gap="0.5rem">
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn Size="12">
+                    <RadzenText Text="@_name" TextStyle="TextStyle.DisplayH4"/>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn SizeSm="6" SizeXS="12">
+                    <RadzenStack Gap="0rem">
+                        <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
+                            <RadzenTextBox @bind-Value="_model.Name"/>
+                        </RadzenFormField>
+                        <ValidationMessage For="@(() => _model.Name)"/>
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow Gap="1rem" RowGap="0.5rem">
+                <RadzenColumn Size="12">
+                    <AppFormButtons
+                        Busy="_isSaving"
+                        CanDelete="@(Source.Id != 0)"
+                        OnDelete="DeleteAsync"
+                        OnReset="ResetAsync">
+                    </AppFormButtons>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </EditForm>
+}
+
+@code {
+    private bool _isSaving;
+    private string _name = string.Empty;
+    private SourceEditModel? _model;
+
+    /// <summary>
+    ///     Source to edit.
+    /// </summary>
+    [EditorRequired]
+    [Parameter]
+    public Source Source { get; set; } = null!;
+
+    /// <summary>
+    ///     Event fired when delete button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<int> OnDelete { get; set; }
+
+    /// <summary>
+    ///     Event fired when save button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<Source> OnSave { get; set; }
+
+    /// <summary>
+    ///     Handles click event for the delete button.
+    /// </summary>
+    private async Task DeleteAsync()
+    {
+        var rs = await DialogService
+            .Confirm($"Are you sure you want to delete the source named \"{Source.Name}\"?");
+        if (rs.GetValueOrDefault())
+        {
+            _isSaving = true;
+            await OnDelete.InvokeAsync(Source.Id);
+            _isSaving = false;
+        }
+    }
+
+    /// <summary>
+    ///     Resets form any time the parent Source is updated.
+    /// </summary>
+    protected override Task OnParametersSetAsync() => ResetAsync();
+
+    /// <summary>
+    ///     Resets the form back to it's initial state.
+    /// </summary>
+    private Task ResetAsync()
+    {
+        _model = new(Source);
+        _name = Source.Id == 0 ? "Create New Source" : Source.Name;
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    ///     Saves current source.
+    /// </summary>
+    private async Task SaveAsync()
+    {
+        if (_model is not null)
+        {
+            _isSaving = true;
+            await OnSave.InvokeAsync(_model.ToSource());
+            _isSaving = false;
+        }
+    }
+
+}
