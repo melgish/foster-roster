@@ -1,0 +1,157 @@
+﻿@page "/felines/{FelineId:int}/print"
+@using System.Globalization
+@using FosterRoster.Components.Layout
+@layout PrintLayout
+@attribute [ExcludeFromInteractiveRouting]
+@inject FosterRosterDbContext DbContext
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@if (_feline is not null)
+{
+    <h1>@_feline.Name</h1>
+    @if (_thumbnail is not null)
+    {
+        <img src="@_thumbnail.GetUrl()" alt="@_feline.Name" />
+        
+    }
+    <table class="vitals">
+        <caption>Vitals</caption>
+        <tbody>
+        <tr>
+            <th>Animal ID</th>
+            <td>@_feline.AnimalId</td>
+        </tr>
+        <tr>
+            <th>Intake Date</th>
+            <td>@_feline.IntakeDate</td>
+        </tr>
+        <tr>
+            <th>Gender</th>
+            <td>@_feline.Gender</td>
+        </tr>
+        <tr>
+            <th>Age At Intake</th>
+            <td>@_feline.IntakeAgeInWeeks</td>
+        </tr>
+        <tr>
+            <th>Breed</th>
+            <td>@_feline.Breed</td>
+        </tr>
+        <tr>
+            <th>Color</th>
+            <td>@_feline.Color</td>
+        </tr>
+        <tr>
+            <th>Source</th>
+            <td>@_feline.Source</td>
+        </tr>
+        <tr>
+            <th>Fosterer</th>
+            <td>@(_fosterer?.Name)</td>
+        </tr>
+        <tr>
+            <th>Weaned</th>
+            <td>@_feline.Weaned.ToDisplay()</td>
+        </tr>
+        <tr>
+            <th>Registration Date</th>
+            <td>@_feline.RegistrationDate</td>
+        </tr>
+        </tbody>
+    </table>
+ 
+    @if (_comments.Count > 0)
+    {
+        <table class="journal">
+            <caption>Journal</caption>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Entry</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var comment in _comments)
+            {
+                <tr>
+                    <td>@comment.TimeStamp.ToString("g")</td>
+                    <td><RadzenHtml>@(new MarkupString(comment.Text))</RadzenHtml></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+    
+    @if (_weights.Count > 0)
+    {
+        <table class="weights">
+            <caption>Weights</caption>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Weight</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var weight in _weights)
+            {
+                <tr>
+                    <td>@weight.DateTime.ToString("g")</td>
+                    <td>@weight.Value.Format(weight.Units, WeightUnit.lbs)</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
+}
+
+@code {
+    [Parameter] public int FelineId { get; set; }
+    private Feline? _feline;
+    private Fosterer? _fosterer;
+    private Thumbnail? _thumbnail;
+    private List<Comment> _comments = [];
+    private List<Weight> _weights = [];
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _feline = await DbContext
+            .Felines
+            .IgnoreQueryFilters()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(f => f.Id == FelineId);
+        
+        if (_feline is null)
+        {
+            NavigationManager.NavigateTo("/not-found");
+            return;
+        }
+        
+        _fosterer = await DbContext
+            .Fosterers
+            .AsNoTracking()
+            .Where(f => f.Id == _feline.FostererId)
+            .FirstOrDefaultAsync();
+        
+        _thumbnail = await DbContext
+            .Thumbnails
+            .AsNoTracking()
+            .Where(t => t.FelineId == FelineId)
+            .FirstOrDefaultAsync();
+
+        _weights = await DbContext
+            .Weights
+            .AsNoTracking()
+            .Where(w => w.FelineId == FelineId)
+            .OrderByDescending(w => w.DateTime)
+            .ToListAsync();
+
+        _comments = await DbContext
+            .Comments
+            .AsNoTracking()
+            .Where(c => c.FelineId == FelineId)
+            .OrderByDescending(c => c.TimeStamp)
+            .ToListAsync();
+    }    
+}
