@@ -31,6 +31,7 @@
                         <RadzenStack Gap="0rem">
                             <RadzenFormField AllowFloatingLabel="false" Text="Date" Variant="Variant.Text">
                                 <RadzenDatePicker @bind-Value="_model.DateTime"
+                                                  Kind="DateTimeKind.Local"
                                                   DateFormat="MM/dd/yyyy h:mm tt"
                                                   HourFormat="12"
                                                   Placeholder="MM/DD/YYYY hh:mm am"
@@ -172,7 +173,7 @@
         // Start a new form, but keep the selected unit type
         _model = new()
         {
-            DateTime = TimeProvider.GetLocalNow(),
+            DateTime = TimeProvider.GetUtcNow(),
             Units = _units
         };
     }

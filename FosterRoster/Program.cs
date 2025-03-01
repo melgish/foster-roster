@@ -50,15 +50,15 @@ builder.Services
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+builder.Services.AddSingleton<TimeProvider, TexasTimeProvider>();
+builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
+builder.Services.AddValidatorsFromAssemblyContaining<App>();
+
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
 builder.Services.AddScoped<IFostererRepository, ServerFostererRepository>();
 builder.Services.AddScoped<ISourceRepository, ServerSourceRepository>();
 builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
-
-builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
-builder.Services.AddValidatorsFromAssemblyContaining<App>();
 
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenCookieThemeService(options =>
