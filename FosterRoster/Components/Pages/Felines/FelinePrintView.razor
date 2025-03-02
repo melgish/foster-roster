@@ -5,63 +5,77 @@
 @attribute [ExcludeFromInteractiveRouting]
 @inject FosterRosterDbContext DbContext
 @inject NavigationManager NavigationManager
+@inject TimeProvider TimeProvider
 @rendermode InteractiveServer
 
 @if (_feline is not null)
 {
-    <h1>@_feline.Name</h1>
-    @if (_thumbnail is not null)
-    {
-        <img src="@_thumbnail.GetUrl()" alt="@_feline.Name" />
-        
-    }
-    <table class="vitals">
-        <caption>Vitals</caption>
-        <tbody>
-        <tr>
-            <th>Animal ID</th>
-            <td>@_feline.AnimalId</td>
-        </tr>
-        <tr>
-            <th>Intake Date</th>
-            <td>@_feline.IntakeDate</td>
-        </tr>
-        <tr>
-            <th>Gender</th>
-            <td>@_feline.Gender</td>
-        </tr>
-        <tr>
-            <th>Age At Intake</th>
-            <td>@_feline.IntakeAgeInWeeks</td>
-        </tr>
-        <tr>
-            <th>Breed</th>
-            <td>@_feline.Breed</td>
-        </tr>
-        <tr>
-            <th>Color</th>
-            <td>@_feline.Color</td>
-        </tr>
-        <tr>
-            <th>Source</th>
-            <td>@_feline.Source</td>
-        </tr>
-        <tr>
-            <th>Fosterer</th>
-            <td>@(_fosterer?.Name)</td>
-        </tr>
-        <tr>
-            <th>Weaned</th>
-            <td>@_feline.Weaned.ToDisplay()</td>
-        </tr>
-        <tr>
-            <th>Registration Date</th>
-            <td>@_feline.RegistrationDate</td>
-        </tr>
-        </tbody>
-    </table>
- 
-    @if (_comments.Count > 0)
+    <RadzenStack AlignItems="AlignItems.Center"
+                 JustifyContent="JustifyContent.SpaceBetween"
+                 Orientation="Orientation.Horizontal">
+        <h1>@_feline.Name</h1>
+        <h3>@_localNow.FormatLocalTime(TimeProvider)</h3>
+    </RadzenStack>
+    <RadzenRow AlignItems="AlignItems.Center" Gap="0.25rem">
+        <RadzenColumn>
+            <table class="vitals">
+                <caption>Vitals</caption>
+                <tbody>
+                <tr>
+                    <th>Animal ID</th>
+                    <td>@_feline.AnimalId</td>
+                </tr>
+                <tr>
+                    <th>Intake Date</th>
+                    <td>@_feline.IntakeDate</td>
+                </tr>
+                <tr>
+                    <th>Gender</th>
+                    <td>@_feline.Gender</td>
+                </tr>
+                <tr>
+                    <th>Age At Intake</th>
+                    <td>@_feline.IntakeAgeInWeeks</td>
+                </tr>
+                <tr>
+                    <th>Age</th>
+                    <td>@_feline.FormatAge(_localNow)</td>
+                </tr>
+                <tr>
+                    <th>Breed</th>
+                    <td>@_feline.Breed</td>
+                </tr>
+                <tr>
+                    <th>Color</th>
+                    <td>@_feline.Color</td>
+                </tr>
+                <tr>
+                    <th>Source</th>
+                    <td>@(_feline.Source?.Name)</td>
+                </tr>
+                <tr>
+                    <th>Fosterer</th>
+                    <td>@(_fosterer?.Name)</td>
+                </tr>
+                <tr>
+                    <th>Weaned</th>
+                    <td>@_feline.Weaned.ToDisplay()</td>
+                </tr>
+                <tr>
+                    <th>Registration Date</th>
+                    <td>@_feline.RegistrationDate</td>
+                </tr>
+                </tbody>
+            </table>
+        </RadzenColumn>
+        @if (_thumbnail is not null)
+        {
+            <RadzenColumn>
+                <img src="@_thumbnail.GetUrl()" alt="@_feline.Name"/>
+            </RadzenColumn>
+        }
+    </RadzenRow>
+    @if (_comments.Count > 0 && ShowJournal != false)
     {
         <table class="journal">
             <caption>Journal</caption>
@@ -75,15 +89,17 @@
             @foreach (var comment in _comments)
             {
                 <tr>
-                    <td>@comment.TimeStamp.ToString("g")</td>
-                    <td><RadzenHtml>@(new MarkupString(comment.Text))</RadzenHtml></td>
+                    <td>@comment.TimeStamp.FormatLocalTime(TimeProvider)</td>
+                    <td>
+                        <RadzenHtml>@(new MarkupString(comment.Text))</RadzenHtml>
+                    </td>
                 </tr>
             }
             </tbody>
         </table>
     }
-    
-    @if (_weights.Count > 0)
+
+    @if (_weights.Count > 0 && ShowWeights != false)
     {
         <table class="weights">
             <caption>Weights</caption>
@@ -97,8 +113,8 @@
             @foreach (var weight in _weights)
             {
                 <tr>
-                    <td>@weight.DateTime.ToString("g")</td>
-                    <td>@weight.Value.Format(weight.Units, WeightUnit.lbs)</td>
+                    <td>@weight.DateTime.FormatLocalTime(TimeProvider)</td>
+                    <td>@weight.Value.Format(weight.Units, _units)</td>
                 </tr>
             }
             </tbody>
@@ -113,27 +129,43 @@
     private Thumbnail? _thumbnail;
     private List<Comment> _comments = [];
     private List<Weight> _weights = [];
+    private DateTimeOffset _localNow;
+    private WeightUnit _units = WeightUnit.lbs;
+
+    [SupplyParameterFromQuery(Name = "journal")]
+    private bool? ShowJournal { get; set; }
+    
+    [SupplyParameterFromQuery(Name = "weights")]
+    private bool? ShowWeights { get; set; }
+
+    [SupplyParameterFromQuery(Name = "units")]
+    private string? Units { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
+        _localNow = TimeProvider.GetLocalNow();
+        if (string.IsNullOrWhiteSpace(Units) || !Enum.TryParse(Units, out _units))
+        {
+            _units = WeightUnit.lbs;
+        }
+        
         _feline = await DbContext
             .Felines
             .IgnoreQueryFilters()
             .AsNoTracking()
             .FirstOrDefaultAsync(f => f.Id == FelineId);
-        
         if (_feline is null)
         {
             NavigationManager.NavigateTo("/not-found");
             return;
         }
-        
+
         _fosterer = await DbContext
             .Fosterers
             .AsNoTracking()
             .Where(f => f.Id == _feline.FostererId)
             .FirstOrDefaultAsync();
-        
+
         _thumbnail = await DbContext
             .Thumbnails
             .AsNoTracking()
@@ -153,5 +185,6 @@
             .Where(c => c.FelineId == FelineId)
             .OrderByDescending(c => c.TimeStamp)
             .ToListAsync();
-    }    
+    }
+
 }
