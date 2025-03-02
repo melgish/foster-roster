@@ -32,7 +32,7 @@
                             <RadzenFormField AllowFloatingLabel="false" Text="Date" Variant="Variant.Text">
                                 <RadzenDatePicker @bind-Value="_model.DateTime"
                                                   Kind="DateTimeKind.Local"
-                                                  DateFormat="MM/dd/yyyy h:mm tt"
+                                                  DateFormat="g"
                                                   HourFormat="12"
                                                   Placeholder="MM/DD/YYYY hh:mm am"
                                                   ShowTime="true"/>
@@ -118,7 +118,7 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(GridRow.DateTime)" Title="Date" Width="20ch">
                     <Template Context="data">
-                        @data.DateTime.FormatLocalTime(TimeProvider, @"MMM dd \a\t hh:mm tt")
+                        @data.DateTime.FormatLocalTime(TimeProvider)
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(GridRow.Name)" Title="Name"/>

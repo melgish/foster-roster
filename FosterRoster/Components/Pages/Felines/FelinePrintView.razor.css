@@ -18,6 +18,7 @@ table {
 caption {
     font-weight: bold;
     text-align: start;
+    margin-bottom: 0.25rem;
 }
 
 th, td {
