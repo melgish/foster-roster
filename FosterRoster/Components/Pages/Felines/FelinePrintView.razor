@@ -51,11 +51,11 @@
                 </tr>
                 <tr>
                     <th>Source</th>
-                    <td>@(_feline.Source?.Name)</td>
+                    <td>@_source</td>
                 </tr>
                 <tr>
                     <th>Fosterer</th>
-                    <td>@(_fosterer?.Name)</td>
+                    <td>@_fosterer</td>
                 </tr>
                 <tr>
                     <th>Weaned</th>
@@ -125,12 +125,13 @@
 @code {
     [Parameter] public int FelineId { get; set; }
     private Feline? _feline;
-    private Fosterer? _fosterer;
+    private string? _fosterer;
     private Thumbnail? _thumbnail;
     private List<Comment> _comments = [];
     private List<Weight> _weights = [];
     private DateTimeOffset _localNow;
     private WeightUnit _units = WeightUnit.lbs;
+    private string? _source;
 
     [SupplyParameterFromQuery(Name = "journal")]
     private bool? ShowJournal { get; set; }
@@ -159,11 +160,19 @@
             NavigationManager.NavigateTo("/not-found");
             return;
         }
+        
+        _source = await DbContext
+            .Sources
+            .AsNoTracking()
+            .Where(s => s.Id == _feline.SourceId)
+            .Select(s => s.Name)
+            .FirstOrDefaultAsync();
 
         _fosterer = await DbContext
             .Fosterers
             .AsNoTracking()
             .Where(f => f.Id == _feline.FostererId)
+            .Select(f => f.Name)
             .FirstOrDefaultAsync();
 
         _thumbnail = await DbContext
