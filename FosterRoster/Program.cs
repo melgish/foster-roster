@@ -3,6 +3,7 @@ using FosterRoster.Components;
 using FosterRoster.Components.Account;
 using FosterRoster.Services;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Radzen;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
@@ -47,6 +48,12 @@ builder.Services
     .AddEntityFrameworkStores<FosterRosterDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
+
+builder
+    .Services
+    .AddDataProtection()
+    .SetApplicationName("Foster Roster")
+    .PersistKeysToDbContext<FosterRosterDbContext>();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
