@@ -1,0 +1,80 @@
+﻿img {
+    display: block;
+    width: 3in;
+    height: 3in;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 1rem;
+    border-radius: 1rem;
+}
+
+table {
+    --table-border: 1px solid silver;
+    border: var(--table-border);
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+caption {
+    font-weight: bold;
+    text-align: start;
+    margin-bottom: 0.25rem;
+}
+
+th, td {
+    padding: 0.25rem 0.5rem;
+    align-content: start;
+}
+
+th {
+    background-color: #f8f8f8;
+}
+
+td {
+    border-top: var(--table-border);
+}
+
+th:not(:first-child),
+td:not(:first-child) {
+    border-left: var(--table-border);
+}
+
+
+th:first-child,
+td:first-child {
+    text-align: start;
+    width: 20ch;
+}
+
+.weights th:last-child,
+.weights td:last-child {
+    text-align: end;
+    width: 12ch;
+}
+
+.journal {
+    width: 100%;
+}
+
+.journal th:last-child,
+.journal td:last-child {
+    text-align: start;
+}
+
+/* remove passing around HTML paragraphs */
+.journal td:last-child ::deep > p:first-child {
+    margin-block-start: 0;
+}
+
+.journal td:last-child ::deep > p:last-child {
+    margin-block-end: 0;
+}
+
+.vitals th {
+    text-align: end;
+    width: 18ch;
+}
+
+.vitals tr:not(:first-child) th {
+    border-top: var(--table-border);
+}

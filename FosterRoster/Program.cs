@@ -50,15 +50,15 @@ builder.Services
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+builder.Services.AddSingleton<TimeProvider, TexasTimeProvider>();
+builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
+builder.Services.AddValidatorsFromAssemblyContaining<App>();
+
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
 builder.Services.AddScoped<IFostererRepository, ServerFostererRepository>();
 builder.Services.AddScoped<ISourceRepository, ServerSourceRepository>();
 builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
-
-builder.Services.AddSingleton(TimeProvider.System);
-builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
-builder.Services.AddValidatorsFromAssemblyContaining<App>();
 
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenCookieThemeService(options =>
@@ -90,7 +90,8 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error", true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    // The default HSTS value is 30 days. You may want to change this for
+    // production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -98,12 +99,12 @@ app.UseHttpsRedirection();
 app.UseOutputCache();
 app.UseResponseCaching();
 app.UseAntiforgery();
+// Without this, local dev renders differently than docker container
+app.UseRequestLocalization("en-US");
 
 app.MapStaticAssets();
 app.MapControllers();
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
 

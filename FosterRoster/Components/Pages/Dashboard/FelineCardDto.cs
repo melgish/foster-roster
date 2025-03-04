@@ -12,9 +12,6 @@ public sealed record FelineCardDto
     public string Name { get; init; } = string.Empty;
     public uint? ThumbnailVersion { get; set; }
     
-    public string FormatAge(DateTimeOffset asOfDate)
-        => FelineExtensions.FormatAge(IntakeAgeInWeeks, IntakeDate, asOfDate);
-    
     public string GetThumbnailUrl()
         => ThumbnailExtensions.GetUrl(Id, ThumbnailVersion);
 }

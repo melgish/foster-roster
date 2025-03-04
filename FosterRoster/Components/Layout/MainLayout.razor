@@ -1,9 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@using System.Globalization
+@inherits LayoutComponentBase
 @* This is required by radzen to make the theme sticky *@
 @* ReSharper disable once UnusedMember.Local *@
 @inject CookieThemeService CookieThemeService
-
-
 <RadzenRow>
     <RadzenColumn OffsetXX="4" SizeXX="4" OffsetXL="3" SizeXL="6" OffsetLG="2" SizeLG="8" OffsetMD="1" SizeMD="10"
                   SizeSM="12">
@@ -15,7 +14,12 @@
                 @Body
             </RadzenBody>
             <RadzenFooter class="rz-py-0 rz-background-secondary-light">
-                <Verison/>
+                <RadzenStack 
+                    AlignItems="AlignItems.Center" 
+                    JustifyContent="JustifyContent.SpaceBetween"
+                    Orientation="Orientation.Horizontal">
+                    <Verison/>
+                </RadzenStack>
             </RadzenFooter>
         </RadzenLayout>
         <RadzenComponents/>

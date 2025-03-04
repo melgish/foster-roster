@@ -197,6 +197,16 @@ else
                                           Text="Inactivate"
                                           Variant="Variant.Outlined"/>
                         }
+                        @if (Feline.Id != 0)
+                        {
+                            <RadzenLink Path="@($"/felines/{Feline.Id}/print")" Target="print">
+                                <RadzenButton
+                                    ButtonStyle="ButtonStyle.Secondary"
+                                    Size="ButtonSize.Small"
+                                    Text="Print"
+                                    Variant="Variant.Outlined"/>
+                            </RadzenLink>
+                        }
                     </AppFormButtons>
                 </RadzenColumn>
             </RadzenRow>
