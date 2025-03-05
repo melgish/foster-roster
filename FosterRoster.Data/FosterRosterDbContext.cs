@@ -3,9 +3,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FosterRoster.Data;
 
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
-public class FosterRosterDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>
+public class FosterRosterDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int>, IDataProtectionKeyContext
+
 {
     public FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options) : base(options)
     {
@@ -17,6 +19,8 @@ public class FosterRosterDbContext : IdentityDbContext<ApplicationUser, Applicat
     public DbSet<Source> Sources { get; set; } = null!;
     public DbSet<Thumbnail> Thumbnails { get; set; } = null!;
     public DbSet<Weight> Weights { get; set; } = null!;
+    // IDataProtectionKeyContext
+    public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -199,13 +199,13 @@ else
                         }
                         @if (Feline.Id != 0)
                         {
-                            <RadzenLink Path="@($"/felines/{Feline.Id}/print")" Target="print">
-                                <RadzenButton
-                                    ButtonStyle="ButtonStyle.Secondary"
-                                    Size="ButtonSize.Small"
-                                    Text="Print"
-                                    Variant="Variant.Outlined"/>
-                            </RadzenLink>
+                            <RadzenButton
+                                ButtonStyle="ButtonStyle.Secondary"
+                                Click="@PrintAsync"
+                                Disabled="_isSaving"
+                                Size="ButtonSize.Small"
+                                Text="Print"
+                                Variant="Variant.Outlined"/>
                         }
                     </AppFormButtons>
                 </RadzenColumn>
@@ -299,6 +299,16 @@ else
         {
             _model.Thumbnail = await args.File.ToThumbnailAsync(_model.Id);
         }
+    }
+
+    private async Task PrintAsync()
+    {
+        var parameters = new Dictionary<string, object>()
+        {
+            { nameof(PrintOptionsDialog.FelineId), _model!.Id }
+        };
+
+        await DialogService.OpenAsync<PrintOptionsDialog>("Print Settings", parameters);
     }
 
     private Task ResetAsync()

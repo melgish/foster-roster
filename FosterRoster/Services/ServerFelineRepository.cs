@@ -192,27 +192,6 @@ public sealed class ServerFelineRepository(
     }
 
     /// <summary>
-    ///     Gets the thumbnail for a single feline.
-    /// </summary>
-    /// <param name="felineId">ID of the feline</param>
-    /// <returns>A Result with Thumbnail if found, or errors on failure.</returns>
-    public async Task<Result<Thumbnail>> GetThumbnailAsync(int felineId)
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
-                .Thumbnails
-                .AsNoTracking()
-                .Where(t => t.FelineId == felineId)
-                .SingleOrDefaultAsync() switch
-            {
-                null => Result.Fail(new NotFoundError()),
-                { } thumbnail => Result.Ok(thumbnail)
-            };
-    }
-
-    
-    
-    /// <summary>
     ///     Sets the thumbnail for a feline.
     /// </summary>
     /// <param name="felineId">ID of feline to change</param>
