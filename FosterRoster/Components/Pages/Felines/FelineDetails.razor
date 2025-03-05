@@ -25,7 +25,7 @@ else
             <RadzenTabs>
                 <Tabs>
                     <RadzenTabsItem Text="Journal" Icon="edit">
-                        <RadzenStack Gap="1rem" Style="margin:-1rem;">
+                        <RadzenStack Gap="0.75rem" Style="margin:-1rem;">
                             <CommentForm OnSave="AddCommentAsync" Model="@_newComment"/>
                             @foreach (var comment in _feline.Comments)
                             {
@@ -163,7 +163,7 @@ else
             _newComment = new() { FelineId = FelineId };
         }
     }
-
+    
     private async Task UpdateCommentAsync(Comment comment)
     {
         var rs = await CommentRepository.UpdateAsync(comment.Id, comment);
@@ -174,5 +174,4 @@ else
             await InvokeAsync(StateHasChanged);
         }
     }
-
 }

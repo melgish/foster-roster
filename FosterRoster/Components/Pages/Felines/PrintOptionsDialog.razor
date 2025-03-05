@@ -1,0 +1,83 @@
+﻿@using System.Collections.Immutable
+@inject DialogService DialogService
+
+<RadzenStack>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenCheckBoxList TValue="string" @bind-Value="_options" Orientation="Orientation.Vertical">
+                <Items>
+                    @foreach (var item in Sections)
+                    {
+                        <RadzenCheckBoxListItem Value="@item" Text="@item"/>
+                    }
+                </Items>
+            </RadzenCheckBoxList>
+        </RadzenColumn>
+        <RadzenColumn>
+            <RadzenFormField AllowFloatingLabel="false" Text="Weight Units" Variant="Variant.Text">
+                <RadzenDropDown @bind-Value="@_units" TValue="Enum" Data="@UnitChoices" />
+            </RadzenFormField>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack
+        AlignItems="AlignItems.Center"
+        Gap="0.5rem"
+        JustifyContent="JustifyContent.End"
+        Orientation="Orientation.Horizontal" >
+        <RadzenLink Path="@Path()" Target="print">
+            <RadzenButton
+                ButtonStyle="ButtonStyle.Secondary"
+                Size="ButtonSize.Small"
+                Text="Print"
+                Variant="Variant.Outlined"/>
+        </RadzenLink>
+        <RadzenButton 
+            ButtonStyle="ButtonStyle.Base" 
+            Click="@Cancel" 
+            Size="ButtonSize.Small"
+            Text="Close"
+            Variant="Variant.Outlined"/>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    /// <summary>
+    /// Choices used by the Units dropdown(s)
+    /// </summary>
+    private static readonly Enum[] UnitChoices =
+    [
+        WeightUnit.g,
+        WeightUnit.oz,
+        WeightUnit.lbs,
+        WeightUnit.kg
+    ];
+
+    private static readonly string[] Sections = ["Vitals", "Image", "Journal", "Weights"];
+    
+    [Parameter]
+    public int FelineId { get; set; }
+    
+    private IEnumerable<string> _options { get; set; } = [.. Sections];
+    private Enum _units = WeightUnit.lbs;
+    
+    private string Path()
+    {
+        var query = Sections
+            .OrderBy(s => s)
+            .Where(s => !_options.Contains(s))
+            .Aggregate(QueryString.Empty, (current, item) => current.Add(item.ToLowerInvariant(), "false"));
+        if (_options.Contains("Weights"))
+        {
+            query = query.Add("units", _units.ToString());
+        }
+        return $"/felines/{FelineId}/print{query}";
+    }
+    
+    void Cancel() => DialogService.Close(null);
+    
+    protected override void OnInitialized()
+    {
+        _options = [.. Sections];
+        _units = WeightUnit.lbs;
+    }
+}
