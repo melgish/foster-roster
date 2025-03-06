@@ -188,7 +188,7 @@ else
                                           Text="Activate"
                                           Variant="Variant.Outlined"/>
                         }
-                        else
+                        else if (_model.Id != 0)
                         {
                             <RadzenButton ButtonStyle="ButtonStyle.Info"
                                           Click="@InactivateAsync"
