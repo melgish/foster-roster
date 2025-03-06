@@ -61,7 +61,7 @@ td:first-child {
     text-align: start;
 }
 
-/* remove passing around HTML paragraphs */
+/* remove padding around HTML paragraphs */
 .journal td:last-child ::deep > p:first-child {
     margin-block-start: 0;
 }
