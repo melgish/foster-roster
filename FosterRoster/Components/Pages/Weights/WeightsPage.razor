@@ -227,7 +227,7 @@
             await using var context = await ContextFactory.CreateDbContextAsync();
             var query = context.Weights
                 .AsNoTracking()
-                .Include(w => w.Feline)
+                .Where(w => !w.Feline.IsInactive)
                 .Select(w => new GridRow()
                 {
                     FelineId = w.FelineId,
