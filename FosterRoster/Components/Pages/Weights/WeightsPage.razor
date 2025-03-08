@@ -56,10 +56,7 @@
                     </RadzenColumn>
                     <RadzenColumn SizeSM="6" SizeXS="12">
                         <RadzenStack Gap="0rem">
-                            <RadzenFormField AllowFloatingLabel="false" Text="Units" Variant="Variant.Text">
-                                <RadzenDropDown TValue="Enum" Value="@((Enum)_model.Units)" Data="@UnitChoices"
-                                                ValueChanged="@((args) => OnUnitsSelected((WeightUnit)args))"/>
-                            </RadzenFormField>
+                            <WeightUnitSelect Value="@_model.Units" ValueChanged="@OnUnitsSelected" />
                             <ValidationMessage For="@(() => _model.Units)"/>
                         </RadzenStack>
                     </RadzenColumn>
@@ -131,18 +128,6 @@
 </RadzenStack>
 
 @code {
-
-    /// <summary>
-    /// Choices used by the Units dropdown(s)
-    /// </summary>
-    private static readonly Enum[] UnitChoices =
-    [
-        WeightUnit.g,
-        WeightUnit.oz,
-        WeightUnit.lbs,
-        WeightUnit.kg
-    ];
-
     private RadzenDataGrid<GridRow>? _grid;
     private bool _isSaving;
     private WeightEditModel _model = new();

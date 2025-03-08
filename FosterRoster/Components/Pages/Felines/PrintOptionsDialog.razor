@@ -1,22 +1,25 @@
-﻿@using System.Collections.Immutable
+﻿@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
 @inject DialogService DialogService
+@inject ProtectedLocalStorage LocalStorage
 
 <RadzenStack>
     <RadzenRow>
         <RadzenColumn>
-            <RadzenCheckBoxList TValue="string" @bind-Value="_options" Orientation="Orientation.Vertical">
+            <RadzenCheckBoxList
+                TValue="PrintSection"
+                Value="_model.SelectedPrintSections"
+                ValueChanged="@(arg => _model.SelectedPrintSections = [.. arg])"
+                Orientation="Orientation.Vertical">
                 <Items>
-                    @foreach (var item in Sections)
+                    @foreach (var item in PrintOptions.PrintSections)
                     {
-                        <RadzenCheckBoxListItem Value="@item" Text="@item"/>
+                        <RadzenCheckBoxListItem Value="@item" Text="@item.ToString()" />
                     }
                 </Items>
             </RadzenCheckBoxList>
         </RadzenColumn>
         <RadzenColumn>
-            <RadzenFormField AllowFloatingLabel="false" Text="Weight Units" Variant="Variant.Text">
-                <RadzenDropDown @bind-Value="@_units" TValue="Enum" Data="@UnitChoices" />
-            </RadzenFormField>
+            <WeightUnitSelect Value="@_model.Units" />
         </RadzenColumn>
     </RadzenRow>
     <RadzenStack
@@ -24,9 +27,10 @@
         Gap="0.5rem"
         JustifyContent="JustifyContent.End"
         Orientation="Orientation.Horizontal" >
-        <RadzenLink Path="@Path()" Target="print">
+        <RadzenLink Path="@Path" Target="print">
             <RadzenButton
                 ButtonStyle="ButtonStyle.Secondary"
+                Click="@PersistOptions"
                 Size="ButtonSize.Small"
                 Text="Print"
                 Variant="Variant.Outlined"/>
@@ -41,43 +45,24 @@
 </RadzenStack>
 
 @code {
-    /// <summary>
-    /// Choices used by the Units dropdown(s)
-    /// </summary>
-    private static readonly Enum[] UnitChoices =
-    [
-        WeightUnit.g,
-        WeightUnit.oz,
-        WeightUnit.lbs,
-        WeightUnit.kg
-    ];
-
-    private static readonly string[] Sections = ["Vitals", "Image", "Journal", "Weights"];
-    
     [Parameter]
     public int FelineId { get; set; }
     
-    private IEnumerable<string> _options { get; set; } = [.. Sections];
-    private Enum _units = WeightUnit.lbs;
-    
-    private string Path()
-    {
-        var query = Sections
-            .OrderBy(s => s)
-            .Where(s => !_options.Contains(s))
-            .Aggregate(QueryString.Empty, (current, item) => current.Add(item.ToLowerInvariant(), "false"));
-        if (_options.Contains("Weights"))
-        {
-            query = query.Add("units", _units.ToString());
-        }
-        return $"/felines/{FelineId}/print{query}";
-    }
+    private PrintOptions _model = new();
+
+    private string Path => $"/felines/{FelineId}/print{_model}";
     
     void Cancel() => DialogService.Close(null);
     
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        _options = [.. Sections];
-        _units = WeightUnit.lbs;
+        var rs = await LocalStorage.GetAsync<PrintOptions>(nameof(PrintOptions));
+        _model = rs.Value ?? new();
+    }
+    
+    async Task PersistOptions()
+    {
+        await LocalStorage.SetAsync(nameof(PrintOptions), _model);
+        DialogService.Close(null);
     }
 }
