@@ -1,8 +1,5 @@
 ﻿namespace FosterRoster.Components.Pages.Felines;
 
-using System.ComponentModel;
-using System.Text.Json.Serialization;
-
 public enum PrintSection
 {
     Vitals,
@@ -20,8 +17,14 @@ public sealed class PrintOptions
         PrintSection.Weights
     ];
 
+    /// <summary>
+    /// Gets or sets the selected print sections.
+    /// </summary>
     public PrintSection[] SelectedPrintSections { get; set; } = [..PrintSections];
 
+    /// <summary>
+    /// Gets or sets the units to display for each weight.
+    /// </summary>
     public WeightUnit Units { get; set; } = WeightUnit.lbs;
 
     /// <summary>
@@ -30,6 +33,8 @@ public sealed class PrintOptions
     /// <returns>string representation of options for Url</returns>
     public override string ToString()
     {
+        // The default is to print everything using lbs.
+        // Just include the differences in the output.
         var query = PrintSections
             .Except(SelectedPrintSections)
             .Aggregate(QueryString.Empty, (current, section) => current.Add(section.ToString(), "false"));
