@@ -119,7 +119,7 @@
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(GridRow.Name)" Title="Name"/>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Value)" Title="Weight" Width="16ch">
+                <RadzenDataGridColumn Property="@nameof(GridRow.Value)" TextAlign="TextAlign.End" Title="Weight" Width="16ch" >
                     <Template Context="data">@data.Value.Format(data.Units, _units)</Template>
                 </RadzenDataGridColumn>
             </Columns>

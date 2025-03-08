@@ -33,6 +33,8 @@ public sealed class PrintOptions
     /// <returns>string representation of options for Url</returns>
     public override string ToString()
     {
+        Console.WriteLine(string.Join(",", SelectedPrintSections));
+        Console.WriteLine(Units);
         // The default is to print everything using lbs.
         // Just include the differences in the output.
         var query = PrintSections
@@ -40,7 +42,7 @@ public sealed class PrintOptions
             .Aggregate(QueryString.Empty, (current, section) => current.Add(section.ToString(), "false"));
         if (SelectedPrintSections.Contains(PrintSection.Weights) && Units != WeightUnit.lbs)
         {
-            query.Add("Units", Units.ToString());
+            query = query.Add("Units", Units.ToString());
         }
         return query.ToString();
     }
