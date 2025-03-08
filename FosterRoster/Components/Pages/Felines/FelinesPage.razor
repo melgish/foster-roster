@@ -1,4 +1,5 @@
 ﻿@page "/felines"
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject NotificationService NotificationService
 @inject IDbContextFactory<FosterRosterDbContext> ContextFactory
 
@@ -6,6 +7,7 @@
 <RadzenStack>
     <RadzenPanel class="rz-p-0 rz-shadow-3">
         <RadzenDataGrid
+            @ref="_grid"
             TItem="GridRow"
             AllowFiltering="true"
             AllowPaging="true"
@@ -20,7 +22,7 @@
             PagerHorizontalAlign="HorizontalAlign.Center"
             PagerPosition="PagerPosition.Top"
             PageSize="20"
-            PageSizeOptions="@( [10, 20, 50, 100])"
+            PageSizeOptions="@([10, 20, 50, 100])"
             PagingSummaryFormat="Showing {0} to {1} of {2}"
             ShowPagingSummary="true">
             <HeaderTemplate>
@@ -60,14 +62,12 @@
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.Name)"
                     SortOrder="SortOrder.Ascending"
-
                     Title="Name"/>
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.FostererName)"
-                    Title="Fosterer"
-                />
+                    Title="Fosterer"/>
                 <RadzenDataGridColumn
-                    FilterValue="_isInactiveFilter"
+                    FilterValue="@_isInactiveFilter"
                     Property="@nameof(GridRow.IsInactive)"
                     Title="Inactive"
                     Width="20ch">
@@ -88,7 +88,8 @@
     private int _count;
     private IEnumerable<GridRow>? _data;
     private bool? _isInactiveFilter = false;
-
+    private RadzenDataGrid<GridRow>? _grid;
+    
     private sealed class GridRow
     {
         public int Id { get; init; }
@@ -128,5 +129,18 @@
         {
             _isLoading = false;
         }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && _grid is not null)
+        {
+            // Load initial filter values into the grid.
+            await _grid.ColumnsCollection
+                .First(e => e.Property == nameof(GridRow.IsInactive))
+                .SetFilterValueAsync(_isInactiveFilter);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
     }
 }
