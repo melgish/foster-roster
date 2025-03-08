@@ -13,7 +13,7 @@
         WeightUnit.kg
     ];
     
-    private async Task UpdateAsync(Enum value) => await ValueChanged.InvokeAsync(Value);
+    private async Task UpdateAsync(Enum newValue) => await ValueChanged.InvokeAsync((WeightUnit)newValue);
 
     [Parameter] public WeightUnit Value { get; set; } = WeightUnit.lbs;
     

@@ -19,7 +19,7 @@
             </RadzenCheckBoxList>
         </RadzenColumn>
         <RadzenColumn>
-            <WeightUnitSelect Value="@_model.Units" />
+            <WeightUnitSelect @bind-Value="_model.Units" />
         </RadzenColumn>
     </RadzenRow>
     <RadzenStack
@@ -62,7 +62,9 @@
     
     async Task PersistOptions()
     {
+        await InvokeAsync(StateHasChanged);
         await LocalStorage.SetAsync(nameof(PrintOptions), _model);
+        
         DialogService.Close(null);
     }
 }
