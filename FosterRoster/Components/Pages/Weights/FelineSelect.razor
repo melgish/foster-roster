@@ -1,17 +1,19 @@
 @inject IFelineRepository FelineRepository;
 
-<RadzenDropDown TValue="int"
-                @attributes="@Attributes"
-                AllowFiltering="true"
-                Data="@_data"
-                Disabled="@Disabled"
-                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                FilterOperator="StringFilterOperator.StartsWith"
-                FilterPlaceholder="Search..."
-                TextProperty="@nameof(ListItem<int>.Name)"
-                Value="@Value.GetValueOrDefault()"
-                ValueChanged="@ValueChanged"
-                ValueProperty="@nameof(ListItem<int>.Id)"/>
+<RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
+    <RadzenDropDown TValue="int"
+                    @attributes="@Attributes"
+                    AllowFiltering="true"
+                    Data="@_data"
+                    Disabled="@Disabled"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    FilterOperator="StringFilterOperator.StartsWith"
+                    FilterPlaceholder="Search..."
+                    TextProperty="@nameof(ListItem<int>.Name)"
+                    Value="@Value.GetValueOrDefault()"
+                    ValueChanged="@ValueChanged"
+                    ValueProperty="@nameof(ListItem<int>.Id)"/>
+</RadzenFormField>
 
 @code {
     private List<ListItem<int>> _data = [];

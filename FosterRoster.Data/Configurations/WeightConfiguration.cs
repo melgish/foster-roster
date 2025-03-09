@@ -31,5 +31,7 @@ internal class WeightConfiguration : IEntityTypeConfiguration<Weight>
             .Property(e => e.Units)
             .HasConversion<string>()
             .IsRequired();
+
+        builder.HasQueryFilter(e => !e.Feline.IsInactive);
     }
 }
