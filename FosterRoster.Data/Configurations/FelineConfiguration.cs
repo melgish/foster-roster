@@ -99,7 +99,7 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .WithOne(e => e.Feline)
             .HasForeignKey(e => e.FelineId)
             .HasConstraintName("FK_Weights_Felines")
-            .IsRequired(false)
+            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
