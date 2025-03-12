@@ -16,6 +16,7 @@
             Data="_data"
             Density="Density.Compact"
             FilterMode="FilterMode.Simple"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
             IsLoading="_isLoading"
             LoadData="LoadDataAsync"
             PageNumbersCount="1"
@@ -62,6 +63,7 @@
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.Name)"
                     SortOrder="SortOrder.Ascending"
+                    
                     Title="Name"/>
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.FostererName)"
