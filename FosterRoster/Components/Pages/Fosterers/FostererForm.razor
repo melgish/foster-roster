@@ -18,7 +18,7 @@ else
                 <RadzenColumn SizeSm="6" SizeXS="12">
                     <RadzenStack Gap="0rem">
                         <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
-                            <RadzenTextBox @bind-Value="_model.Name" Disabled="@_model.IsInactive"/>
+                            <RadzenTextBox @bind-Value="_model.Name"/>
                         </RadzenFormField>
                         <ValidationMessage For="@(() => _model.Name)"/>
                     </RadzenStack>
@@ -28,7 +28,6 @@ else
                         <RadzenFormField AllowFloatingLabel="false" Text="Phone" Variant="Variant.Text">
                             <RadzenMask @bind-Value="_model.Phone"
                                         CharacterPattern="[0-9]"
-                                        Disabled="@_model.IsInactive"
                                         Mask="***-***-****"
                                         Placeholder="000-000-0000"/>
                         </RadzenFormField>
@@ -40,8 +39,7 @@ else
                 <RadzenColumn SizeSm="6" SizeXS="12">
                     <RadzenStack Gap="0rem">
                         <RadzenFormField AllowFloatingLabel="false" Text="Email" Variant="Variant.Text">
-                            <RadzenTextBox @bind-Value="_model.Email"
-                                           Disabled="@_model.IsInactive"/>
+                            <RadzenTextBox @bind-Value="_model.Email"/>
                         </RadzenFormField>
                         <ValidationMessage For="@(() => _model.Email)"/>
                     </RadzenStack>
@@ -50,8 +48,7 @@ else
                     <RadzenStack Gap="0rem">
                         <RadzenFormField AllowFloatingLabel="false" Text="Contact Method" Variant="Variant.Text">
                             <RadzenDropDown @bind-Value="_model.ContactMethod"
-                                            Data="@ContactMethodChoices"
-                                            Disabled="@_model.IsInactive"/>
+                                            Data="@ContactMethodChoices"/>
                         </RadzenFormField>
                         <ValidationMessage For="@(() => _model.ContactMethod)"/>
                     </RadzenStack>
@@ -62,7 +59,6 @@ else
                     <RadzenStack Gap="0rem">
                         <RadzenFormField AllowFloatingLabel="false" Text="Address" Variant="Variant.Text">
                             <RadzenTextArea @bind-Value="_model.Address"
-                                            Disabled="@_model.IsInactive"
                                             Placeholder="@("Name\nStreet\nCity, State Zip")"
                                             Rows="3"/>
                         </RadzenFormField>
@@ -75,7 +71,6 @@ else
                     <AppFormButtons
                         Busy="_isSaving"
                         CanDelete="Fosterer.Id != 0"
-                        Disabled="_model.IsInactive"
                         OnDelete="DeleteAsync"
                         OnReset="ResetAsync"/>
                 </RadzenColumn>

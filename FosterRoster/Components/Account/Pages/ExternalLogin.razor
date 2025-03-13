@@ -44,9 +44,9 @@
     private string? _message;
     private ExternalLoginInfo? _externalLoginInfo;
 
-    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
 
-    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
+    [SupplyParameterFromForm] private InputModel Input { get; } = new();
 
     [SupplyParameterFromQuery] private string? RemoteError { get; set; }
 
@@ -163,7 +163,7 @@
         _message = $"Error: {string.Join(",", result.Errors.Select(error => error.Description))}";
     }
 
-    private ApplicationUser CreateUser()
+    private static ApplicationUser CreateUser()
     {
         try
         {

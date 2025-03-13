@@ -1,6 +1,6 @@
 namespace FosterRoster.Domain;
 
-public sealed class Feline : IInactivatable
+public sealed class Feline
 {
     public string? AnimalId { get; set; }
     public string? Breed { get; set; }
@@ -17,7 +17,7 @@ public sealed class Feline : IInactivatable
     public bool IsInactive { get; set; }
     public string Name { get; set; } = string.Empty;
     public DateOnly? RegistrationDate { get; set; }
-    public Source? Source { get; set; }
+    public Source? Source { get; init; }
     public int? SourceId { get; set; }
     public Thumbnail? Thumbnail { get; set; }
     public Weaned Weaned { get; set; }

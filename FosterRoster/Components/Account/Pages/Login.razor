@@ -91,7 +91,7 @@
 
     [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
 
-    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
+    [SupplyParameterFromForm] private InputModel Input { get; } = new();
 
     [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
 

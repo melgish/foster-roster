@@ -5,7 +5,7 @@ public sealed class Thumbnail
     /// <summary>
     /// The ID of the feline this thumbnail is associated with.
     /// </summary>
-    public int FelineId { get; set; }
+    public int FelineId { get; init; }
 
     /// <summary>
     /// The image data for the thumbnail.
@@ -15,7 +15,7 @@ public sealed class Thumbnail
     /// <summary>
     /// The version of the thumbnail, used for cache busting.
     /// </summary>
-    public uint Version { get; set; }
+    public uint Version { get; init; }
 
     /// <summary>
     /// The content type of the image data. Will be image/png unless something

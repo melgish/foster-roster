@@ -8,8 +8,6 @@ public sealed class FostererEditModel()
         ContactMethod = fosterer.ContactMethod;
         Email = fosterer.Email;
         Id = fosterer.Id;
-        InactivatedAtUtc = fosterer.InactivatedAtUtc;
-        IsInactive = fosterer.IsInactive;
         Name = fosterer.Name;
         Phone = fosterer.Phone;
     }
@@ -32,17 +30,7 @@ public sealed class FostererEditModel()
     /// <summary>
     ///     Unique identifier for the Fosterer
     /// </summary>
-    public int Id { get; set; }
-
-    /// <summary>
-    ///     Date and time the Fosterer was inactivated
-    /// </summary>
-    public DateTimeOffset? InactivatedAtUtc { get; set; }
-
-    /// <summary>
-    ///     True if the Fosterer is not active.
-    /// </summary>
-    public bool IsInactive { get; set; }
+    private int Id { get; }
 
     /// <summary>
     ///     Gets / Sets teh name of the Fosterer
@@ -61,8 +49,6 @@ public sealed class FostererEditModel()
             ContactMethod = ContactMethod,
             Email = string.IsNullOrWhiteSpace(Email) ? null : Email.Trim(),
             Id = Id,
-            InactivatedAtUtc = InactivatedAtUtc,
-            IsInactive = IsInactive,
             Name = Name.Trim(),
             Phone = string.IsNullOrWhiteSpace(Phone) ? null : Phone.Trim()
         };

@@ -8,10 +8,10 @@ public sealed class FelineEditModel()
     public string? Color { get; set; } = string.Empty;
     public int? FostererId { get; set; }
     public Gender Gender { get; set; }
-    public int Id { get; set; }
+    public int Id { get; }
     public int? IntakeAgeInWeeks { get; set; }
-    public bool IsInactive { get; init; }
-    public DateTimeOffset? InactivatedAtUtc { get; init; }
+    public bool IsInactive { get; }
+    public DateTimeOffset? InactivatedAtUtc { get; }
     public DateOnly? IntakeDate { get; set; }
     public string Name { get; set; } = string.Empty;
     public DateOnly? RegistrationDate { get; set; }
