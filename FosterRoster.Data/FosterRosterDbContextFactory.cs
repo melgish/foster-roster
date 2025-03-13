@@ -1,9 +1,11 @@
+namespace FosterRoster.Data;
+
+using JetBrains.Annotations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace FosterRoster.Data;
-
-public class FosterRosterDbContextFactory
+[UsedImplicitly]
+public sealed class FosterRosterDbContextFactory
     : IDesignTimeDbContextFactory<FosterRosterDbContext>
 {
     public FosterRosterDbContext CreateDbContext(string[] args)

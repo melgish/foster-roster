@@ -10,7 +10,7 @@ public sealed record FelineCardDto
     public int? IntakeAgeInWeeks { get; init; }
     public DateOnly IntakeDate { get; init; }
     public string Name { get; init; } = string.Empty;
-    public uint? ThumbnailVersion { get; set; }
+    public uint? ThumbnailVersion { get; init; }
     
     public string GetThumbnailUrl()
         => ThumbnailExtensions.GetUrl(Id, ThumbnailVersion);

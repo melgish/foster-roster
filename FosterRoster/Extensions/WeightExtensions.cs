@@ -6,7 +6,7 @@ public static class WeightExtensions
     private const float PerOz = 28.3495f;
     private const float PerLb = 453.592f;
 
-    public static float Convert(this float value, WeightUnit from, WeightUnit to)
+    private static float Convert(this float value, WeightUnit from, WeightUnit to)
         => from switch
         {
             WeightUnit.g => to switch
@@ -56,37 +56,5 @@ public static class WeightExtensions
             _ => throw new InvalidOperationException($"Unknown weight unit: {to}")
         };
         return $"{value.ToString(format)} {to}";
-    }
-
-    private static Weight Copy(this Weight weight, float value, WeightUnit units)
-        => new()
-        {
-            FelineId = weight.FelineId,
-            DateTime = weight.DateTime,
-            Value = value,
-            Units = units,
-            Feline = weight.Feline
-        };
-
-    private static Weight ConvertUnits(this Weight weight, WeightUnit units)
-        => weight.Units == units
-            ? weight
-            : weight.Copy(Convert(weight.Value, weight.Units, units), units);
-
-
-    public static string Format(this Weight weight, WeightUnit? units = null)
-    {
-        units ??= weight.Units;
-        var value = weight.ConvertUnits(units.Value).Value;
-        var format = units switch
-        {
-            WeightUnit.g => "N0",
-            WeightUnit.kg => "N2",
-            WeightUnit.oz => "N0",
-            WeightUnit.lbs => "N2",
-            _ => throw new InvalidOperationException($"Unknown weight unit: {units}")
-        };
-
-        return $"{value.ToString(format)} {units}";
     }
 }

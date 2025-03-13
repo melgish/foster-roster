@@ -1,10 +1,14 @@
 ﻿namespace FosterRoster.Extensions;
 
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 
 public static class EnumExtensions
 {
+    /// <summary>
+    /// Use display attribute to get a human-readable name for an enum value.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static string ToDisplay(this Enum value)
     {
         var stringValue = value.ToString();

@@ -278,7 +278,7 @@ else
     /// </summary>
     private async Task InactivateAsync()
     {
-        var parameters = new Dictionary<string, object>()
+        var parameters = new Dictionary<string, object>
         {
             { nameof(ConfirmInactivateFelineDialog.Feline), _model! }
         };
@@ -303,7 +303,7 @@ else
 
     private async Task PrintAsync()
     {
-        var parameters = new Dictionary<string, object>()
+        var parameters = new Dictionary<string, object>
         {
             { nameof(PrintOptionsDialog.FelineId), _model!.Id }
         };

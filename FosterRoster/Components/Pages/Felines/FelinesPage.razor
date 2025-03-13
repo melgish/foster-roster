@@ -114,7 +114,7 @@
                 .IgnoreQueryFilters()
                 .AsNoTracking()
                 .Include(f => f.Fosterer)
-                .Select(f => new GridRow()
+                .Select(f => new GridRow
                 {
                     Id = f.Id,
                     Name = f.Name,

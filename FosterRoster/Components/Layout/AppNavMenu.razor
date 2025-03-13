@@ -26,7 +26,7 @@
             <RadzenProfileMenu Style="margin-left: auto;padding-left: 0">
                 <Template>@context.User.Identity?.Name</Template>
                 <ChildContent>
-                    <form action="account/logout" method="post" name="logoutForm">
+                    <form action="@("account/logout")" method="post" name="logoutForm">
                         <AntiforgeryToken/>
                         <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
                     </form>

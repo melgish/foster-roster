@@ -22,7 +22,7 @@ internal static class ThumbnailExtensions
 
         // Copy the image data into a byte array
         using var memory = new MemoryStream();
-        using var stream = image.OpenReadStream();
+        await using var stream = image.OpenReadStream();
         await stream.CopyToAsync(memory);
 
         return new()
@@ -39,8 +39,8 @@ internal static class ThumbnailExtensions
     public static string GetUrl(this Thumbnail? thumbnail)
         => thumbnail switch
         {
-            { ImageData: { Length: 0 } } => $"thumbnails/{thumbnail.FelineId}?v={thumbnail.Version}",
-            { ImageData: { Length: > 0 } } => $"data:{thumbnail.ContentType};base64,{Convert.ToBase64String(thumbnail.ImageData)}",
+            { ImageData.Length: 0 } => $"thumbnails/{thumbnail.FelineId}?v={thumbnail.Version}",
+            { ImageData.Length: > 0 } => $"data:{thumbnail.ContentType};base64,{Convert.ToBase64String(thumbnail.ImageData)}",
             _ => NoImage
         };
 }

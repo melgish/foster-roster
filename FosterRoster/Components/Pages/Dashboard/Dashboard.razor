@@ -42,7 +42,7 @@
     /// <param name="feline">Updated card</param>
     private void OnFelineChanged(FelineCardDto feline)
     {
-        _felines = _felines!.Select(f => f.Id == feline.Id ? feline : f).ToList();
+        _felines = _felines.Select(f => f.Id == feline.Id ? feline : f).ToList();
     }
 
     protected override async Task OnInitializedAsync()

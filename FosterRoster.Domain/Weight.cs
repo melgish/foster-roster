@@ -1,10 +1,10 @@
 namespace FosterRoster.Domain;
 
-public class Weight
+public sealed class Weight
 {
-    public DateTimeOffset DateTime { get; set; }
-    public virtual Feline Feline { get; set; } = null!;
-    public int FelineId { get; set; }
-    public WeightUnit Units { get; set; } = WeightUnit.g;
-    public float Value { get; set; }
+    public DateTimeOffset DateTime { get; init; }
+    public Feline Feline { get; init; } = null!;
+    public int FelineId { get; init; }
+    public WeightUnit Units { get; init; } = WeightUnit.g;
+    public float Value { get; init; }
 }

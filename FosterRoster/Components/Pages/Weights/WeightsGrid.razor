@@ -116,7 +116,7 @@
                 FelineId == 0
                     ? context.Weights.AsNoTracking()
                     : context.Weights.AsNoTracking().Where(e => e.FelineId == FelineId)
-            ).Select(w => new WeightGridRow()
+            ).Select(w => new WeightGridRow
             {
                 FelineId = w.FelineId,
                 DateTime = w.DateTime,
