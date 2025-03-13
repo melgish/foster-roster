@@ -6,7 +6,7 @@ public enum WeightUnit
 {
     // Names are intentionally lowercase to match the database values.
     // Resharper disable InconsistentNaming
-    
+
     [Display(Description = "Grams", Name = "Grams", ShortName = "g")]
     g = 0,
 
@@ -18,6 +18,6 @@ public enum WeightUnit
 
     [Display(Description = "Kilograms", Name = "Kilograms", ShortName = "kg")]
     kg = 3
-    
+
     // Resharper restore InconsistentNaming
 }

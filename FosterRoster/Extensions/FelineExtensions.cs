@@ -21,10 +21,10 @@ public static class FelineExtensions
             _ => "Age unknown"
         };
     }
-    
-    public static string FormatAge(this Feline feline, DateTimeOffset asOfDate) 
+
+    public static string FormatAge(this Feline feline, DateTimeOffset asOfDate)
         => FormatAge(feline.IntakeAgeInWeeks, feline.IntakeDate, asOfDate);
 
-    public static string FormatAge(this FelineCardDto feline, DateTimeOffset asOfDate) 
+    public static string FormatAge(this FelineCardDto feline, DateTimeOffset asOfDate)
         => FormatAge(feline.IntakeAgeInWeeks, feline.IntakeDate, asOfDate);
 }

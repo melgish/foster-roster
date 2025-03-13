@@ -32,7 +32,7 @@ internal static class ThumbnailExtensions
             ContentType = image.ContentType
         };
     }
-    
+
     public static string GetUrl(int felineId, uint? version)
         => version is null ? NoImage : $"thumbnails/{felineId}?v={version}";
 
@@ -40,7 +40,8 @@ internal static class ThumbnailExtensions
         => thumbnail switch
         {
             { ImageData.Length: 0 } => $"thumbnails/{thumbnail.FelineId}?v={thumbnail.Version}",
-            { ImageData.Length: > 0 } => $"data:{thumbnail.ContentType};base64,{Convert.ToBase64String(thumbnail.ImageData)}",
+            { ImageData.Length: > 0 } =>
+                $"data:{thumbnail.ContentType};base64,{Convert.ToBase64String(thumbnail.ImageData)}",
             _ => NoImage
         };
 }

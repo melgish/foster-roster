@@ -18,8 +18,8 @@ public static class EnumExtensions
                 .SelectMany(e => e.GetCustomAttributes(false).OfType<DisplayAttribute>())
                 .FirstOrDefault() switch
             {
-                { Description: {} description } => description,
-                { Name: {} name } => name,
+                { Description: { } description } => description,
+                { Name: { } name } => name,
                 _ => stringValue
             };
     }

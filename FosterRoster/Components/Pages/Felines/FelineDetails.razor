@@ -163,7 +163,7 @@ else
             _newComment = new() { FelineId = FelineId };
         }
     }
-    
+
     private async Task UpdateCommentAsync(Comment comment)
     {
         var rs = await CommentRepository.UpdateAsync(comment.Id, comment);
@@ -174,4 +174,5 @@ else
             await InvokeAsync(StateHasChanged);
         }
     }
+
 }

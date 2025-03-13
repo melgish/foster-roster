@@ -2,7 +2,7 @@
     color: var(--rz-on-info-darker);
     background-color: var(--rz-info-lighter);
     border-color: var(--rz-info);
-    
+
     border-width: 1px;
     border-style: solid;
     border-radius: 0.25rem;
@@ -19,5 +19,5 @@
 .status-message.danger {
     color: var(--rz-on-danger-darker);
     background-color: var(--rz-danger-lighter);
-    border-color: var(--rz-danger);    
+    border-color: var(--rz-danger);
 }

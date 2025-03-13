@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace FosterRoster.Components.Account;
+
 // Remove the "else if (EmailSender is IdentityNoOpEmailSender)" block from RegisterConfirmation.razor after updating with a real implementation.
 internal sealed class IdentityNoOpEmailSender : IEmailSender<ApplicationUser>
 {

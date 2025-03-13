@@ -28,9 +28,9 @@
                 <ChildContent>
                     <form action="@("account/logout")" method="post" name="logoutForm">
                         <AntiforgeryToken/>
-                        <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
+                        <input type="hidden" name="ReturnUrl" value="@_currentUrl"/>
                     </form>
-                    <RadzenProfileMenuItem Text="Logout" Path="javascript:document.forms['logoutForm'].submit();" />
+                    <RadzenProfileMenuItem Text="Logout" Path="javascript:document.forms['logoutForm'].submit();"/>
                     <RadzenProfileMenuItem Path="/account/manage/changePassword" Text="Change Password"/>
                 </ChildContent>
             </RadzenProfileMenu>
@@ -41,21 +41,21 @@
     </AuthorizeView>
     <RadzenMenuItem>
         <Template>
-            <RadzenAppearanceToggle Variant="Variant.Text" />
+            <RadzenAppearanceToggle Variant="Variant.Text"/>
         </Template>
     </RadzenMenuItem>
     <RadzenMenuItem Path="https://github.com/melgish/foster-roster" Target="_blank">
         <Template>
-            <GitHubIcon />
+            <GitHubIcon/>
         </Template>
     </RadzenMenuItem>
 </RadzenMenu>
 
 @code {
     private string? _currentUrl;
-    
+
     [CascadingParameter] private HttpContext? HttpContext { get; set; } = null;
-    
+
     private bool IsInteractive => HttpContext?.AcceptsInteractiveRouting() ?? false;
 
     protected override void OnInitialized()
@@ -63,7 +63,6 @@
         _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
     }
-    
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
@@ -75,4 +74,5 @@
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
+
 }

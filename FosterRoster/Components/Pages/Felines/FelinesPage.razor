@@ -1,5 +1,5 @@
 ﻿@page "/felines"
-@rendermode @(new InteractiveServerRenderMode(prerender: false))
+@rendermode @(new InteractiveServerRenderMode(false))
 @inject NotificationService NotificationService
 @inject IDbContextFactory<FosterRosterDbContext> ContextFactory
 
@@ -23,7 +23,7 @@
             PagerHorizontalAlign="HorizontalAlign.Center"
             PagerPosition="PagerPosition.Top"
             PageSize="20"
-            PageSizeOptions="@([10, 20, 50, 100])"
+            PageSizeOptions="@( [10, 20, 50, 100])"
             PagingSummaryFormat="Showing {0} to {1} of {2}"
             ShowPagingSummary="true">
             <HeaderTemplate>
@@ -63,7 +63,7 @@
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.Name)"
                     SortOrder="SortOrder.Ascending"
-                    
+
                     Title="Name"/>
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.FostererName)"
@@ -91,7 +91,7 @@
     private IEnumerable<GridRow>? _data;
     private bool? _isInactiveFilter = false;
     private RadzenDataGrid<GridRow>? _grid;
-    
+
     private sealed class GridRow
     {
         public int Id { get; init; }
@@ -99,7 +99,7 @@
         public string FostererName { get; init; } = string.Empty;
         public bool IsInactive { get; init; }
     }
-    
+
     /// <summary>
     ///     Called by grid to fetch data. 
     /// </summary>
@@ -145,4 +145,5 @@
 
         await base.OnAfterRenderAsync(firstRender);
     }
+
 }

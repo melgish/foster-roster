@@ -16,8 +16,8 @@ public sealed class ThumbnailsController(
     /// <returns>File if found, otherwise 404</returns>
     [AllowAnonymous]
     [HttpGet("{felineId:int}")]
-    [OutputCache(Duration = 60*60*24, VaryByQueryKeys = ["v"])]
-    [ResponseCache(Duration = 60*60*24*7, VaryByQueryKeys = ["v"])]
+    [OutputCache(Duration = 60 * 60 * 24, VaryByQueryKeys = ["v"])]
+    [ResponseCache(Duration = 60 * 60 * 24 * 7, VaryByQueryKeys = ["v"])]
     public async Task<IActionResult> GetThumbnailAsync(int felineId)
     {
         var thumbnail = await dbContext

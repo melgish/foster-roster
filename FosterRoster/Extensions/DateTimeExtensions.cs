@@ -18,9 +18,10 @@ public static class DateTimeExtensions
     /// <param name="timeProvider">TimeProvider with timezone to use for conversion.</param>
     /// <param name="format">Output format</param>
     /// <returns>Formatted time value</returns>
-    public static string FormatLocalTime(this DateTimeOffset dateTimeOffset, TimeProvider timeProvider, string format = "g")
+    public static string FormatLocalTime(this DateTimeOffset dateTimeOffset, TimeProvider timeProvider,
+        string format = "g")
         => ToLocalTime(dateTimeOffset, timeProvider).ToString(format);
-    
+
     /// <summary>
     /// Formats a DateTimeOffset as a relative time string.
     /// </summary>

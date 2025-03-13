@@ -10,7 +10,8 @@ public enum PrintSection
 
 public sealed class PrintOptions
 {
-    public static readonly PrintSection[] PrintSections = [
+    public static readonly PrintSection[] PrintSections =
+    [
         PrintSection.Vitals,
         PrintSection.Image,
         PrintSection.Journal,
@@ -41,9 +42,7 @@ public sealed class PrintOptions
             .Except(SelectedPrintSections)
             .Aggregate(QueryString.Empty, (current, section) => current.Add(section.ToString(), "false"));
         if (SelectedPrintSections.Contains(PrintSection.Weights) && Units != WeightUnit.lbs)
-        {
             query = query.Add("Units", Units.ToString());
-        }
         return query.ToString();
     }
 }
