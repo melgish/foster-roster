@@ -1,4 +1,5 @@
-﻿@inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
+﻿@using FosterRoster.Components.Shared
+@inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
 @inject TimeProvider TimeProvider
 
 <div class="weights-grid">
@@ -22,17 +23,20 @@
         <HeaderTemplate>
             <RadzenStack
                 AlignItems="AlignItems.Center"
-                class="rz-w-100 rz-py-1 rz-px-2"
+                class="rz-py-1 rz-px-2"
+                Gap="0.5rem"
                 JustifyContent="JustifyContent.SpaceBetween"
                 Orientation="Orientation.Horizontal">
-                <RadzenText Text="Weights" TextStyle="TextStyle.DisplayH6" Style="margin: 0"/>
+                <GridTitle Text="Weights"/>
+                <Toggle Text="Actions" @bind-Value="_showActions"/>
             </RadzenStack>
         </HeaderTemplate>
         <Columns>
             <RadzenDataGridColumn
-                Title="Actions"
                 Sortable="false"
-                Width="12ch">
+                Title="Actions"
+                Visible="_showActions"
+                Width="8ch">
                 <Template>
                     <RadzenButton ButtonStyle="ButtonStyle.Danger"
                                   Click="@(() => DeleteAsync(context))"
@@ -41,17 +45,24 @@
                                   Variant="Variant.Outlined"/>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(WeightGridRow.DateTime)" Title="Date" Width="20ch">
-                <Template Context="data">@data.DateTime.FormatLocalTime(TimeProvider)</Template>
+            <RadzenDataGridColumn
+                Property="@nameof(WeightGridRow.DateTime)"
+                Title="Date"
+                Width="13ch">
+                <Template Context="row"><LocalDateTime Value="row.DateTime" /></Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(WeightGridRow.Name)" Title="Name"/>
+            <RadzenDataGridColumn
+                Property="@nameof(WeightGridRow.Name)"
+                MinWidth="12ch"
+                Title="Name"/>
             <RadzenDataGridColumn
                 HeaderCssClass="weights-column"
+                CssClass="rz-py-2"
                 Property="@nameof(WeightGridRow.Value)"
                 Sortable="false"
                 TextAlign="TextAlign.End"
                 Title="Weight"
-                Width="12ch">
+                Width="8ch">
                 <Template Context="data">@data.Value.Format(data.Units, Units)</Template>
             </RadzenDataGridColumn>
         </Columns>
@@ -63,6 +74,7 @@
     private IEnumerable<WeightGridRow>? _data;
     private RadzenDataGrid<WeightGridRow>? _grid;
     private bool _isLoading;
+    private bool _showActions;
 
     /// <summary>
     /// When non-0 will limit results to the specified feline.

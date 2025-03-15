@@ -1,4 +1,5 @@
 ﻿@page "/felines"
+@using FosterRoster.Components.Shared
 @rendermode @(new InteractiveServerRenderMode(false))
 @inject NotificationService NotificationService
 @inject IDbContextFactory<FosterRosterDbContext> ContextFactory
@@ -29,11 +30,10 @@
             <HeaderTemplate>
                 <RadzenStack
                     AlignItems="AlignItems.Center"
-                    class="rz-w-100"
+                    Gap="0.5rem"
                     JustifyContent="JustifyContent.SpaceBetween"
                     Orientation="Orientation.Horizontal">
-                    <RadzenText Text="Felines" TextStyle="TextStyle.DisplayH6" Style="margin: 0"/>
-                    <div style="margin-right: auto"></div>
+                    <GridTitle Text="Felines"/>
                     <RadzenLink Path="/intake">
                         <RadzenButton
                             ButtonStyle="ButtonStyle.Primary"
@@ -49,7 +49,7 @@
                     Filterable="false"
                     Sortable="false"
                     Property="@nameof(GridRow.Id)"
-                    Width="8ch">
+                    Width="6ch">
                     <Template>
                         <RadzenLink Path="@($"/felines/{context.Id}")">
                             <RadzenButton
@@ -63,10 +63,11 @@
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.Name)"
                     SortOrder="SortOrder.Ascending"
-
+                    MinWidth="12ch"
                     Title="Name"/>
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.FostererName)"
+                    MinWidth="12ch"
                     Title="Fosterer"/>
                 <RadzenDataGridColumn
                     FilterValue="@_isInactiveFilter"
