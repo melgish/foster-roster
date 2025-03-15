@@ -1,0 +1,11 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+    <RadzenLabel Text="@Text" Component="@Name"/>
+    <RadzenSwitch Value="@Value" ValueChanged="@ValueChanged" Name="@Name"/>
+</RadzenStack>
+
+@code {
+    [Parameter] public bool Value { get; set;}
+    [Parameter] public EventCallback<bool> ValueChanged { get; set;}
+    [Parameter] public string Text { get; set; } = "Actions";
+    [Parameter] public string Name { get; set; } = "Actions";
+}
