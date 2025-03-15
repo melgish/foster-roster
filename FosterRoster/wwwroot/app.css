@@ -14,12 +14,16 @@ html, body {
 }
 
 .invalid ~ .rz-form-field-label {
-    /** use darker danger color for labels when invalid */
+    /* use darker danger color for labels when invalid */
     /*--rz-danger: var(--rz-danger);*/
 }
 
 .validation-message {
-    /** use darker danger color for validation errors */
+    /* use darker danger color for validation errors */
     color: var(--rz-danger);
 }
 
+.rz-data-grid .rz-group-header .rz-custom-header {
+    /* Make group header in grid fill full width */
+    width: 100%;
+}
