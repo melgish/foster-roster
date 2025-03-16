@@ -4,8 +4,24 @@
 </RadzenStack>
 
 @code {
+    /// <summary>
+    /// Indicates if toggle is on or off
+    /// </summary>
     [Parameter] public bool Value { get; set;}
+    
+    /// <summary>
+    /// Event handler fired when toggle is clicked 
+    /// </summary>
     [Parameter] public EventCallback<bool> ValueChanged { get; set;}
+    
+    /// <summary>
+    /// Text to display next to toggle
+    /// Default 'Actions'
+    /// </summary>
     [Parameter] public string Text { get; set; } = "Actions";
+    
+    /// <summary>
+    /// Component name for accessibility
+    /// </summary>
     [Parameter] public string Name { get; set; } = "Actions";
 }

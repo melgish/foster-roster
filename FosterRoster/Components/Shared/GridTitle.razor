@@ -1,5 +1,8 @@
 ﻿<RadzenText Text="@Text" TextStyle="TextStyle.DisplayH6" Style="margin: 0"/>
 
 @code {
-    [Parameter] public string Text { get; set; } = string.Empty;
+    /// <summary>
+    /// Title text to display
+    /// </summary>
+    [Parameter, EditorRequired] public required string Text { get; set; }
 }
