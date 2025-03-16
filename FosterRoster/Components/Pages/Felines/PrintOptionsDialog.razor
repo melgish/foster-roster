@@ -13,20 +13,20 @@
                 <Items>
                     @foreach (var item in PrintOptions.PrintSections)
                     {
-                        <RadzenCheckBoxListItem Value="@item" Text="@item.ToString()" />
+                        <RadzenCheckBoxListItem Value="@item" Text="@item.ToString()"/>
                     }
                 </Items>
             </RadzenCheckBoxList>
         </RadzenColumn>
         <RadzenColumn>
-            <WeightUnitSelect @bind-Value="_model.Units" />
+            <WeightUnitSelect @bind-Value="_model.Units"/>
         </RadzenColumn>
     </RadzenRow>
     <RadzenStack
         AlignItems="AlignItems.Center"
         Gap="0.5rem"
         JustifyContent="JustifyContent.End"
-        Orientation="Orientation.Horizontal" >
+        Orientation="Orientation.Horizontal">
         <RadzenLink Path="@Path" Target="print">
             <RadzenButton
                 ButtonStyle="ButtonStyle.Secondary"
@@ -35,9 +35,9 @@
                 Text="Print"
                 Variant="Variant.Outlined"/>
         </RadzenLink>
-        <RadzenButton 
-            ButtonStyle="ButtonStyle.Base" 
-            Click="@Cancel" 
+        <RadzenButton
+            ButtonStyle="ButtonStyle.Base"
+            Click="@Cancel"
             Size="ButtonSize.Small"
             Text="Close"
             Variant="Variant.Outlined"/>
@@ -45,26 +45,26 @@
 </RadzenStack>
 
 @code {
-    [Parameter]
-    public int FelineId { get; set; }
-    
+    [Parameter] public int FelineId { get; set; }
+
     private PrintOptions _model = new();
 
     private string Path => $"/felines/{FelineId}/print{_model}";
-    
-    void Cancel() => DialogService.Close(null);
-    
+
+    void Cancel() => DialogService.Close();
+
     protected override async Task OnInitializedAsync()
     {
         var rs = await LocalStorage.GetAsync<PrintOptions>(nameof(PrintOptions));
         _model = rs.Value ?? new();
     }
-    
+
     async Task PersistOptions()
     {
         await InvokeAsync(StateHasChanged);
         await LocalStorage.SetAsync(nameof(PrintOptions), _model);
-        
-        DialogService.Close(null);
+
+        DialogService.Close();
     }
+
 }

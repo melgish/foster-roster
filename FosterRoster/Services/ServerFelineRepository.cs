@@ -21,7 +21,7 @@ public sealed class ServerFelineRepository(
             // Just include the name for grid layout.
             Fosterer = f.Fosterer == null
                 ? null
-                : new Fosterer()
+                : new Fosterer
                 {
                     Id = f.Fosterer!.Id,
                     Name = f.Fosterer!.Name
@@ -129,25 +129,6 @@ public sealed class ServerFelineRepository(
                 1 => Result.Ok(),
                 _ => Result.Fail(new MultipleChangesError())
             };
-    }
-
-    /// <summary>
-    ///     Get list of all felines in the database.
-    /// </summary>
-    /// <returns>A Result with list of felines, or errors on failure.</returns>
-    public async Task<Result<List<Feline>>> GetAllAsync()
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return Result.Ok(
-            await context
-                .Felines
-                .AsNoTracking()
-                .Include(f => f.Thumbnail)
-                .OrderBy(f => f.Name)
-                .Select(FelineProjection)
-                .AsSplitQuery()
-                .ToListAsync()
-        );
     }
 
     /// <summary>

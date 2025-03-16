@@ -2,13 +2,14 @@
 <!DOCTYPE html>
 <html lang="en">
 
+<!--suppress HtmlRequiredTitleElement -->
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <base href="/"/>
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
           rel="stylesheet"/>
-    <RadzenTheme @rendermode="PageRenderMode" Theme="@_theme" Wcag="_wcag"/>
+    <RadzenTheme @rendermode="PageRenderMode" Theme="@_theme" Wcag="Wcag"/>
     <link rel="stylesheet" href="@Assets["app.css"]"/>
     <link rel="stylesheet" href="@Assets["FosterRoster.styles.css"]"/>
     <link rel="icon" type="image/png" href="@Assets["favicon.png"]"/>
@@ -17,7 +18,7 @@
 
 <body>
 <Routes @rendermode="PageRenderMode"/>
-<script src="_framework/blazor.web.js"></script>
+<script src="@("_framework/blazor.web.js")"></script>
 <script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(RadzenStack).Assembly.GetName().Version)"></script>
 </body>
 
@@ -28,7 +29,7 @@
 
     private string _theme = "material";
 
-    private readonly bool _wcag = true;
+    private const bool Wcag = true;
 
     private IComponentRenderMode? PageRenderMode =>
         HttpContext?.AcceptsInteractiveRouting() == true ? InteractiveServer : null;
@@ -40,10 +41,12 @@
         {
             return;
         }
+
         var theme = HttpContext.Request.Cookies["RadzenTheme"];
         if (!string.IsNullOrWhiteSpace(theme))
         {
             _theme = theme;
         }
     }
+
 }

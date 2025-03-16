@@ -11,7 +11,7 @@
 @code {
     private string? _statusMessage;
 
-    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
 
     [SupplyParameterFromQuery] private string? UserId { get; set; }
 

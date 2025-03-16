@@ -1,6 +1,6 @@
 namespace FosterRoster.Domain;
 
-public class Fosterer : IInactivatable
+public sealed class Fosterer
 {
     /// <summary>
     /// Mailing label style address of the Fosterer
@@ -18,14 +18,9 @@ public class Fosterer : IInactivatable
     public string? Email { get; set; }
 
     /// <summary>
-    /// Felines fostered by this Fosterer
-    /// </summary>
-    public virtual ICollection<Feline> Felines { get; set; } = [];
-
-    /// <summary>
     /// Unique identifier for the Fosterer
     /// </summary>
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     /// <summary>
     /// Date and time the Fosterer was inactivated

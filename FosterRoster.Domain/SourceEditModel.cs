@@ -2,7 +2,7 @@
 
 public sealed class SourceEditModel()
 {
-    public int Id { get; }
+    private int Id { get; }
 
     public string Name { get; set; } = string.Empty;
 

@@ -8,13 +8,12 @@ public enum Weaned
     /// Feline has not been weaned.
     /// </summary>
     No = 1,
-    
+
     /// <summary>
     /// Feline is being weaned.
     /// </summary>
-    [Display(Description = "In Progress")]
-    InProgress = 2,
-    
+    [Display(Description = "In Progress")] InProgress = 2,
+
     /// <summary>
     /// Feline has been weaned.
     /// </summary>

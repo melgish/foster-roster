@@ -29,7 +29,8 @@
             <DataAnnotationsValidator/>
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email."/>
+                <InputText @bind-Value="Input.Email" id="Input.Email" class="form-control" autocomplete="email"
+                           placeholder="Please enter your email."/>
                 <label for="Input.Email" class="form-label">Email</label>
                 <ValidationMessage For="() => Input.Email"/>
             </div>
@@ -44,9 +45,9 @@
     private string? _message;
     private ExternalLoginInfo? _externalLoginInfo;
 
-    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
 
-    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
+    [SupplyParameterFromForm] private InputModel Input { get; } = new();
 
     [SupplyParameterFromQuery] private string? RemoteError { get; set; }
 
@@ -96,8 +97,8 @@
         var result = await SignInManager.ExternalLoginSignInAsync(
             _externalLoginInfo.LoginProvider,
             _externalLoginInfo.ProviderKey,
-            isPersistent: false,
-            bypassTwoFactor: true);
+            false,
+            true);
 
         if (result.Succeeded)
         {
@@ -155,7 +156,7 @@
                     RedirectManager.RedirectTo("Account/RegisterConfirmation", new() { ["email"] = Input.Email });
                 }
 
-                await SignInManager.SignInAsync(user, isPersistent: false, _externalLoginInfo.LoginProvider);
+                await SignInManager.SignInAsync(user, false, _externalLoginInfo.LoginProvider);
                 RedirectManager.RedirectTo(ReturnUrl);
             }
         }
@@ -163,7 +164,7 @@
         _message = $"Error: {string.Join(",", result.Errors.Select(error => error.Description))}";
     }
 
-    private ApplicationUser CreateUser()
+    private static ApplicationUser CreateUser()
     {
         try
         {

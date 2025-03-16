@@ -1,7 +1,8 @@
-﻿@implements IDisposable
+﻿@using System.Reflection
+@implements IDisposable
 @inject NavigationManager NavigationManager
 
-<RadzenMenu Responsive="true">
+<RadzenMenu Responsive="true" @ref="_menu">
     <li class="rz-navigation-item">
         <div class="rz-navigation-item-wrapper">
             <h4 class="rz-px-2 rz-py-0 rz-ma-0">Foster Roster</h4>
@@ -26,11 +27,11 @@
             <RadzenProfileMenu Style="margin-left: auto;padding-left: 0">
                 <Template>@context.User.Identity?.Name</Template>
                 <ChildContent>
-                    <form action="account/logout" method="post" name="logoutForm">
+                    <form action="@("account/logout")" method="post" name="logoutForm">
                         <AntiforgeryToken/>
-                        <input type="hidden" name="ReturnUrl" value="@_currentUrl" />
+                        <input type="hidden" name="ReturnUrl" value="@_currentUrl"/>
                     </form>
-                    <RadzenProfileMenuItem Text="Logout" Path="javascript:document.forms['logoutForm'].submit();" />
+                    <RadzenProfileMenuItem Text="Logout" Path="javascript:document.forms['logoutForm'].submit();"/>
                     <RadzenProfileMenuItem Path="/account/manage/changePassword" Text="Change Password"/>
                 </ChildContent>
             </RadzenProfileMenu>
@@ -41,21 +42,22 @@
     </AuthorizeView>
     <RadzenMenuItem>
         <Template>
-            <RadzenAppearanceToggle Variant="Variant.Text" />
+            <RadzenAppearanceToggle Variant="Variant.Text"/>
         </Template>
     </RadzenMenuItem>
     <RadzenMenuItem Path="https://github.com/melgish/foster-roster" Target="_blank">
         <Template>
-            <GitHubIcon />
+            <GitHubIcon/>
         </Template>
     </RadzenMenuItem>
 </RadzenMenu>
 
 @code {
     private string? _currentUrl;
-    
+    private RadzenMenu _menu = null!;
+
     [CascadingParameter] private HttpContext? HttpContext { get; set; } = null;
-    
+
     private bool IsInteractive => HttpContext?.AcceptsInteractiveRouting() ?? false;
 
     protected override void OnInitialized()
@@ -63,11 +65,16 @@
         _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
     }
-    
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        
+        // Hack to close menu when navigating.
+        _menu.GetType()
+            .GetProperty("IsOpen", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.Public)
+            ?.SetValue(_menu, false);
+             
         StateHasChanged();
     }
 
@@ -75,4 +82,5 @@
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
+
 }

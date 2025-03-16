@@ -4,6 +4,7 @@
 </RadzenFormField>
 
 @code {
+
     // Choices for the dropdown. Need to be enum to use display value.
     private static readonly Enum[] Choices =
     [
@@ -12,10 +13,10 @@
         WeightUnit.lbs,
         WeightUnit.kg
     ];
-    
+
     private async Task UpdateAsync(Enum newValue) => await ValueChanged.InvokeAsync((WeightUnit)newValue);
 
     [Parameter] public WeightUnit Value { get; set; } = WeightUnit.lbs;
-    
+
     [Parameter] public EventCallback<WeightUnit> ValueChanged { get; set; }
 }

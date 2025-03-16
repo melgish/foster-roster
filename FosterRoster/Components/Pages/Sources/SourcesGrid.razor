@@ -1,16 +1,15 @@
-﻿<RadzenDataGrid 
-    TItem="Source" 
+﻿<RadzenDataGrid
+    TItem="Source"
     Data="@Items"
     Density="Density.Compact"
-    >
+>
     <HeaderTemplate>
         <RadzenStack
             AlignItems="AlignItems.Center"
             class="rz-w-100"
             JustifyContent="JustifyContent.SpaceBetween"
             Orientation="Orientation.Horizontal">
-            <RadzenText Text="Sources" TextStyle="TextStyle.DisplayH6" Style="margin: 0"/>
-            <div style="margin-right: auto"></div>
+            <GridTitle Text="Sources"/>
             <RadzenButton
                 ButtonStyle="ButtonStyle.Primary"
                 Click="@(() => OnAdd.InvokeAsync())"

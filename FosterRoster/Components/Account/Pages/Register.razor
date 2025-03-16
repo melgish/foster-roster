@@ -34,16 +34,16 @@
                                            autocomplete="username"
                                            class="rz-textbox"
                                            id="Input.Email"
-                                           placeholder="name@example.com" 
-                                           type="text" />
+                                           placeholder="name@example.com"
+                                           type="text"/>
                             </RadzenFormField>
                             <ValidationMessage For="() => Input.Email"/>
                         </RadzenStack>
                         <RadzenStack Gap="0rem">
-                            <RadzenFormField 
+                            <RadzenFormField
                                 AllowFloatingLabel="false"
                                 Component="Input.Password"
-                                Text="Password" 
+                                Text="Password"
                                 Variant="Variant.Text">
                                 <InputText @bind-Value="Input.Password"
                                            aria-required="true"
@@ -51,15 +51,15 @@
                                            class="rz-textbox"
                                            id="Input.Password"
                                            placeholder="password"
-                                           type="password" />
+                                           type="password"/>
                             </RadzenFormField>
-                            <ValidationMessage For="() => Input.Password" />
+                            <ValidationMessage For="() => Input.Password"/>
                         </RadzenStack>
                         <RadzenStack Gap="0rem">
-                            <RadzenFormField 
+                            <RadzenFormField
                                 AllowFloatingLabel="false"
                                 Component="Input.Password"
-                                Text="Confirm Password" 
+                                Text="Confirm Password"
                                 Variant="Variant.Text">
                                 <InputText @bind-Value="Input.ConfirmPassword"
                                            aria-required="true"
@@ -67,9 +67,9 @@
                                            class="rz-textbox"
                                            id="Input.ConfirmPassword"
                                            placeholder="password"
-                                           type="password" />
+                                           type="password"/>
                             </RadzenFormField>
-                            <ValidationMessage For="() => Input.ConfirmPassword" />
+                            <ValidationMessage For="() => Input.ConfirmPassword"/>
                         </RadzenStack>
                         <RadzenStack
                             AlignItems="AlignItems.Center"
@@ -93,7 +93,7 @@
 @code {
     private IEnumerable<IdentityError>? _identityErrors;
 
-    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
+    [SupplyParameterFromForm] private InputModel Input { get; } = new();
 
     [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
 
@@ -136,7 +136,7 @@
         RedirectManager.RedirectTo(ReturnUrl);
     }
 
-    private ApplicationUser CreateUser()
+    private static ApplicationUser CreateUser()
     {
         try
         {

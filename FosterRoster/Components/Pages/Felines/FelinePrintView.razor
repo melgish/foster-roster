@@ -76,7 +76,8 @@
                 <img src="@_thumbnail.GetUrl()" alt="@_feline.Name"/>
             }
         </RadzenStack>
-    } else if (ShowImage.GetValueOrDefault(true) && _thumbnail is not null)
+    }
+    else if (ShowImage.GetValueOrDefault(true) && _thumbnail is not null)
     {
         <img src="@_thumbnail.GetUrl()" alt="@_feline.Name"/>
     }
@@ -168,7 +169,6 @@
     /// </summary>
     [SupplyParameterFromQuery(Name = "vitals")]
     private bool? ShowVitals { get; set; }
-
 
     protected override async Task OnInitializedAsync()
     {

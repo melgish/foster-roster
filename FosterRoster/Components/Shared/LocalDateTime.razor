@@ -1,0 +1,8 @@
+﻿@inject TimeProvider TimeProvider
+
+@(Value is not null ? Value.Value.FormatLocalTime(TimeProvider, Format) : string.Empty)
+
+@code {
+    [Parameter] public string Format { get; set; } = "MM/dd hh:mm tt";
+    [Parameter] public DateTimeOffset? Value { get; set; }
+}

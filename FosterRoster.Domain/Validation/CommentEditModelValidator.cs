@@ -3,9 +3,10 @@ namespace FosterRoster.Domain.Validation;
 using System.Text.RegularExpressions;
 
 [UsedImplicitly]
-public sealed class CommentEditModelValidator : AbstractValidator<CommentEditModel>
+public sealed partial class CommentEditModelValidator : AbstractValidator<CommentEditModel>
 {
-    private static readonly Regex AnyTag = new("<.*?>", RegexOptions.Compiled);
+    [GeneratedRegex("<.*?>", RegexOptions.Compiled)]
+    private static partial Regex AnyTag { get; }
 
     public CommentEditModelValidator()
     {
@@ -13,7 +14,7 @@ public sealed class CommentEditModelValidator : AbstractValidator<CommentEditMod
             .GreaterThan(0);
 
         RuleFor(model => model.Text)
-            .Must((value) =>
+            .Must(value =>
                 !string.IsNullOrWhiteSpace(value) &&
                 !string.IsNullOrWhiteSpace(AnyTag.Replace(value, string.Empty)))
             .WithMessage("{PropertyName} must not be empty.")

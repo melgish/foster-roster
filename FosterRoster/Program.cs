@@ -1,4 +1,5 @@
 // spell-checker: ignore npgsql
+
 using FosterRoster.Components;
 using FosterRoster.Components.Account;
 using FosterRoster.Services;
@@ -69,10 +70,10 @@ builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
 
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenCookieThemeService(options =>
-    {
-        options.Name = "RadzenTheme";
-        options.Duration = TimeSpan.FromDays(30);
-    });
+{
+    options.Name = "RadzenTheme";
+    options.Duration = TimeSpan.FromDays(30);
+});
 
 builder.Services.AddOutputCache();
 builder.Services.AddResponseCaching();

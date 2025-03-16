@@ -4,7 +4,7 @@ namespace FosterRoster.Domain.Validation;
 public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel>
 {
     private static DateOnly GetDateOnlyNow() => DateOnly.FromDateTime(TimeProvider.System.GetUtcNow().DateTime);
-    
+
     public FelineEditModelValidator()
     {
         RuleFor(feline => feline.AnimalId)
