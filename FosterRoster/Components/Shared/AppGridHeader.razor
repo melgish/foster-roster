@@ -1,5 +1,6 @@
 ﻿<RadzenStack
     AlignItems="AlignItems.Center"
+    class="rz-px-3"
     Gap="0.5rem"
     JustifyContent="JustifyContent.SpaceBetween"
     Orientation="Orientation.Horizontal">
@@ -19,5 +20,5 @@
 @code {
     [Parameter] public string Text { get; set; } = null!;
 
-    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
+    [Parameter] public RenderFragment? ChildContent { get; set; } = null!;
 }
