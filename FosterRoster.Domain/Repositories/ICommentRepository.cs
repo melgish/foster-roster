@@ -17,7 +17,7 @@ public interface ICommentRepository : IRepository
     public Task<Result> DeleteByKeyAsync(int commentId);
 
     /// <summary>
-    ///     Update an existing comment. 
+    ///     Update an existing comment.
     /// </summary>
     /// <param name="commentId">ID of the comment to update.</param>
     /// <param name="comment">New data for the comment.</param>

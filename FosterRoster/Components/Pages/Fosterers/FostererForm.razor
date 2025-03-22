@@ -2,79 +2,49 @@
 
 @if (_model is null)
 {
-    <Loading/>
+    <AppLoading/>
 }
 else
 {
     <EditForm FormName="editFosterer" Model="_model" OnValidSubmit="SaveAsync">
         <FluentValidationValidator/>
         <RadzenStack Gap="0.5rem">
-            <RadzenRow Gap="1rem" RowGap="0.5rem">
-                <RadzenColumn Size="12">
-                    <RadzenText Text="@_name" TextStyle="TextStyle.DisplayH4"/>
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow Gap="1rem" RowGap="0.5rem">
-                <RadzenColumn SizeSm="6" SizeXS="12">
-                    <RadzenStack Gap="0rem">
-                        <RadzenFormField AllowFloatingLabel="false" Text="Name" Variant="Variant.Text">
-                            <RadzenTextBox @bind-Value="_model.Name"/>
-                        </RadzenFormField>
-                        <ValidationMessage For="@(() => _model.Name)"/>
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn SizeSm="6" SizeXS="12">
-                    <RadzenStack Gap="0rem">
-                        <RadzenFormField AllowFloatingLabel="false" Text="Phone" Variant="Variant.Text">
-                            <RadzenMask @bind-Value="_model.Phone"
-                                        CharacterPattern="[0-9]"
-                                        Mask="***-***-****"
-                                        Placeholder="000-000-0000"/>
-                        </RadzenFormField>
-                        <ValidationMessage For="@(() => _model.Phone)"/>
-                    </RadzenStack>
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow Gap="1rem" RowGap="0.5rem">
-                <RadzenColumn SizeSm="6" SizeXS="12">
-                    <RadzenStack Gap="0rem">
-                        <RadzenFormField AllowFloatingLabel="false" Text="Email" Variant="Variant.Text">
-                            <RadzenTextBox @bind-Value="_model.Email"/>
-                        </RadzenFormField>
-                        <ValidationMessage For="@(() => _model.Email)"/>
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn SizeSm="6" SizeXS="12">
-                    <RadzenStack Gap="0rem">
-                        <RadzenFormField AllowFloatingLabel="false" Text="Contact Method" Variant="Variant.Text">
-                            <RadzenDropDown @bind-Value="_model.ContactMethod"
-                                            Data="@ContactMethodChoices"/>
-                        </RadzenFormField>
-                        <ValidationMessage For="@(() => _model.ContactMethod)"/>
-                    </RadzenStack>
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow Gap="1rem" RowGap="0.5rem">
-                <RadzenColumn SizeSm="6" SizeXS="12">
-                    <RadzenStack Gap="0rem">
-                        <RadzenFormField AllowFloatingLabel="false" Text="Address" Variant="Variant.Text">
-                            <RadzenTextArea @bind-Value="_model.Address"
-                                            Placeholder="@("Name\nStreet\nCity, State Zip")"
-                                            Rows="3"/>
-                        </RadzenFormField>
-                        <ValidationMessage For="@(() => _model.Address)"/>
-                    </RadzenStack>
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow Gap="1rem" RowGap="0.5rem">
-                <RadzenColumn Size="12">
-                    <AppFormButtons
-                        Busy="_isSaving"
-                        CanDelete="Fosterer.Id != 0"
-                        OnDelete="DeleteAsync"
-                        OnReset="ResetAsync"/>
-                </RadzenColumn>
-            </RadzenRow>
+            <AppFormHeader Text="@_name"/>
+            <AppFormRow>
+                <AppFormColumn>
+                    <AppTextBox @bind-Value="_model.Name" Text="Name"/>
+                </AppFormColumn>
+                <AppFormColumn>
+                    <AppMaskInput
+                        @bind-Value="_model.Phone"
+                        CharacterPattern="[0-9]"
+                        Mask="***-***-****"
+                        Placeholder="000-000-0000"
+                        Text="Phone"/>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormRow>
+                <AppFormColumn>
+                    <AppTextBox @bind-Value="_model.Email" Text="Email"/>
+                </AppFormColumn>
+                <AppFormColumn>
+                    <ContactMethodSelect @bind-Value="_model.ContactMethod"/>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormRow>
+                <AppFormColumn>
+                    <AppTextArea @bind-Value="_model.Address" Placeholder="@("Name\nStreet\nCity, State Zip")"/>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormFooter>
+                <AppBusyCircle IsBusy="_isSaving"/>
+                @if (Fosterer.Id != 0)
+                {
+                    <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving"/>
+                }
+                <AppFormSaveButton Disabled="_isSaving"/>
+                <AppFormResetButton Click="ResetAsync" Disabled="_isSaving"/>
+            </AppFormFooter>
         </RadzenStack>
     </EditForm>
 }

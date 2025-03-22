@@ -1,8 +1,8 @@
-using FosterRoster.Domain;
+namespace FosterRoster.Data.Configurations;
+
+using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-namespace FosterRoster.Data.Configurations;
 
 internal class ThumbnailConfiguration : IEntityTypeConfiguration<Thumbnail>
 {

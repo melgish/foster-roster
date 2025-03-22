@@ -1,0 +1,10 @@
+﻿<RadzenColumn SizeSM="SizeSM" SizeXS="12">
+    @ChildContent
+</RadzenColumn>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
+
+    @* ReSharper disable once InconsistentNaming *@
+    [Parameter] public int SizeSM { get; set; } = 6;
+}

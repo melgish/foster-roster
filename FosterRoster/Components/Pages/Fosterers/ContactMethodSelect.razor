@@ -1,0 +1,16 @@
+﻿@inherits AppFormComponent<ContactMethod>
+
+<AppFormSelect
+    Data="Choices"
+    Text="Contact Method"
+    TValue="ContactMethod"
+    Value="@Value"
+    ValueChanged="ValueChanged"
+    ValueExpression="ValueExpression"/>
+
+@code {
+
+    private static readonly ContactMethod[] Choices =
+        [ContactMethod.Email, ContactMethod.Text, ContactMethod.Voice];
+
+}

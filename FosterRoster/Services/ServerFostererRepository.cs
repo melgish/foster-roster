@@ -53,23 +53,6 @@ public sealed class ServerFostererRepository(
     }
 
     /// <summary>
-    ///     Gets names of all fosterers from the database.
-    /// </summary>
-    /// <returns>Result with list of items, or Errors on failure.</returns>
-    public async Task<Result<List<ListItem<int>>>> GetAllNamesAsync()
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return Result.Ok(
-            await context
-                .Fosterers
-                .AsNoTracking()
-                .OrderBy(f => f.Name)
-                .Select(f => new ListItem<int>(f.Id, f.Name))
-                .ToListAsync()
-        );
-    }
-
-    /// <summary>
     ///     Gets single fosterer from the database.
     /// </summary>
     /// <param name="fostererId">ID of fosterer to return.</param>

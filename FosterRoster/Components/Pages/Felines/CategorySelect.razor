@@ -1,0 +1,18 @@
+﻿@inherits AppFormComponent<Category>
+
+<AppFormSelect
+    Data="Choices"
+    Disabled="Disabled"
+    Text="Category"
+    TValue="Category"
+    Value="@Value"
+    ValueChanged="ValueChanged"
+    ValueExpression="ValueExpression"
+/>
+
+@code {
+
+    private static readonly Category[] Choices =
+        [Category.Cat, Category.NursingCat, Category.Kitten, Category.NursingKitten];
+
+}

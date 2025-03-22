@@ -10,7 +10,7 @@ public sealed class ThumbnailsController(
 ) : ControllerBase
 {
     /// <summary>
-    /// Gets thumbnail image as file
+    ///     Gets thumbnail image as file
     /// </summary>
     /// <param name="felineId">ID of feline thumbnail to fetch.</param>
     /// <returns>File if found, otherwise 404</returns>

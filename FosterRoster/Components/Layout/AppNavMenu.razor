@@ -69,12 +69,12 @@
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
         _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
-        
+
         // Hack to close menu when navigating.
         _menu.GetType()
-            .GetProperty("IsOpen", BindingFlags.NonPublic|BindingFlags.Instance|BindingFlags.Public)
+            .GetProperty("IsOpen", BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public)
             ?.SetValue(_menu, false);
-             
+
         StateHasChanged();
     }
 

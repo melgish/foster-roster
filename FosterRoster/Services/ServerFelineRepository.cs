@@ -132,23 +132,6 @@ public sealed class ServerFelineRepository(
     }
 
     /// <summary>
-    ///     Get list of all felines in the database, with only their names and ids.
-    /// </summary>
-    /// <returns>A Result with list of items, or errors on failure.</returns>
-    public async Task<Result<List<ListItem<int>>>> GetAllNamesAsync()
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return Result.Ok(
-            await context
-                .Felines
-                .AsNoTracking()
-                .OrderBy(f => f.Name)
-                .Select(f => new ListItem<int>(f.Id, f.Name))
-                .ToListAsync()
-        );
-    }
-
-    /// <summary>
     ///     Gets a single feline by ID.
     /// </summary>
     /// <param name="felineId">ID of feline to get.</param>

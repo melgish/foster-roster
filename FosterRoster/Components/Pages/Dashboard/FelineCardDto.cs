@@ -1,6 +1,6 @@
-﻿using FosterRoster.Extensions;
+﻿namespace FosterRoster.Components.Pages.Dashboard;
 
-namespace FosterRoster.Components.Pages.Dashboard;
+using Extensions;
 
 public sealed record FelineCardDto
 {

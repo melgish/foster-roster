@@ -1,9 +1,9 @@
-﻿using FosterRoster.Domain;
-using Microsoft.EntityFrameworkCore;
+﻿namespace FosterRoster.Data;
+
+using Domain;
 using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-
-namespace FosterRoster.Data;
+using Microsoft.EntityFrameworkCore;
 
 public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options)
     : IdentityDbContext<ApplicationUser, ApplicationRole, int>(options), IDataProtectionKeyContext
@@ -12,6 +12,7 @@ public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> optio
     public DbSet<Feline> Felines { get; set; } = null!;
     public DbSet<Fosterer> Fosterers { get; set; } = null!;
     public DbSet<Source> Sources { get; set; } = null!;
+    public DbSet<ApplicationTask> Tasks { get; set; } = null!;
     public DbSet<Thumbnail> Thumbnails { get; set; } = null!;
     public DbSet<Weight> Weights { get; set; } = null!;
 

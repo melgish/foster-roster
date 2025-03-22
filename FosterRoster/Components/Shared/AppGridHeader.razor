@@ -1,0 +1,23 @@
+﻿<RadzenStack
+    AlignItems="AlignItems.Center"
+    Gap="0.5rem"
+    JustifyContent="JustifyContent.SpaceBetween"
+    Orientation="Orientation.Horizontal">
+    <RadzenText Text="@Text" TextStyle="TextStyle.DisplayH6" Style="margin: 0"/>
+    @if (ChildContent is not null)
+    {
+        <RadzenStack
+            AlignItems="AlignItems.Center"
+            Gap="0.5rem"
+            JustifyContent="JustifyContent.End"
+            Orientation="Orientation.Horizontal">
+            @ChildContent
+        </RadzenStack>
+    }
+</RadzenStack>
+
+@code {
+    [Parameter] public string Text { get; set; } = null!;
+
+    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
+}

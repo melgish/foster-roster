@@ -1,5 +1,4 @@
-﻿@using FosterRoster.Components.Shared
-@inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
+﻿@inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
 @inject TimeProvider TimeProvider
 
 <div class="weights-grid">
@@ -21,15 +20,9 @@
         PagingSummaryFormat="Showing {0} to {1} of {2}"
         ShowPagingSummary="true">
         <HeaderTemplate>
-            <RadzenStack
-                AlignItems="AlignItems.Center"
-                class="rz-py-1 rz-px-2"
-                Gap="0.5rem"
-                JustifyContent="JustifyContent.SpaceBetween"
-                Orientation="Orientation.Horizontal">
-                <GridTitle Text="Weights"/>
-                <Toggle Text="Actions" @bind-Value="_showActions"/>
-            </RadzenStack>
+            <AppGridHeader Text="Weights">
+                <AppToggle Text="Actions" @bind-Value="_showActions"/>
+            </AppGridHeader>
         </HeaderTemplate>
         <Columns>
             <RadzenDataGridColumn
@@ -38,18 +31,17 @@
                 Visible="_showActions"
                 Width="8ch">
                 <Template>
-                    <RadzenButton ButtonStyle="ButtonStyle.Danger"
-                                  Click="@(() => DeleteAsync(context))"
-                                  Size="ButtonSize.ExtraSmall"
-                                  Text="Delete"
-                                  Variant="Variant.Outlined"/>
+                    <AppGridButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteAsync(context))"
+                                   Text="Delete"/>
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn
                 Property="@nameof(WeightGridRow.DateTime)"
                 Title="Date"
                 Width="13ch">
-                <Template Context="row"><LocalDateTime Value="row.DateTime" /></Template>
+                <Template Context="row">
+                    <AppLocalDateTime Value="row.DateTime"/>
+                </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn
                 Property="@nameof(WeightGridRow.Name)"
@@ -77,25 +69,25 @@
     private bool _showActions;
 
     /// <summary>
-    /// When non-0 will limit results to the specified feline.
+    ///     When non-0 will limit results to the specified feline.
     /// </summary>
     [Parameter]
     public int FelineId { get; set; }
 
     /// <summary>
-    /// Invoked when delete button is pressed.
+    ///     Invoked when delete button is pressed.
     /// </summary>
     [Parameter]
     public EventCallback<(int FelineId, DateTimeOffset DateTime)> OnDelete { get; set; }
 
     /// <summary>
-    /// Determines what units to display in the weight column.
+    ///     Determines what units to display in the weight column.
     /// </summary>
     [Parameter]
     public WeightUnit Units { get; set; }
 
     /// <summary>
-    /// Data for a single row in the grid.
+    ///     Data for a single row in the grid.
     /// </summary>
     private sealed record WeightGridRow
     {
@@ -107,14 +99,14 @@
     }
 
     /// <summary>
-    /// Raise event when delete button is pressed.
+    ///     Raise event when delete button is pressed.
     /// </summary>
     /// <param name="row"></param>
     private async Task DeleteAsync(WeightGridRow row)
         => await OnDelete.InvokeAsync((row.FelineId, row.DateTime));
 
     /// <summary>
-    /// Fetch data for the grid.
+    ///     Fetch data for the grid.
     /// </summary>
     /// <param name="args"></param>
     private async Task LoadDataAsync(LoadDataArgs args)
@@ -146,7 +138,7 @@
     }
 
     /// <summary>
-    /// Reload data when FelineId is changed.
+    ///     Reload data when FelineId is changed.
     /// </summary>
     /// <param name="parameters"></param>
     public override async Task SetParametersAsync(ParameterView parameters)

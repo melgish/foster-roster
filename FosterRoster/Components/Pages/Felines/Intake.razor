@@ -7,7 +7,7 @@
 <PageTitle>Intake</PageTitle>
 <RadzenStack>
     <RadzenPanel class="rz-shadow-3">
-        <FelineEditForm Feline="@_feline" IsNew OnSave="OnSaveAsync"/>
+        <FelineForm Feline="@_feline" IsNew OnSave="OnSaveAsync"/>
     </RadzenPanel>
 </RadzenStack>
 
@@ -27,7 +27,7 @@
     }
 
     /// <summary>
-    /// Save event handler for the FelineEditForm
+    ///     Save event handler for the FelineForm
     /// </summary>
     private async Task OnSaveAsync(FelineEditModel model)
     {

@@ -4,29 +4,14 @@
     Density="Density.Compact"
 >
     <HeaderTemplate>
-        <RadzenStack
-            AlignItems="AlignItems.Center"
-            class="rz-w-100"
-            JustifyContent="JustifyContent.SpaceBetween"
-            Orientation="Orientation.Horizontal">
-            <GridTitle Text="Sources"/>
-            <RadzenButton
-                ButtonStyle="ButtonStyle.Primary"
-                Click="@(() => OnAdd.InvokeAsync())"
-                Icon="add"
-                Size="ButtonSize.Small"
-                Text="Add"
-                Variant="Variant.Outlined"/>
-        </RadzenStack>
+        <AppGridHeader Text="Sources">
+            <AppGridButton Click="@(() => OnAdd.InvokeAsync())" Text="Add"/>
+        </AppGridHeader>
     </HeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Width="12ch">
+        <RadzenDataGridColumn Width="6ch">
             <Template Context="data">
-                <RadzenButton ButtonStyle="ButtonStyle.Info"
-                              Click="@(() => OnEdit.InvokeAsync(data.Id))"
-                              Size="ButtonSize.Small"
-                              Text="Edit"
-                              Variant="Variant.Outlined"/>
+                <AppGridButton Click="@(() => OnEdit.InvokeAsync(data.Id))" Text="Edit"/>
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(Fosterer.Name)" Title="@nameof(Fosterer.Name)"/>

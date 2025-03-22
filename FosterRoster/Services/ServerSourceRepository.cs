@@ -49,23 +49,6 @@ public sealed class ServerSourceRepository(
     }
 
     /// <summary>
-    ///     Get list of all sources in the database, with only their names and ids.
-    /// </summary>
-    /// <returns>A Result with list of items if successful, or Errors on failure.</returns>
-    public async Task<Result<List<ListItem<int>>>> GetAllNamesAsync()
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return Result.Ok(
-            await context
-                .Sources
-                .AsNoTracking()
-                .OrderBy(s => s.Name)
-                .Select(s => new ListItem<int>(s.Id, s.Name))
-                .ToListAsync()
-        );
-    }
-
-    /// <summary>
     ///     Gets single Source from the database.
     /// </summary>
     /// <param name="sourceId">ID of source to return.</param>

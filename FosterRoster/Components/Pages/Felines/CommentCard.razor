@@ -15,10 +15,10 @@
                           Size="ButtonSize.Small"
                           Text="Edit"
                           Variant="Variant.Outlined"/>
-            <AppDateTimeAgo Value="Comment.TimeStamp"/>
+            <AppLocalDateTimeWithAgo Value="Comment.TimeStamp"/>
             @if (Comment.Modified.HasValue)
             {
-                <AppDateTimeAgo Value="Comment.Modified" Label="Revised"/>
+                <AppLocalDateTimeWithAgo Value="Comment.Modified" Label="Revised"/>
             }
         </RadzenStack>
         <RadzenHtml>@_html</RadzenHtml>

@@ -39,12 +39,6 @@ public interface IFelineRepository : IRepository
     public Task<Result> DeleteByKeyAsync(int felineId);
 
     /// <summary>
-    ///     Get list of all felines in the database, with only their names and ids.
-    /// </summary>
-    /// <returns>A Result with list of items, or errors on failure.</returns>
-    public Task<Result<List<ListItem<int>>>> GetAllNamesAsync();
-
-    /// <summary>
     ///     Gets a single feline by ID.
     /// </summary>
     /// <param name="felineId">ID of feline to get.</param>

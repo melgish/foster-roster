@@ -1,0 +1,26 @@
+﻿@inherits AppFormComponent<string>
+
+<RadzenStack Gap="0rem">
+    <RadzenFormField
+        AllowFloatingLabel="false"
+        Component="@Name"
+        Text="@Text"
+        Variant="Variant.Text">
+        <RadzenMask CharacterPattern="@CharacterPattern"
+                    Disabled="Disabled"
+                    Name="@Name"
+                    Mask="@Mask"
+                    Placeholder="@Placeholder"
+                    Value="@Value"
+                    ValueChanged="ValueChanged"
+                    ValueExpression="ValueExpression"
+        />
+    </RadzenFormField>
+    <ValidationMessage For="ValueExpression"/>
+</RadzenStack>
+
+@code {
+    [Parameter] public string CharacterPattern { get; set; } = null!;
+
+    [Parameter] public string Mask { get; set; } = null!;
+}

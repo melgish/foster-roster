@@ -9,86 +9,38 @@
     <RadzenPanel class="rz-shadow-3">
         <EditForm FormName="weightForm"
                   Model="_model"
-                  OnValidSubmit="OnSaveAsync">
+                  OnValidSubmit="SaveAsync">
             <FluentValidationValidator/>
             <RadzenStack Gap="0.5rem">
-                <RadzenRow Gap="1rem" RowGap="0.5rem">
-                    <RadzenColumn Size="12">
-                        <RadzenText Text="Enter Weight" TextStyle="TextStyle.DisplayH4"/>
-                    </RadzenColumn>
-                </RadzenRow>
-                <RadzenRow Gap="1rem" RowGap="0.5rem">
-                    <RadzenColumn SizeXS="12" SizeSM="6">
-                        <RadzenStack Gap="0rem">
-                            <FelineSelect Value="@_model.FelineId" ValueChanged="@OnFelineSelected"/>
-                            <ValidationMessage For="@(() => _model.FelineId)"/>
-                        </RadzenStack>
-                    </RadzenColumn>
-                    <RadzenColumn SizeXS="12" SizeSM="6">
-                        <RadzenStack Gap="0rem">
-                            <RadzenFormField AllowFloatingLabel="false" Text="Date" Variant="Variant.Text">
-                                <RadzenDatePicker @bind-Value="_model.DateTime"
-                                                  Kind="DateTimeKind.Local"
-                                                  DateFormat="g"
-                                                  HourFormat="12"
-                                                  Placeholder="MM/DD/YYYY hh:mm am"
-                                                  ShowTime="true"/>
-                            </RadzenFormField>
-                            <ValidationMessage For="@(() => _model.DateTime)"/>
-                        </RadzenStack>
-                    </RadzenColumn>
-                </RadzenRow>
-                <RadzenRow Gap="1rem" RowGap="0.5rem">
-                    <RadzenColumn SizeXS="12" SizeSM="6">
-                        <RadzenStack Gap="0rem">
-                            <RadzenFormField AllowFloatingLabel="false" Text="Weight" Variant="Variant.Text">
-                                <RadzenNumeric TValue="float"
-                                               @bind-Value="_model.Value"
-                                               Step="0.1f"
-                                               Min="0.0m"
-                                               ShowUpDown="false"/>
-                            </RadzenFormField>
-                            <ValidationMessage For="@(() => _model.Value)"/>
-                        </RadzenStack>
-                    </RadzenColumn>
-                    <RadzenColumn SizeSM="6" SizeXS="12">
-                        <RadzenStack Gap="0rem">
-                            <WeightUnitSelect Value="@_model.Units" ValueChanged="@OnUnitsSelected"/>
-                            <ValidationMessage For="@(() => _model.Units)"/>
-                        </RadzenStack>
-                    </RadzenColumn>
-                </RadzenRow>
-                <RadzenRow Gap="1rem" RowGap="0.5rem">
-                    <RadzenColumn Size="12">
-                        <RadzenStack
-                            AlignItems="AlignItems.Center"
-                            Gap="0.5rem"
-                            JustifyContent="JustifyContent.End"
-                            Orientation="Orientation.Horizontal">
-                            <RadzenButton BusyText="Saving..."
-                                          ButtonStyle="ButtonStyle.Primary"
-                                          ButtonType="ButtonType.Submit"
-                                          Disabled="_isSaving"
-                                          IsBusy="_isSaving"
-                                          Size="ButtonSize.Small"
-                                          Text="Save"
-                                          Variant="Variant.Outlined"/>
-                            <RadzenButton ButtonStyle="ButtonStyle.Secondary"
-                                          Click="@Reset"
-                                          Disabled="_isSaving"
-                                          Size="ButtonSize.Small"
-                                          Text="Reset"
-                                          Variant="Variant.Outlined"/>
-                        </RadzenStack>
-                    </RadzenColumn>
-                </RadzenRow>
+                <AppFormHeader Text="Enter Weight"/>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <FelineSelect @bind-Value="@_model.FelineId"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppDateTime @bind-Value="_model.DateTime" Text="Date"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppNumeric @bind-Value="_model.Value" Min="0.0m" Step="0.1" Text="Weight" TValue="float"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <WeightUnitSelect @bind-Value="@_model.Units"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormFooter>
+                    <AppBusyCircle IsBusy="_isSaving"/>
+                    <AppFormSaveButton Disabled="_isSaving"/>
+                    <AppFormResetButton Click="Reset" Disabled="_isSaving"/>
+                </AppFormFooter>
             </RadzenStack>
         </EditForm>
     </RadzenPanel>
     <RadzenPanel class="rz-p-0 rz-shadow-3">
         <WeightsGrid FelineId="_model.FelineId"
                      OnDelete="DeleteAsync"
-                     Units="_units"
+                     Units="_model.Units"
         />
     </RadzenPanel>
 </RadzenStack>
@@ -96,22 +48,10 @@
 @code {
     private bool _isSaving;
     private WeightEditModel _model = new();
-    private WeightUnit _units = WeightUnit.g;
-
-    private void OnFelineSelected(int felineId)
-    {
-        _model.FelineId = felineId;
-    }
 
     protected override void OnInitialized()
     {
         Reset();
-    }
-
-    private void OnUnitsSelected(WeightUnit unit)
-    {
-        _model.Units = unit;
-        _units = unit;
     }
 
     private void Reset()
@@ -120,11 +60,11 @@
         _model = new()
         {
             DateTime = TimeProvider.GetUtcNow(),
-            Units = _units
+            Units = _model.Units
         };
     }
 
-    private async Task OnSaveAsync()
+    private async Task SaveAsync()
     {
         _isSaving = true;
         var rs = await WeightRepository.AddAsync(_model.ToWeight());
@@ -132,7 +72,6 @@
         if (rs.IsSuccess)
         {
             Reset();
-            OnFelineSelected(_model.FelineId);
         }
 
         _isSaving = false;
@@ -143,10 +82,6 @@
         _isSaving = true;
         var rs = await WeightRepository.DeleteByKeyAsync(weight.FelineId, weight.DateTime);
         NotificationService.Notify(rs, "Weight deleted", "Failed to delete weight");
-        if (rs.IsSuccess)
-        {
-            OnFelineSelected(weight.FelineId);
-        }
 
         _isSaving = false;
     }

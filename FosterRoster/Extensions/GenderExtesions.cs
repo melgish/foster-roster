@@ -3,7 +3,7 @@ namespace FosterRoster.Extensions;
 public static class GenderExtensions
 {
     /// <summary>
-    /// Returns the possessive form of the pronoun.
+    ///     Returns the possessive form of the pronoun.
     /// </summary>
     public static string PossessivePronoun(this Gender gender)
     {

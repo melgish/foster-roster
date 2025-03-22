@@ -1,7 +1,7 @@
 namespace FosterRoster.Domain;
 
 /// <summary>
-/// Represents any item that might be displayed in a list.
+///     Represents any item that might be displayed in a list.
 /// </summary>
 /// <param name="Id"></param>
 /// <param name="Name"></param>

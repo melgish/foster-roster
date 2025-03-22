@@ -1,10 +1,10 @@
-﻿using System.Security.Claims;
+﻿namespace FosterRoster.Components.Account;
+
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-
-namespace FosterRoster.Components.Account;
+using System.Security.Claims;
 
 internal sealed class IdentityRevalidatingAuthenticationStateProvider(
     ILoggerFactory loggerFactory,

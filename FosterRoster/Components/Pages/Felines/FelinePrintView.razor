@@ -141,31 +141,31 @@
     private string? _source;
 
     /// <summary>
-    /// When truthy, print the image.
+    ///     When truthy, print the image.
     /// </summary>
     [SupplyParameterFromQuery(Name = "image")]
     private bool? ShowImage { get; set; }
 
     /// <summary>
-    /// When truthy, print the journal.
+    ///     When truthy, print the journal.
     /// </summary>
     [SupplyParameterFromQuery(Name = "journal")]
     private bool? ShowJournal { get; set; }
 
     /// <summary>
-    /// When truthy, print the weights.
+    ///     When truthy, print the weights.
     /// </summary>
     [SupplyParameterFromQuery(Name = "weights")]
     private bool? ShowWeights { get; set; }
 
     /// <summary>
-    /// Sets units for weight display.
+    ///     Sets units for weight display.
     /// </summary>
     [SupplyParameterFromQuery(Name = "units")]
     private string? Units { get; set; }
 
     /// <summary>
-    /// When truthy, print the vitals.
+    ///     When truthy, print the vitals.
     /// </summary>
     [SupplyParameterFromQuery(Name = "vitals")]
     private bool? ShowVitals { get; set; }

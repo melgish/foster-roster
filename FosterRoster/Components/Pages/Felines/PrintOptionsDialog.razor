@@ -3,25 +3,27 @@
 @inject ProtectedLocalStorage LocalStorage
 
 <RadzenStack>
-    <RadzenRow>
-        <RadzenColumn>
-            <RadzenCheckBoxList
-                TValue="PrintSection"
-                Value="_model.SelectedPrintSections"
-                ValueChanged="@(arg => _model.SelectedPrintSections = [.. arg])"
-                Orientation="Orientation.Vertical">
-                <Items>
-                    @foreach (var item in PrintOptions.PrintSections)
-                    {
-                        <RadzenCheckBoxListItem Value="@item" Text="@item.ToString()"/>
-                    }
-                </Items>
-            </RadzenCheckBoxList>
-        </RadzenColumn>
-        <RadzenColumn>
-            <WeightUnitSelect @bind-Value="_model.Units"/>
-        </RadzenColumn>
-    </RadzenRow>
+    <EditForm Model="_model">
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenCheckBoxList
+                    TValue="PrintSection"
+                    Value="_model.SelectedPrintSections"
+                    ValueChanged="@(arg => _model.SelectedPrintSections = [.. arg])"
+                    Orientation="Orientation.Vertical">
+                    <Items>
+                        @foreach (var item in PrintOptions.PrintSections)
+                        {
+                            <RadzenCheckBoxListItem Value="@item" Text="@item.ToString()"/>
+                        }
+                    </Items>
+                </RadzenCheckBoxList>
+            </RadzenColumn>
+            <RadzenColumn>
+                <WeightUnitSelect @bind-Value="_model.Units"/>
+            </RadzenColumn>
+        </RadzenRow>
+    </EditForm>
     <RadzenStack
         AlignItems="AlignItems.Center"
         Gap="0.5rem"

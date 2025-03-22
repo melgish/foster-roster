@@ -1,0 +1,7 @@
+﻿<RadzenRow Gap="1rem" RowGap="0.5rem">
+    @ChildContent
+</RadzenRow>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
+}

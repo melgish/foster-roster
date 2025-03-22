@@ -1,0 +1,218 @@
+@inject DialogService DialogService
+
+@if (_model is null)
+{
+    <AppLoading/>
+}
+else
+{
+    <EditForm FormName="editFeline"
+              Model="@_model"
+              OnValidSubmit="@SaveAsync">
+        <FluentValidationValidator/>
+        <RadzenStack Gap="0.5rem">
+            <AppFormHeader Text="@_name"/>
+            <AppFormRow>
+                <AppFormColumn>
+                    <RadzenStack JustifyContent="JustifyContent.SpaceAround" Orientation="Orientation.Horizontal">
+                        <AppThumbnail
+                            Path="@_model.Thumbnail.GetUrl()"
+                            disabled="@_model.IsInactive"
+                            OnChange="OnFilesChangedAsync"/>
+                    </RadzenStack>
+                </AppFormColumn>
+                <AppFormColumn>
+                    <RadzenStack Gap="1rem">
+                        <AppDateOnly @bind-Value="_model.IntakeDate" Disabled="_model.IsInactive" Text="Intake Date"/>
+                        <AppTextBox @bind-Value="@_model.Name" Disabled="_model.IsInactive" Text="Name"/>
+                        <AppRadioButtonList @bind-Value="@_model.Gender" Disabled="_model.IsInactive" Text="Gender">
+                            <RadzenRadioButtonListItem Text="Female" Value="@Gender.Female"/>
+                            <RadzenRadioButtonListItem Text="Male" Value="@Gender.Male"/>
+                        </AppRadioButtonList>
+                        <AppNumeric @bind-Value="_model.IntakeAgeInWeeks" Disabled="_model.IsInactive" Min="0"
+                                    Text="Age at Intake (weeks)"/>
+                    </RadzenStack>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormRow>
+                <AppFormColumn>
+                    <AppTextBox @bind-Value="@_model.Breed" Disabled="_model.IsInactive" Text="Breed"/>
+                </AppFormColumn>
+                <AppFormColumn>
+                    <AppTextBox @bind-Value="@_model.Color" Disabled="_model.IsInactive" Text="Color"/>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormRow>
+                <AppFormColumn>
+                    <SourceSelect @bind-Value="_model.SourceId" Disabled="@_model.IsInactive"/>
+                </AppFormColumn>
+                <AppFormColumn>
+                    <FostererSelect @bind-Value="_model.FostererId" Disabled="@_model.IsInactive"/>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormRow>
+                <AppFormColumn>
+                    <CategorySelect @bind-Value="_model.Category" Disabled="_model.IsInactive"/>
+                </AppFormColumn>
+                <AppFormColumn>
+                    <AppDateOnly @bind-Value="_model.RegistrationDate"
+                                 Disabled="_model.IsInactive"
+                                 Text="Registration Date"/>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormRow>
+                <AppFormColumn>
+                    <AppTextBox @bind-Value="@_model.AnimalId" Disabled="_model.IsInactive" Text="Animal ID"/>
+                </AppFormColumn>
+                <AppFormColumn>
+                    <AppRadioButtonList @bind-Value="_model.Weaned" Disabled="_model.IsInactive" Text="Weaned">
+                        <RadzenRadioButtonListItem Text="No" Value="@Weaned.No"/>
+                        <RadzenRadioButtonListItem Text="In Progress" Value="@Weaned.InProgress"/>
+                        <RadzenRadioButtonListItem Text="Yes" Value="@Weaned.Yes"/>
+                    </AppRadioButtonList>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormFooter>
+                <AppBusyCircle IsBusy="_isSaving"/>
+                @if (Feline.Id != 0)
+                {
+                    @if (_model.IsInactive)
+                    {
+                        <AppLocalDateTimeWithAgo Value="_model.InactivatedAtUtc" Label="Inactive since"/>
+                        <AppFormButton
+                            ButtonStyle="ButtonStyle.Info"
+                            Click="@ActivateAsync"
+                            Disabled="@(_isSaving || !_model.IsInactive)"
+                            Text="Activate"/>
+                    }
+                    else
+                    {
+                        <AppFormButton
+                            ButtonStyle="ButtonStyle.Info"
+                            Click="@InactivateAsync"
+                            Disabled="@(_isSaving || _model.IsInactive)"
+                            Text="Inactivate"/>
+                    }
+
+                    <AppFormButton
+                        ButtonStyle="ButtonStyle.Secondary"
+                        Click="@PrintAsync"
+                        Disabled="_isSaving"
+                        Text="Print"/>
+                    <AppFormDeleteButton Click="DeleteAsync" Disabled="@(_isSaving || _model.IsInactive)"/>
+                }
+                <AppFormSaveButton Disabled="@(_isSaving || _model.IsInactive)"/>
+                <AppFormResetButton Click="ResetAsync" Disabled="@(_isSaving || _model.IsInactive)"/>
+            </AppFormFooter>
+        </RadzenStack>
+    </EditForm>
+}
+
+@code {
+
+    private bool _isSaving = false;
+    private string _name = string.Empty;
+    private FelineEditModel? _model = null;
+
+    [EditorRequired] [Parameter] public Feline Feline { get; set; } = null!;
+
+    [Parameter] public bool IsNew { get; set; }
+
+    [Parameter] public EventCallback OnActivate { get; set; } = EventCallback.Empty;
+
+    [Parameter] public EventCallback OnDelete { get; set; } = EventCallback.Empty;
+
+    [Parameter]
+    public EventCallback<DateTimeOffset> OnInactivate { get; set; } =
+        EventCallback<DateTimeOffset>.Empty;
+
+    [Parameter] public EventCallback<FelineEditModel> OnSave { get; set; } = EventCallback<FelineEditModel>.Empty;
+
+    /// <summary>
+    ///     Re-activates an inactive cat.
+    /// </summary>
+    private async Task ActivateAsync()
+    {
+        _isSaving = true;
+        await OnActivate.InvokeAsync();
+        _isSaving = false;
+    }
+
+    /// <summary>
+    ///     Reset any time the parent Feline is updated.
+    /// </summary>
+    protected override async Task OnParametersSetAsync() => await ResetAsync();
+
+    /// <summary>
+    ///     Deletes the current cat.
+    /// </summary>
+    private async Task DeleteAsync()
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(ConfirmDeleteFelineDialog.Model), _model! }
+        };
+
+        bool result = await DialogService
+            .OpenAsync<ConfirmDeleteFelineDialog>("Confirm Delete", parameters);
+        if (result)
+        {
+            _isSaving = true;
+            await OnDelete.InvokeAsync(Feline.Id);
+            _isSaving = false;
+        }
+    }
+
+    /// <summary>
+    ///     Inactivates the current cat.
+    /// </summary>
+    private async Task InactivateAsync()
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(ConfirmInactivateFelineDialog.Feline), _model! }
+        };
+
+        DateTimeOffset? result = await DialogService
+            .OpenAsync<ConfirmInactivateFelineDialog>("Confirm Inactivate", parameters);
+        if (result.HasValue)
+        {
+            _isSaving = true;
+            await OnInactivate.InvokeAsync(result.Value);
+            _isSaving = false;
+        }
+    }
+
+    private async Task OnFilesChangedAsync(InputFileChangeEventArgs args)
+    {
+        if (_model is not null)
+        {
+            _model.Thumbnail = await args.File.ToThumbnailAsync(_model.Id);
+        }
+    }
+
+    private async Task PrintAsync()
+    {
+        var parameters = new Dictionary<string, object>
+        {
+            { nameof(PrintOptionsDialog.FelineId), _model!.Id }
+        };
+
+        await DialogService.OpenAsync<PrintOptionsDialog>("Print Settings", parameters);
+    }
+
+    private Task ResetAsync()
+    {
+        _model = new(Feline);
+        _name = IsNew ? "Intake" : _model.Name;
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveAsync()
+    {
+        _isSaving = true;
+        await OnSave.InvokeAsync(_model);
+        _isSaving = false;
+    }
+
+}

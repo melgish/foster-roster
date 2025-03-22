@@ -5,7 +5,7 @@ using Radzen;
 public static class NotifyServiceExtensions
 {
     /// <summary>
-    /// Notify user about the result of an action
+    ///     Notify user about the result of an action
     /// </summary>
     /// <param name="service">Notification Service to target</param>
     /// <param name="result">Result instance to check</param>

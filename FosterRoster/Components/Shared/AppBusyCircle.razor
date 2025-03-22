@@ -1,0 +1,11 @@
+﻿@if (IsBusy)
+{
+    <RadzenProgressBarCircular Mode="ProgressBarMode.Indeterminate"
+                               ProgressBarStyle="ProgressBarStyle.Primary"
+                               ShowValue="false"
+                               Size="ProgressBarCircularSize.Small"/>
+}
+
+@code {
+    [Parameter] public bool IsBusy { get; set; }
+}

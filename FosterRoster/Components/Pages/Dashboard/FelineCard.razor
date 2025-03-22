@@ -37,24 +37,24 @@ else
 @code {
 
     /// <summary>
-    /// Feline to display.
+    ///     Feline to display.
     /// </summary>
     [Parameter]
     public FelineCardDto? Feline { get; set; }
 
     /// <summary>
-    /// Gender and category of the feline.
+    ///     Gender and category of the feline.
     /// </summary>
     private string GenderCategory => $"{Feline?.Gender} {Feline?.Category}";
 
     /// <summary>
-    /// Fired if Feline is updated.
+    ///     Fired if Feline is updated.
     /// </summary>
     [Parameter]
     public EventCallback<FelineCardDto> FelineChanged { get; set; }
 
     /// <summary>
-    /// Handles quick change of the thumbnail from the dashboard.
+    ///     Handles quick change of the thumbnail from the dashboard.
     /// </summary>
     /// <param name="args"></param>
     private async Task OnFilesChangedAsync(InputFileChangeEventArgs args)

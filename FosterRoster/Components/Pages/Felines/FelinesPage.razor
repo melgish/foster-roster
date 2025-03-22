@@ -1,5 +1,4 @@
 ﻿@page "/felines"
-@using FosterRoster.Components.Shared
 @rendermode @(new InteractiveServerRenderMode(false))
 @inject NotificationService NotificationService
 @inject IDbContextFactory<FosterRosterDbContext> ContextFactory
@@ -28,21 +27,11 @@
             PagingSummaryFormat="Showing {0} to {1} of {2}"
             ShowPagingSummary="true">
             <HeaderTemplate>
-                <RadzenStack
-                    AlignItems="AlignItems.Center"
-                    Gap="0.5rem"
-                    JustifyContent="JustifyContent.SpaceBetween"
-                    Orientation="Orientation.Horizontal">
-                    <GridTitle Text="Felines"/>
+                <AppGridHeader Text="Felines">
                     <RadzenLink Path="/intake">
-                        <RadzenButton
-                            ButtonStyle="ButtonStyle.Primary"
-                            Icon="add"
-                            Size="ButtonSize.Small"
-                            Text="Intake"
-                            Variant="Variant.Outlined"/>
+                        <AppGridButton Text="Intake"/>
                     </RadzenLink>
-                </RadzenStack>
+                </AppGridHeader>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn
@@ -52,11 +41,7 @@
                     Width="6ch">
                     <Template>
                         <RadzenLink Path="@($"/felines/{context.Id}")">
-                            <RadzenButton
-                                ButtonStyle="ButtonStyle.Secondary"
-                                Size="ButtonSize.ExtraSmall"
-                                Text="Edit"
-                                Variant="Variant.Outlined"/>
+                            <AppGridButton ButtonStyle="ButtonStyle.Secondary" Text="Edit"/>
                         </RadzenLink>
                     </Template>
                 </RadzenDataGridColumn>
@@ -73,12 +58,12 @@
                     FilterValue="@_isInactiveFilter"
                     Property="@nameof(GridRow.IsInactive)"
                     Title="Inactive"
-                    Width="20ch">
+                    Width="19ch">
                     <FilterTemplate>
-                        <AppInactiveFilter @bind-Value="_isInactiveFilter"/>
+                        <AppGridInactiveFilter @bind-Value="_isInactiveFilter"/>
                     </FilterTemplate>
                     <Template>
-                        <AppInactiveValue Value="context.IsInactive"/>
+                        <AppGridInactiveValue Value="context.IsInactive"/>
                     </Template>
                 </RadzenDataGridColumn>
             </Columns>
@@ -102,7 +87,7 @@
     }
 
     /// <summary>
-    ///     Called by grid to fetch data. 
+    ///     Called by grid to fetch data.
     /// </summary>
     /// <param name="args">Arguments supplied by grid.</param>
     private async Task LoadDataAsync(LoadDataArgs args)

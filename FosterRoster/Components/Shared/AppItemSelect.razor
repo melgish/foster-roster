@@ -1,0 +1,29 @@
+﻿@typeparam TValue
+@inherits AppFormComponent<TValue>
+
+<RadzenStack Gap="0rem">
+    <RadzenFormField
+        AllowFloatingLabel="false"
+        Component="@Name"
+        Text="@Text"
+        Variant="Variant.Text">
+        <RadzenDropDown Data="Items"
+                        Disabled="@Disabled"
+                        Name="@Name"
+                        Placeholder="@Placeholder"
+                        TextProperty="@nameof(Item.Name)"
+                        TValue="TValue"
+                        Value="@Value"
+                        ValueChanged="ValueChanged"
+                        ValueExpression="ValueExpression"
+                        ValueProperty="@nameof(Item.Id)"/>
+    </RadzenFormField>
+    <ValidationMessage For="ValueExpression" TValue="TValue"/>
+</RadzenStack>
+
+@code {
+
+    public sealed record Item(TValue Id, string Name);
+
+    [Parameter] public IEnumerable<Item>? Items { get; set; }
+}

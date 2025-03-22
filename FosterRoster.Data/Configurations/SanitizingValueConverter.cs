@@ -1,7 +1,7 @@
+namespace FosterRoster.Data.Configurations;
+
 using Ganss.Xss;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
-namespace FosterRoster.Data.Configurations;
 
 internal sealed class SanitizingValueConverter(ConverterMappingHints? mappingHints = null)
     : ValueConverter<string, string>(

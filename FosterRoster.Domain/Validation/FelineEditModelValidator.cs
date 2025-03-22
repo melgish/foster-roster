@@ -3,8 +3,6 @@ namespace FosterRoster.Domain.Validation;
 [UsedImplicitly]
 public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel>
 {
-    private static DateOnly GetDateOnlyNow() => DateOnly.FromDateTime(TimeProvider.System.GetUtcNow().DateTime);
-
     public FelineEditModelValidator()
     {
         RuleFor(feline => feline.AnimalId)
@@ -38,4 +36,6 @@ public sealed class FelineEditModelValidator : AbstractValidator<FelineEditModel
 
         RuleFor(feline => feline.Weaned).IsInEnum();
     }
+
+    private static DateOnly GetDateOnlyNow() => DateOnly.FromDateTime(TimeProvider.System.GetUtcNow().DateTime);
 }

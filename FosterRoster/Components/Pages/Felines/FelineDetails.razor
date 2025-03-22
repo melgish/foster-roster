@@ -9,17 +9,17 @@
 <PageTitle>Details: @Name</PageTitle>
 @if (_feline is null)
 {
-    <Loading/>
+    <AppLoading/>
 }
 else
 {
     <RadzenStack>
         <RadzenPanel class="rz-shadow-3">
-            <FelineEditForm Feline="@_feline"
-                            OnActivate="OnActivateAsync"
-                            OnDelete="DeleteFelineAsync"
-                            OnInactivate="OnInactivateAsync"
-                            OnSave="SaveFelineAsync"/>
+            <FelineForm Feline="@_feline"
+                        OnActivate="OnActivateAsync"
+                        OnDelete="DeleteFelineAsync"
+                        OnInactivate="OnInactivateAsync"
+                        OnSave="SaveFelineAsync"/>
         </RadzenPanel>
         <RadzenPanel class="rz-p-0 rz-shadow-3">
             <RadzenTabs>
@@ -60,7 +60,7 @@ else
         => (await FelineRepository.GetByKeyAsync(FelineId)).ValueOrDefault;
 
     /// <summary>
-    /// Delete the supplied comment from the current feline.
+    ///     Delete the supplied comment from the current feline.
     /// </summary>
     /// <param name="comment">Comment to delete</param>
     async Task DeleteCommentAsync(Comment comment)
@@ -98,7 +98,7 @@ else
     public void Dispose() => _stateSubscription?.Dispose();
 
     /// <summary>
-    /// Handle when user clicks activate button.
+    ///     Handle when user clicks activate button.
     /// </summary>
     private async Task OnActivateAsync()
     {
@@ -108,7 +108,7 @@ else
     }
 
     /// <summary>
-    /// Handle when user clicks delete button.
+    ///     Handle when user clicks delete button.
     /// </summary>
     private async Task DeleteFelineAsync()
     {
@@ -124,7 +124,7 @@ else
     }
 
     /// <summary>
-    /// Handle when user clicks inactivate button
+    ///     Handle when user clicks inactivate button
     /// </summary>
     /// <param name="asOf"></param>
     private async Task OnInactivateAsync(DateTimeOffset asOf)
@@ -135,7 +135,7 @@ else
     }
 
     /// <summary>
-    /// Save event handler for the FelineEditForm
+    ///     Save event handler for the FelineForm
     /// </summary>
     private async Task SaveFelineAsync(FelineEditModel model)
     {
@@ -150,7 +150,7 @@ else
     }
 
     /// <summary>
-    /// Add a new comment to the current feline.
+    ///     Add a new comment to the current feline.
     /// </summary>
     /// <param name="model"></param>
     private async Task AddCommentAsync(CommentEditModel model)

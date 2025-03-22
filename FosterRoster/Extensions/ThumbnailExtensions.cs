@@ -1,7 +1,7 @@
+namespace FosterRoster.Extensions;
+
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Mime;
-
-namespace FosterRoster.Extensions;
 
 internal static class ThumbnailExtensions
 {
@@ -9,7 +9,7 @@ internal static class ThumbnailExtensions
         "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewPort='0 0 200 200'%3E%3Ctext x='50%25' y='50%25' font-size='1rem' dominant-baseline='middle' text-anchor='middle'%3ENO IMAGE%3C/text%3E%3C/svg%3E";
 
     /// <summary>
-    /// Converts a <see cref="IBrowserFile"/> to a <see cref="Thumbnail"/>.
+    ///     Converts a <see cref="IBrowserFile" /> to a <see cref="Thumbnail" />.
     /// </summary>
     /// <param name="file"></param>
     /// <param name="felineId"></param>

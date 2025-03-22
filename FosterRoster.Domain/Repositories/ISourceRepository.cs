@@ -23,12 +23,6 @@ public interface ISourceRepository : IRepository
     public Task<Result<List<Source>>> GetAllAsync();
 
     /// <summary>
-    ///     Get list of all Sources in the database, with only their names and ids.
-    /// </summary>
-    /// <returns>A Result with list of items if successful, or Errors on failure.</returns>
-    public Task<Result<List<ListItem<int>>>> GetAllNamesAsync();
-
-    /// <summary>
     ///     Gets single Source from the database.
     /// </summary>
     /// <param name="sourceId">ID of source to return.</param>

@@ -1,0 +1,69 @@
+@inject IDbContextFactory<FosterRosterDbContext> DbContextFactory;
+
+<RadzenStack Gap="0rem">
+    <RadzenFormField
+        AllowFloatingLabel="false"
+        Component="@Name"
+        Text="@Text"
+        Variant="Variant.Text">
+        <RadzenDropDown TValue="int"
+                        @attributes="Attributes"
+                        AllowFiltering="true"
+                        Data="_choices"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        FilterOperator="StringFilterOperator.StartsWith"
+                        FilterPlaceholder="Search..."
+                        Name="@Name"
+                        TextProperty="@nameof(ListItem<int>.Name)"
+                        Value="@Value"
+                        ValueChanged="ValueChanged"
+                        ValueExpression="ValueExpression"
+                        ValueProperty="@nameof(ListItem<int>.Id)"/>
+    </RadzenFormField>
+    <ValidationMessage For="@ValueExpression"/>
+</RadzenStack>
+
+@code {
+
+    private sealed record Item(int Id, string Name, bool IsActive);
+
+    private List<Item>? _data;
+    private IEnumerable<Item>? _choices;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; } = [];
+
+    [Parameter] public string? Name { get; set; } = Guid.NewGuid().ToString();
+
+    [Parameter] public string? Text { get; set; } = "Name";
+
+    [Parameter] public int Value { get; set; }
+
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+
+    [Parameter] public Expression<Func<int>> ValueExpression { get; set; } = null!;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        parameters.SetParameterProperties(this);
+
+        if (_data is null)
+        {
+            // Get all felines, active or inactive from db.
+            await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+            _data = await dbContext
+                .Felines
+                .AsNoTracking()
+                .IgnoreQueryFilters()
+                .OrderBy(e => e.Name)
+                .Select(e => new Item(e.Id, e.Name, !e.IsInactive))
+                .ToListAsync();
+        }
+
+        // Only display for active felines. Include the current selection
+        // even if inactive.
+        _choices = _data!.Where(e => e.IsActive || e.Id == Value);
+        await base.SetParametersAsync(ParameterView.Empty);
+    }
+
+}

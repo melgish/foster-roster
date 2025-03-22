@@ -1,0 +1,16 @@
+﻿@inherits AppFormComponent<WeightUnit>
+
+<AppFormSelect
+    Data="Choices"
+    Text="Units"
+    TValue="WeightUnit"
+    Value="@Value"
+    ValueChanged="ValueChanged"
+    ValueExpression="ValueExpression"/>
+
+@code {
+
+    private static readonly WeightUnit[] Choices =
+        [WeightUnit.g, WeightUnit.oz, WeightUnit.lbs, WeightUnit.kg];
+
+}

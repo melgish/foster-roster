@@ -23,7 +23,7 @@ public static class RepositoryExtensions
                 : queryable;
 
     /// <summary>
-    /// Run Radzen LoadDataArgs to apply filters and sorting to queryable, and fetch results.
+    ///     Run Radzen LoadDataArgs to apply filters and sorting to queryable, and fetch results.
     /// </summary>
     /// <param name="queryable"></param>
     /// <param name="args"></param>

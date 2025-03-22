@@ -3,7 +3,7 @@
 public static class DateTimeExtensions
 {
     /// <summary>
-    /// Uses supplied timeProvider to convert time to local time.
+    ///     Uses supplied timeProvider to convert time to local time.
     /// </summary>
     /// <param name="dateTimeOffset">Time to convert</param>
     /// <param name="timeProvider">TimeProvider with timezone to use for conversion.</param>
@@ -12,7 +12,7 @@ public static class DateTimeExtensions
         => TimeZoneInfo.ConvertTime(dateTimeOffset, timeProvider.LocalTimeZone);
 
     /// <summary>
-    /// Uses supplied timeProvider to format time as local time.
+    ///     Uses supplied timeProvider to format time as local time.
     /// </summary>
     /// <param name="dateTimeOffset">Time to display</param>
     /// <param name="timeProvider">TimeProvider with timezone to use for conversion.</param>
@@ -23,7 +23,7 @@ public static class DateTimeExtensions
         => ToLocalTime(dateTimeOffset, timeProvider).ToString(format);
 
     /// <summary>
-    /// Formats a DateTimeOffset as a relative time string.
+    ///     Formats a DateTimeOffset as a relative time string.
     /// </summary>
     /// <param name="dateTimeOffset">Time to display</param>
     /// <param name="asOfDate">Date to base ago off of</param>

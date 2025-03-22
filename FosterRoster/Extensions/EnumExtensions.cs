@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 public static class EnumExtensions
 {
     /// <summary>
-    /// Use display attribute to get a human-readable name for an enum value.
+    ///     Use display attribute to get a human-readable name for an enum value.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>

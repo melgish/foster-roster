@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.AspNetCore.Components;
+﻿namespace FosterRoster.Components.Account;
 
-namespace FosterRoster.Components.Account;
+using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 internal sealed class IdentityRedirectManager(NavigationManager navigationManager)
 {
@@ -14,6 +14,8 @@ internal sealed class IdentityRedirectManager(NavigationManager navigationManage
         IsEssential = true,
         MaxAge = TimeSpan.FromSeconds(5)
     };
+
+    private string CurrentPath => navigationManager.ToAbsoluteUri(navigationManager.Uri).GetLeftPart(UriPartial.Path);
 
     [DoesNotReturn]
     public void RedirectTo(string? uri)
@@ -44,8 +46,6 @@ internal sealed class IdentityRedirectManager(NavigationManager navigationManage
         context.Response.Cookies.Append(StatusCookieName, message, StatusCookieBuilder.Build(context));
         RedirectTo(uri);
     }
-
-    private string CurrentPath => navigationManager.ToAbsoluteUri(navigationManager.Uri).GetLeftPart(UriPartial.Path);
 
     [DoesNotReturn]
     public void RedirectToCurrentPage() => RedirectTo(CurrentPath);

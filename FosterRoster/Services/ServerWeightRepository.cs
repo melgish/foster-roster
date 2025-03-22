@@ -1,6 +1,6 @@
-using System.Linq.Expressions;
-
 namespace FosterRoster.Services;
+
+using System.Linq.Expressions;
 
 public sealed class ServerWeightRepository(
     IDbContextFactory<FosterRosterDbContext> contextFactory
@@ -20,7 +20,7 @@ public sealed class ServerWeightRepository(
         };
 
     /// <summary>
-    /// Adds a new weight to the database for a given feline.
+    ///     Adds a new weight to the database for a given feline.
     /// </summary>
     /// <param name="weight">weight information about feline.</param>
     /// <returns>Result with Weight on success, or Errors on failure.</returns>
@@ -35,7 +35,7 @@ public sealed class ServerWeightRepository(
     }
 
     /// <summary>
-    /// Delete the given weight from the database.
+    ///     Delete the given weight from the database.
     /// </summary>
     /// <param name="felineId">ID of feline.</param>
     /// <param name="dateTime">Date and Time of weight to remove.</param>

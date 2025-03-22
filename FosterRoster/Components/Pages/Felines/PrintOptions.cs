@@ -19,17 +19,17 @@ public sealed class PrintOptions
     ];
 
     /// <summary>
-    /// Gets or sets the selected print sections.
+    ///     Gets or sets the selected print sections.
     /// </summary>
     public PrintSection[] SelectedPrintSections { get; set; } = [..PrintSections];
 
     /// <summary>
-    /// Gets or sets the units to display for each weight.
+    ///     Gets or sets the units to display for each weight.
     /// </summary>
     public WeightUnit Units { get; set; } = WeightUnit.lbs;
 
     /// <summary>
-    /// Convert to string representation
+    ///     Convert to string representation
     /// </summary>
     /// <returns>string representation of options for Url</returns>
     public override string ToString()

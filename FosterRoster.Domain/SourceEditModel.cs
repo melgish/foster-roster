@@ -2,15 +2,15 @@
 
 public sealed class SourceEditModel()
 {
-    private int Id { get; }
-
-    public string Name { get; set; } = string.Empty;
-
     public SourceEditModel(Source source) : this()
     {
         Id = source.Id;
         Name = source.Name;
     }
+
+    private int Id { get; }
+
+    public string Name { get; set; } = string.Empty;
 
     public Source ToSource() =>
         new()

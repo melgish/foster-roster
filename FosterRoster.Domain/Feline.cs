@@ -11,10 +11,10 @@ public sealed class Feline
     public int? FostererId { get; set; }
     public Gender Gender { get; set; }
     public int Id { get; init; }
-    public DateTimeOffset? InactivatedAtUtc { get; set; }
+    public DateTimeOffset? InactivatedAtUtc { get; init; }
     public int? IntakeAgeInWeeks { get; set; }
     public DateOnly IntakeDate { get; set; }
-    public bool IsInactive { get; set; }
+    public bool IsInactive { get; init; }
     public string Name { get; set; } = string.Empty;
     public DateOnly? RegistrationDate { get; set; }
     public Source? Source { get; init; }

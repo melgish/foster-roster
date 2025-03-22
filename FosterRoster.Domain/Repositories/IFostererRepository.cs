@@ -23,12 +23,6 @@ public interface IFostererRepository : IRepository
     public Task<Result<List<Fosterer>>> GetAllAsync();
 
     /// <summary>
-    ///     Gets names of all fosterers from the database.
-    /// </summary>
-    /// <returns>Result with list of items, or Errors on failure.</returns>
-    public Task<Result<List<ListItem<int>>>> GetAllNamesAsync();
-
-    /// <summary>
     ///     Gets single fosterer from the database.
     /// </summary>
     /// <param name="fostererId">ID of fosterer to return.</param>
