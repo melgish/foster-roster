@@ -27,7 +27,6 @@
         <Columns>
             <RadzenDataGridColumn
                 Sortable="false"
-                Title="Actions"
                 Visible="_showActions"
                 Width="8ch">
                 <Template>
@@ -116,11 +115,11 @@
         try
         {
             await using var context = await DbContextFactory.CreateDbContextAsync();
-            var query = (
-                FelineId == 0
-                    ? context.Weights.AsNoTracking()
-                    : context.Weights.AsNoTracking().Where(e => e.FelineId == FelineId)
-            ).Select(w => new WeightGridRow
+            var query = context
+                .Weights
+                .AsNoTracking()
+                .ForFeline(FelineId)
+                .Select(w => new WeightGridRow
             {
                 FelineId = w.FelineId,
                 DateTime = w.DateTime,
