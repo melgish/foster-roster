@@ -5,7 +5,7 @@
 
 <PageTitle>Felines</PageTitle>
 <RadzenStack>
-    <RadzenPanel class="rz-p-0 rz-shadow-3">
+    <AppGridPanel>
         <RadzenDataGrid
             @ref="_grid"
             TItem="GridRow"
@@ -68,7 +68,7 @@
                 </RadzenDataGridColumn>
             </Columns>
         </RadzenDataGrid>
-    </RadzenPanel>
+    </AppGridPanel>
 </RadzenStack>
 
 @code {
@@ -131,5 +131,4 @@
 
         await base.OnAfterRenderAsync(firstRender);
     }
-
 }

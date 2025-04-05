@@ -4,15 +4,15 @@ using Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-internal sealed class ApplicationTasksConfiguration : IEntityTypeConfiguration<ApplicationTask>
+internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
 {
-    public void Configure(EntityTypeBuilder<ApplicationTask> builder)
+    public void Configure(EntityTypeBuilder<Chore> builder)
     {
-        builder.ToTable("ApplicationTasks");
+        builder.ToTable("Chores");
 
         builder
             .HasKey(e => e.Id)
-            .HasName("PK_ApplicationTasks");
+            .HasName("PK_Chores");
 
         builder.Property(e => e.Description)
             .HasMaxLength(256)
@@ -23,7 +23,7 @@ internal sealed class ApplicationTasksConfiguration : IEntityTypeConfiguration<A
             .HasOne(e => e.Feline)
             .WithMany()
             .HasForeignKey(e => e.FelineId)
-            .HasConstraintName("FK_ApplicationTasks_Felines")
+            .HasConstraintName("FK_Chores_Felines")
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 

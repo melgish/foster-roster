@@ -62,6 +62,7 @@ builder.Services.AddSingleton<TimeProvider, TexasTimeProvider>();
 builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
 builder.Services.AddValidatorsFromAssemblyContaining<App>();
 
+builder.Services.AddScoped<IChoresRepository, ServerChoresRepository>();
 builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
 builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
 builder.Services.AddScoped<IFostererRepository, ServerFostererRepository>();

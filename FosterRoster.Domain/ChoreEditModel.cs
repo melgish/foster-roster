@@ -1,8 +1,8 @@
 ﻿namespace FosterRoster.Domain;
 
-public sealed class ApplicationTaskEditModel()
+public sealed class ChoreEditModel()
 {
-    public ApplicationTaskEditModel(ApplicationTask task) : this()
+    public ChoreEditModel(Chore task) : this()
     {
         Description = task.Description;
         FelineId = task.FelineId.GetValueOrDefault();
@@ -45,7 +45,7 @@ public sealed class ApplicationTaskEditModel()
     /// </summary>
     public int Repeats { get; set; } = 1;
 
-    public ApplicationTask ToApplicationTask() =>
+    public Chore ToChore() =>
         new()
         {
             Description = Description,

@@ -24,10 +24,10 @@ else
                 <AppBusyCircle IsBusy="_isSaving"/>
                 @if (Source.Id != 0)
                 {
-                    <AppFormDeleteButton Click="DeleteAsync" Disabled="@_isSaving"/>
+                    <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving"/>
                 }
-                <AppFormSaveButton Disabled="@_isSaving"/>
-                <AppFormResetButton Click="ResetAsync" Disabled="@_isSaving"/>
+                <AppFormSaveButton Disabled="_isSaving"/>
+                <AppFormResetButton Click="ResetAsync" Disabled="_isSaving"/>
             </AppFormFooter>
         </RadzenStack>
     </EditForm>

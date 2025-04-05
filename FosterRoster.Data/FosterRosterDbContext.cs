@@ -12,7 +12,7 @@ public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> optio
     public DbSet<Feline> Felines { get; set; } = null!;
     public DbSet<Fosterer> Fosterers { get; set; } = null!;
     public DbSet<Source> Sources { get; set; } = null!;
-    public DbSet<ApplicationTask> Tasks { get; set; } = null!;
+    public DbSet<Chore> Chores { get; set; } = null!;
     public DbSet<Thumbnail> Thumbnails { get; set; } = null!;
     public DbSet<Weight> Weights { get; set; } = null!;
 

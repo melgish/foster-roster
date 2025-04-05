@@ -93,7 +93,7 @@
 @code {
     private IEnumerable<IdentityError>? _identityErrors;
 
-    [SupplyParameterFromForm] private InputModel Input { get; } = new();
+    [SupplyParameterFromForm] private InputModel Input { get; set;  } = new();
 
     [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
 

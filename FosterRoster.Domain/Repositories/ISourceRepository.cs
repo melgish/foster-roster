@@ -1,6 +1,6 @@
 namespace FosterRoster.Domain.Repositories;
 
-public interface ISourceRepository : IRepository
+public interface ISourceRepository
 {
     /// <summary>
     ///     Adds a new source

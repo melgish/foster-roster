@@ -1,60 +1,138 @@
 ﻿@page "/sources"
-@implements IAsyncDisposable
-@inject PersistentComponentState ComponentState
+@page "/sources/{sourceId:int}"
+@rendermode @(new InteractiveServerRenderMode(false))
 @inject ISourceRepository SourceRepository
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
+@inject IDbContextFactory<FosterRosterDbContext> ContextFactory
+@inject ILogger<SourcesPage> Logger;
 
 <PageTitle>Sources</PageTitle>
 <RadzenStack>
-    <RadzenPanel class="rz-shadow-3">
+    <AppFormPanel>
         <SourceForm
             Source="_source"
             OnDelete="DeleteAsync"
             OnSave="SaveAsync"
         />
-    </RadzenPanel>
-    <RadzenPanel class="rz-p-0 rz-shadow-3">
-        <SourcesGrid Items="_sources" OnAdd="AddAsync" OnEdit="EditAsync"/>
-    </RadzenPanel>
+    </AppFormPanel>
+    <AppGridPanel>
+        <RadzenDataGrid
+            @ref="_grid"
+            TItem="GridRow"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowSorting="true"
+            Count="_count"
+            Data="_data"
+            Density="Density.Compact"
+            FilterMode="FilterMode.Simple"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="1"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            PagerPosition="PagerPosition.Top"
+            PageSize="20"
+            PageSizeOptions="@( [10, 20, 50, 100])"
+            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            ShowPagingSummary="true">
+            <HeaderTemplate>
+                <AppGridHeader Text="Sources">
+                    <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
+                </AppGridHeader>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn Width="6ch">
+                    <Template Context="data">
+                        <AppGridButton Click="@(() => Edit(data.Id))" Text="Edit"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(GridRow.Name)" Title="@nameof(GridRow.Name)"/>
+            </Columns>
+        </RadzenDataGrid>
+    </AppGridPanel>
 </RadzenStack>
 
 @code {
-    private Source _source = new();
-    private ICollection<Source>? _sources = [];
-    private IDisposable? _stateSubscription;
-
-    private Task AddAsync()
+    private sealed class GridRow
     {
-        _source = new();
-        return Task.CompletedTask;
+        public required int Id { get; init; }
+        public required string Name { get; init; }
     }
 
+    private int _count;
+    private IEnumerable<GridRow>? _data;
+    private RadzenDataGrid<GridRow>? _grid;
+    private bool _isLoading;
+    private Source _source = new();
+
+    /// <summary>
+    ///     The ID of the source currently being edited.
+    /// </summary>
+    [Parameter]
+    public int? SourceId { get; set; }
+
+    /// <summary>
+    ///     Delete an existing source identified by its ID.
+    /// </summary>
+    /// <param name="sourceId">ID of source to delete.</param>
     private async Task DeleteAsync(int sourceId)
     {
         var rs = await SourceRepository.DeleteByKeyAsync(sourceId);
         NotificationService.Notify(rs, "Deleted source", "Failed to delete source");
         if (rs.IsSuccess)
         {
-            await RefreshAsync(0);
+            await _grid!.Reload();
+            Edit(0);
         }
     }
 
-    public async ValueTask DisposeAsync()
+    /// <summary>
+    ///     Edit the specified source.
+    /// </summary>
+    /// <param name="sourceId"></param>
+    private void Edit(int sourceId)
+        => NavigationManager.NavigateTo(sourceId == 0 ? "/sources" : $"/sources/{sourceId}");
+
+    /// <summary>
+    ///     Loads paged data for the grid.
+    /// </summary>
+    /// <param name="args">Radzen grid arguments</param>
+    private async Task LoadDataAsync(LoadDataArgs args)
     {
-        if (_stateSubscription is IAsyncDisposable sub)
+        _isLoading = true;
+        try
         {
-            await sub.DisposeAsync();
+            Logger.LogDebug("LoadDataAsync");
+            await using var dbContext = await ContextFactory.CreateDbContextAsync();
+            (_data, _count) = await dbContext
+                .Sources
+                .AsNoTracking()
+                .Select(e => new GridRow { Id = e.Id, Name = e.Name })
+                .ToQueryResultsAsync(args, "Name asc");
         }
-        else
+        catch (Exception ex)
         {
-            _stateSubscription?.Dispose();
+            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 
-    private async Task EditAsync(int sourceId)
+    /// <summary>
+    ///     
+    /// </summary>
+    protected override async Task OnParametersSetAsync()
     {
-        var rs = await SourceRepository.GetByKeyAsync(sourceId);
+        await base.OnParametersSetAsync();
+
+        // Load the corresponding source from the database.
+        var rs = SourceId.HasValue
+            ? await SourceRepository.GetByKeyAsync(SourceId.Value)
+            : Result.Ok<Source>(new());
         if (rs.IsFailed)
         {
             NavigationManager.NavigateTo("/not-found");
@@ -64,27 +142,10 @@
         _source = rs.Value;
     }
 
-    protected override async Task OnInitializedAsync()
-    {
-        _stateSubscription = ComponentState.RegisterOnPersisting(PersistStateAsync);
-        ComponentState.TryTakeFromJson("sources", out _sources);
-        _sources ??= (await SourceRepository.GetAllAsync()).ValueOrDefault ?? [];
-        _source = new();
-        await base.OnInitializedAsync();
-    }
-
-    private Task PersistStateAsync()
-    {
-        ComponentState.PersistAsJson("sources", _sources);
-        return Task.CompletedTask;
-    }
-
-    private async Task RefreshAsync(int sourceId)
-    {
-        _sources = (await SourceRepository.GetAllAsync()).ValueOrDefault ?? [];
-        _source = _sources.FirstOrDefault(e => e.Id == sourceId) ?? new();
-    }
-
+    /// <summary>
+    ///     Save the source to the database.
+    /// </summary>
+    /// <param name="source">Source to add or update.</param>
     private async Task SaveAsync(Source source)
     {
         var rs = source.Id == 0
@@ -93,8 +154,8 @@
         NotificationService.Notify(rs, "Saved source", "Failed to save source");
         if (rs.IsSuccess)
         {
-            await RefreshAsync(rs.Value.Id);
+            await _grid!.Reload();
+            Edit(rs.Value.Id);
         }
     }
-
 }

@@ -7,7 +7,7 @@ namespace FosterRoster.Domain.Repositories;
 /// <param name="Version">Updated row version for the thumbnail.</param>
 public sealed record SetThumbnailResponse([UsedImplicitly] int FelineId, uint Version);
 
-public interface IFelineRepository : IRepository
+public interface IFelineRepository
 {
     /// <summary>
     ///     Restores identified feline to active status.
