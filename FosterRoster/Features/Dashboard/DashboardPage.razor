@@ -1,0 +1,54 @@
+﻿@page "/"
+@attribute [AllowAnonymous]
+@inject Felines.FelineRepository FelineRepository
+
+<PageTitle>Dashboard</PageTitle>
+<div class="deck">
+    @foreach (var feline in _felines)
+    {
+        <FelineCard @key="feline.Id" Feline="@feline" FelineChanged="OnFelineChanged"/>
+    }
+</div>
+
+@code {
+    private IEnumerable<FelineCardDto> _felines = [];
+
+    /// <summary>
+    ///     Load all active felines for the dashboard.
+    /// </summary>
+    private async Task LoadFelinesAsync()
+    {
+        await using var query = await FelineRepository.CreateQueryAsync();
+        _felines = await query
+            .AsNoTracking()
+            .Include(f => f.Thumbnail)
+            .OrderBy(f => f.Name)
+            .Select(f => new FelineCardDto
+            {
+                Category = f.Category,
+                Gender = f.Gender,
+                Id = f.Id,
+                IntakeAgeInWeeks = f.IntakeAgeInWeeks,
+                IntakeDate = f.IntakeDate,
+                Name = f.Name,
+                ThumbnailVersion = f.Thumbnail == null ? null : f.Thumbnail.Version
+            })
+            .ToListAsync();
+    }
+
+    /// <summary>
+    ///     When a new image is uploaded via the Feline Card, update the feline in the list.
+    /// </summary>
+    /// <param name="feline">Updated card</param>
+    private void OnFelineChanged(FelineCardDto feline)
+    {
+        _felines = _felines.Select(f => f.Id == feline.Id ? feline : f).ToList();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadFelinesAsync();
+        await base.OnInitializedAsync();
+    }
+
+}

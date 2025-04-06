@@ -1,0 +1,236 @@
+@page "/weights"
+@using FosterRoster.Features.Felines
+@inject DialogService DialogService
+@inject NotificationService NotificationService
+@inject WeightRepository WeightRepository
+@inject TimeProvider TimeProvider
+
+<PageTitle>Weights</PageTitle>
+
+<RadzenStack>
+    <AppFormPanel>
+        <EditForm FormName="weightForm"
+                  Model="_model"
+                  OnValidSubmit="SaveAsync">
+            <FluentValidationValidator/>
+            <RadzenStack Gap="0.5rem">
+                <AppFormHeader Text="Enter Weight"/>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <FelineSelect @bind-Value="@_model.FelineId"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppDateTime @bind-Value="_model.DateTime" Text="Date"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppNumeric @bind-Value="_model.Value" Min="0.0m" Step="0.1" Text="Weight" TValue="float"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <WeightUnitSelect @bind-Value="@_model.Units"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormFooter>
+                    <AppBusyCircle IsBusy="_isSaving"/>
+                    <AppFormSaveButton Disabled="_isSaving"/>
+                    <AppFormResetButton Click="Reset" Disabled="_isSaving"/>
+                </AppFormFooter>
+            </RadzenStack>
+        </EditForm>
+    </AppFormPanel>
+    <AppGridPanel>
+        <RadzenDataGrid
+            @ref="_grid"
+            TItem="GridRow"
+            AllowPaging="true"
+            AllowSorting="true"
+            Count="_count"
+            Data="_data"
+            Density="Density.Compact"
+            FilterMode="FilterMode.Simple"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="1"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            PagerPosition="PagerPosition.Top"
+            PageSize="20"
+            PageSizeOptions="@( [10, 20, 50, 100])"
+            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            ShowPagingSummary="true">
+            <HeaderTemplate>
+                <AppGridHeader Text="Weights">
+                    <RadzenSelectBar
+                        @bind-Value="Units"
+                        TValue="WeightUnit"
+                        Size="ButtonSize.ExtraSmall">
+                        <Items>
+                            <RadzenSelectBarItem Text="g" Value="WeightUnit.g"/>
+                            <RadzenSelectBarItem Text="kg" Value="WeightUnit.kg"/>
+                            <RadzenSelectBarItem Text="lbs" Value="WeightUnit.lbs"/>
+                            <RadzenSelectBarItem Text="oz" Value="WeightUnit.oz"/>
+                        </Items>
+                    </RadzenSelectBar>
+                    <AppToggle Text="Actions" @bind-Value="_showActions"/>
+                </AppGridHeader>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn
+                    Sortable="false"
+                    Visible="_showActions"
+                    Width="8ch">
+                    <Template Context="data">
+                        <AppGridButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteAsync(data))"
+                                       Text="Delete"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="@nameof(GridRow.DateTime)"
+                    Title="Date"
+                    Width="13ch">
+                    <Template Context="row">
+                        <AppLocalDateTime Value="row.DateTime"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="@nameof(GridRow.Name)"
+                    MinWidth="12ch"
+                    Title="Name"/>
+                <RadzenDataGridColumn
+                    HeaderCssClass="app-text-right"
+                    CssClass="rz-py-2"
+                    Property="@nameof(GridRow.Value)"
+                    Sortable="false"
+                    TextAlign="TextAlign.End"
+                    Title="Weight"
+                    Width="8ch">
+                    <Template Context="data">@data.Value.Format(data.Units, Units)</Template>
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>
+    </AppGridPanel>
+</RadzenStack>
+
+@code {
+
+    /// <summary>
+    ///     Data for a single row in the grid.
+    /// </summary>
+    private sealed record GridRow
+    {
+        public int FelineId { get; init; }
+        public DateTimeOffset DateTime { get; init; }
+        public string Name { get; init; } = string.Empty;
+        public float Value { get; init; }
+        public WeightUnit Units { get; init; }
+    }
+
+    private int _count;
+    private IEnumerable<GridRow>? _data;
+    private RadzenDataGrid<GridRow>? _grid;
+    private bool _isLoading;
+    private bool _isSaving;
+    private WeightEditModel _model = new();
+    private bool _showActions;
+
+    /// <summary>
+    /// Units to display in the grid
+    /// </summary>
+    public WeightUnit Units { get; set; } = WeightUnit.lbs;
+
+    /// <summary>
+    ///     Prompt the user to confirm deletion of a fosterer.
+    /// </summary>
+    /// <returns>True if user confirms the delete action.</returns>
+    private async Task<bool> ConfirmDeleteAsync(GridRow row)
+        => await DialogService.OpenAsync<ConfirmDeleteWeight>(
+            "Confirm Delete",
+            new() { [nameof(ConfirmDeleteWeight.Name)] = row.Name }
+        ) as bool? ?? false;
+
+    /// <summary>
+    ///     Delete the weight for the selected row.
+    /// </summary>
+    /// <param name="data"></param>
+    private async Task DeleteAsync(GridRow data)
+    {
+        if (!await ConfirmDeleteAsync(data))
+            return;
+
+        _isSaving = true;
+        try
+        {
+            var rs = await WeightRepository.DeleteByKeyAsync(data.FelineId, data.DateTime);
+            NotificationService.Notify(rs, "Weight deleted", "Failed to delete weight");
+            if (rs.IsSuccess)
+            {
+                await _grid!.Reload();
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    /// <summary>
+    ///     Fetch data for the grid.
+    /// </summary>
+    /// <param name="args"></param>
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        if (_grid is null) return;
+        _isLoading = true;
+        try
+        {
+            await using var query = await WeightRepository.CreateQueryAsync();
+            (_data, _count) = await query
+                .AsNoTracking()
+                .ForFeline(_model.FelineId)
+                .Select(w => new GridRow
+                {
+                    FelineId = w.FelineId,
+                    DateTime = w.DateTime,
+                    Name = w.Feline.Name,
+                    Value = w.Value,
+                    Units = w.Units
+                })
+                .ToGridResultsAsync(args, "DateTime desc");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        Reset();
+    }
+
+    private void Reset()
+    {
+        // Start a new form, but keep the selected unit type
+        _model = new()
+        {
+            DateTime = TimeProvider.GetUtcNow(),
+            Units = _model.Units
+        };
+    }
+
+    private async Task SaveAsync()
+    {
+        _isSaving = true;
+        var rs = await WeightRepository.AddAsync(_model.ToWeight());
+        NotificationService.Notify(rs, "Weight saved", "Failed to save weight");
+        if (rs.IsSuccess)
+        {
+            Reset();
+            await _grid!.Reload();
+        }
+
+        _isSaving = false;
+    }
+
+}

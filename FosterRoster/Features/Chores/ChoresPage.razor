@@ -1,0 +1,258 @@
+﻿@using FosterRoster.Features.Felines
+
+@page "/tasks"
+@page "/tasks/{choreId:int}"
+
+@rendermode @(new InteractiveServerRenderMode(false))
+
+@inject ChoresRepository ChoresRepository;
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager;
+@inject NotificationService NotificationService;
+
+<PageTitle>Tasks</PageTitle>
+<RadzenStack>
+    <AppFormPanel>
+        <EditForm Model="_model" OnValidSubmit="SaveAsync">
+            <FluentValidationValidator/>
+            <RadzenStack Gap="0.5rem">
+                <AppFormHeader Text="New Task"/>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="@_model.Name" Text="Task Name"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <FelineSelect
+                            @bind-Value="_model.FelineId"
+                            Disabled="_isSaving"
+                            Placeholder="Create Template"
+                            Text="Feline Name (leave blank to create template)"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn SizeSM="12">
+                        <AppTextBox @bind-Value="@_model.Description" Text="Description"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppNumeric @bind-Value="_model.Repeats" Text="Repeats"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <FrequencySelect @bind-Value="@_model.Frequency" Disabled="_isSaving"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormFooter>
+                    <AppBusyCircle IsBusy="_isSaving"/>
+                    @if (_model.Id != 0)
+                    {
+                        <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving"/>
+                    }
+                    <AppFormSaveButton Disabled="_isSaving"/>
+                    <AppFormResetButton Click="ResetAsync" Disabled="_isSaving"/>
+                </AppFormFooter>
+            </RadzenStack>
+        </EditForm>
+    </AppFormPanel>
+    <AppGridPanel>
+        <RadzenDataGrid
+            @ref="_grid"
+            TItem="GridRow"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowSorting="true"
+            Count="_count"
+            Data="_data"
+            Density="Density.Compact"
+            FilterMode="FilterMode.Simple"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="1"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            PagerPosition="PagerPosition.Top"
+            PageSize="20"
+            PageSizeOptions="@( [10, 20, 50, 100])"
+            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            ShowPagingSummary="true">
+            <HeaderTemplate>
+                <AppGridHeader Text="Sources">
+                    <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
+                </AppGridHeader>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn Width="6ch">
+                    <Template Context="data">
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => Edit(data.Id))" Text="Edit"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="@nameof(GridRow.Name)"
+                    Title="@nameof(GridRow.Name)"/>
+                <RadzenDataGridColumn
+                    Filterable="false"
+                    Property="@nameof(GridRow.Frequency)"
+                    Title="@nameof(GridRow.Frequency)"
+                    Width="20ch"/>
+                <RadzenDataGridColumn Property="@nameof(GridRow.FelineName)" Title="Assigned To"/>
+                <RadzenDataGridColumn
+                    Filterable="false"
+                    HeaderCssClass="app-text-right"
+                    Property="@nameof(GridRow.Repeats)"
+                    Title="@nameof(GridRow.Repeats)"
+                    TextAlign="TextAlign.Right"
+                    Width="12ch"/>
+            </Columns>
+        </RadzenDataGrid>
+    </AppGridPanel>
+</RadzenStack>
+
+@code {
+
+    private sealed class GridRow
+    {
+        public required int Id { get; init; }
+        public required string Name { get; init; }
+        public required string Frequency { get; init; }
+        public required string? FelineName { get; init; }
+        public required int Repeats { get; init; }
+    }
+
+    private const string PageRoute = "/tasks";
+    private const string EntityName = "Task";
+
+    private int _count;
+    private IEnumerable<GridRow>? _data;
+    private RadzenDataGrid<GridRow>? _grid;
+    private bool _isLoading;
+    private bool _isSaving;
+    private ChoreEditModel _model = new();
+    private string _name = $"Create New {EntityName}";
+
+    /// <summary>
+    ///     The ID of the source currently being edited.
+    /// </summary>
+    [Parameter]
+    public int ChoreId { get; set; }
+
+    /// <summary>
+    ///     Prompt the user to confirm deletion of a fosterer.
+    /// </summary>
+    /// <returns>True if user confirms the delete action.</returns>
+    private async Task<bool> ConfirmDeleteAsync()
+        => await DialogService.OpenAsync<ConfirmDeleteChore>(
+            "Confirm Delete",
+            new() { [nameof(ConfirmDeleteChore.Name)] = _name }
+        ) as bool? ?? false;
+
+    /// <summary>
+    ///     Delete the chore currently being edited.
+    /// </summary>
+    private async Task DeleteAsync()
+    {
+        if (!(_model.Id != 0 && await ConfirmDeleteAsync()))
+            return;
+
+        _isSaving = true;
+        try
+        {
+            var rs = await ChoresRepository.DeleteByKeyAsync(_model.Id);
+            NotificationService.Notify(rs, $"Deleted {EntityName}", $"Failed to delete {EntityName}");
+            if (rs.IsSuccess)
+            {
+                await _grid!.Reload();
+                Edit(0);
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    /// <summary>
+    ///     Edit the specified chore.
+    /// </summary>
+    /// <param name="choreId">ID of the chore to edit or 0 to create a new one.</param>
+    private void Edit(int choreId)
+        => NavigationManager.NavigateTo(choreId == 0 ? PageRoute : $"{PageRoute}/{choreId}");
+
+    /// <summary>
+    ///     Loads paged data for the grid.
+    /// </summary>
+    /// <param name="args">Radzen grid arguments</param>
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        _isLoading = true;
+        try
+        {
+            await using var query = await ChoresRepository.CreateQueryAsync();
+            (_data, _count) = await query
+                .AsNoTracking()
+                .Select(e => new GridRow
+                {
+                    FelineName = e.Feline == null ? "Template" : e.Feline.Name,
+                    Frequency = e.Frequency,
+                    Id = e.Id, 
+                    Name = e.Name,
+                    Repeats = e.Repeats
+                })
+                .ToGridResultsAsync(args, "Name asc");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+    
+    /// <summary>
+    ///     Invoked when the component is initialized.
+    /// </summary>
+    protected override async Task OnParametersSetAsync()
+    {
+        // Initialize the model to be edited.
+        await ResetAsync();
+        await base.OnParametersSetAsync();
+    }
+
+    /// <summary>
+    ///     Invoked when form reset is requested.
+    /// </summary>
+    private async Task ResetAsync()
+    {
+        // Reset the model to be edited.
+        var rs = ChoreId != 0
+            ? await ChoresRepository.GetByKeyAsync(ChoreId)
+            : Result.Ok<Chore>(new());
+        if (rs.IsFailed)
+        {
+            NavigationManager.NavigateTo("/not-found");
+            return;
+        }
+
+        _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
+        _model = new(rs.Value);
+    }
+
+    /// <summary>
+    ///     Save the source to the database.
+    /// </summary>
+    /// <param name="editContext">Form context</param>
+    private async Task SaveAsync(EditContext editContext)
+    {
+        var rs = _model.Id == 0
+            ? await ChoresRepository.AddAsync(_model.ToChore())
+            : await ChoresRepository.UpdateAsync(_model.Id, _model.ToChore());
+        NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");
+        if (rs.IsSuccess)
+        {
+            await _grid!.Reload();
+            Edit(rs.Value.Id);
+        }
+    }
+
+}
