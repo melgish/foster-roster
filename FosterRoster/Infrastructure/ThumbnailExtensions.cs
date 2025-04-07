@@ -1,7 +1,8 @@
-namespace FosterRoster.Features.Felines;
+namespace FosterRoster.Infrastructure;
 
 using Microsoft.AspNetCore.Components.Forms;
 using System.Net.Mime;
+using Features.Thumbnails;
 
 public static class ThumbnailExtensions
 {

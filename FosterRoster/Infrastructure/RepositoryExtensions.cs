@@ -23,6 +23,14 @@ public static class RepositoryExtensions
                 : queryable;
 
     /// <summary>
+    /// Return value of ToGridResultsAsync
+    /// </summary>
+    /// <param name="Items"></param>
+    /// <param name="Count"></param>
+    /// <typeparam name="TEntity"></typeparam>
+    public sealed record GridResults<TEntity>(List<TEntity> Items, int Count) where TEntity : class;
+
+    /// <summary>
     ///     Run Radzen LoadDataArgs to apply filters and sorting to queryable, and fetch results.
     /// </summary>
     /// <param name="queryable"></param>
@@ -30,7 +38,7 @@ public static class RepositoryExtensions
     /// <param name="defaultOrderBy"></param>
     /// <typeparam name="TEntity"></typeparam>
     /// <returns>Results of query including total record count.</returns>
-    public static async Task<QueryResults<TEntity>> ToGridResultsAsync<TEntity>(
+    public static async Task<GridResults<TEntity>> ToGridResultsAsync<TEntity>(
         this IQueryable<TEntity> queryable,
         LoadDataArgs args,
         string? defaultOrderBy = null

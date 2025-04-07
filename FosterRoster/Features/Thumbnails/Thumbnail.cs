@@ -1,4 +1,4 @@
-namespace FosterRoster.Features.Felines;
+namespace FosterRoster.Features.Thumbnails;
 
 public sealed class Thumbnail
 {

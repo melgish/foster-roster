@@ -1,7 +1,9 @@
 namespace FosterRoster.Features.Felines;
 
+using Comments;
 using Fosterers;
 using Sources;
+using Thumbnails;
 using Weights;
 
 public sealed class Feline

@@ -1,5 +1,10 @@
-namespace FosterRoster.Features.Felines;
+namespace FosterRoster.Features.Comments;
 
+using Felines;
+
+/// <summary>
+/// Represents a single journal entry
+/// </summary>
 public sealed class Comment
 {
     /// <summary>

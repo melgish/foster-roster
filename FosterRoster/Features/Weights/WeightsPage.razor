@@ -43,6 +43,7 @@
         <RadzenDataGrid
             @ref="_grid"
             TItem="GridRow"
+            AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
             Count="_count"
@@ -77,6 +78,7 @@
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn
+                    Filterable="false"
                     Sortable="false"
                     Visible="_showActions"
                     Width="8ch">
@@ -86,6 +88,7 @@
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
+                    Filterable="false"
                     Property="@nameof(GridRow.DateTime)"
                     Title="Date"
                     Width="13ch">
@@ -94,12 +97,13 @@
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
-                    Property="@nameof(GridRow.Name)"
                     MinWidth="12ch"
+                    Property="@nameof(GridRow.Name)"
                     Title="Name"/>
                 <RadzenDataGridColumn
-                    HeaderCssClass="app-text-right"
                     CssClass="rz-py-2"
+                    HeaderCssClass="app-text-right"
+                    Filterable="false"
                     Property="@nameof(GridRow.Value)"
                     Sortable="false"
                     TextAlign="TextAlign.End"

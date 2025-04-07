@@ -1,4 +1,4 @@
-namespace FosterRoster.Features.Felines;
+namespace FosterRoster.Features.Thumbnails;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.OutputCaching;
 [ApiController]
 [Route("thumbnails")]
 public sealed class ThumbnailsController(
-    FelineRepository felineRepository
+    ThumbnailRepository thumbnailRepository
 ) : ControllerBase
 {
     /// <summary>
@@ -21,7 +21,7 @@ public sealed class ThumbnailsController(
     [ResponseCache(Duration = 60 * 60 * 24 * 7, VaryByQueryKeys = ["v"])]
     public async Task<IActionResult> GetThumbnailAsync(int felineId)
     {
-        var rs = await felineRepository.GetThumbnailAsync(felineId);
+        var rs = await thumbnailRepository.GetThumbnailAsync(felineId);
         return rs.IsSuccess
             ? new FileContentResult(rs.Value.ImageData, rs.Value.ContentType)
             : NotFound();

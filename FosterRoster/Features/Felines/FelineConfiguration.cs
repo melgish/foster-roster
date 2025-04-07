@@ -2,6 +2,7 @@ namespace FosterRoster.Features.Felines;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Thumbnails;
 
 internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
 {

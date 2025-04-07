@@ -1,4 +1,4 @@
-namespace FosterRoster.Features.Felines;
+namespace FosterRoster.Features.Thumbnails;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;

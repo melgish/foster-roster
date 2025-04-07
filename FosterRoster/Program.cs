@@ -3,9 +3,11 @@
 using FosterRoster.Data;
 using FosterRoster.Features.Account;
 using FosterRoster.Features.Chores;
+using FosterRoster.Features.Comments;
 using FosterRoster.Features.Felines;
 using FosterRoster.Features.Fosterers;
 using FosterRoster.Features.Sources;
+using FosterRoster.Features.Thumbnails;
 using FosterRoster.Features.Weights;
 using FosterRoster.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -71,6 +73,7 @@ builder.Services.AddScoped<CommentRepository>();
 builder.Services.AddScoped<FelineRepository>();
 builder.Services.AddScoped<FostererRepository>();
 builder.Services.AddScoped<SourceRepository>();
+builder.Services.AddScoped<ThumbnailRepository>();
 builder.Services.AddScoped<WeightRepository>();
 
 builder.Services.AddRadzenComponents();

@@ -1,9 +1,9 @@
-﻿@using FosterRoster.Features.Felines
-
-@page "/tasks"
+﻿@page "/tasks"
 @page "/tasks/{choreId:int}"
 
 @rendermode @(new InteractiveServerRenderMode(false))
+
+@using FosterRoster.Features.Felines
 
 @inject ChoresRepository ChoresRepository;
 @inject DialogService DialogService

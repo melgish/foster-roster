@@ -1,5 +1,7 @@
 namespace FosterRoster.Features.Felines;
 
+using Thumbnails;
+
 public sealed class FelineEditModel()
 {
     public FelineEditModel(Feline feline) : this()

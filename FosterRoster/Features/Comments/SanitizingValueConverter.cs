@@ -1,4 +1,4 @@
-namespace FosterRoster.Features.Felines;
+namespace FosterRoster.Features.Comments;
 
 using Ganss.Xss;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;

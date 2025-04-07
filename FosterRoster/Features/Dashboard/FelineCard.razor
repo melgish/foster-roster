@@ -1,7 +1,8 @@
 @using FosterRoster.Features.Felines
+@using FosterRoster.Features.Thumbnails
 
 @inject TimeProvider TimeProvider
-@inject FelineRepository FelineRepository
+@inject ThumbnailRepository ThumbnailRepository
 @inject ILogger<FelineCard> Logger
 
 @if (Feline is null)
@@ -64,7 +65,7 @@ else
         var thumbnail = await args.File.ToThumbnailAsync(Feline!.Id);
         if (thumbnail is not null)
         {
-            var rs = await FelineRepository.SetThumbnailAsync(Feline.Id, thumbnail);
+            var rs = await ThumbnailRepository.SetThumbnailAsync(Feline.Id, thumbnail);
             if (rs.IsSuccess)
             {
                 await FelineChanged.InvokeAsync(Feline with { ThumbnailVersion = rs.Value.Version });

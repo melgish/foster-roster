@@ -1,4 +1,4 @@
-namespace FosterRoster.Features.Felines;
+namespace FosterRoster.Features.Comments;
 
 public sealed class CommentEditModel()
 {
