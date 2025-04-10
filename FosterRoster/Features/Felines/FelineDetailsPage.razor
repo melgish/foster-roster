@@ -3,6 +3,7 @@
 @rendermode @(new InteractiveServerRenderMode(false))
 
 @using FosterRoster.Features.Comments
+@using FosterRoster.Features.Chores
 
 @inject CommentRepository CommentRepository
 @inject DialogService DialogService
@@ -26,25 +27,26 @@ else
                         OnSave="SaveFelineAsync"/>
         </AppFormPanel>
         <RadzenPanel class="rz-p-0 rz-shadow-3">
-            <RadzenTabs>
-                <Tabs>
-                    <RadzenTabsItem Text="Journal" Icon="edit">
-                        <CommentForm OnSave="AddCommentAsync" Model="@_comment"/>
-                        @foreach (var comment in _feline.Comments)
-                        {
-                            <CommentCard
-                                @key="comment.Id"
-                                Comment="comment"
-                                OnSave="UpdateCommentAsync"
-                                OnDelete="DeleteCommentAsync"/>
-                        }
-                    </RadzenTabsItem>
-                    <RadzenTabsItem Text="Tasks">
-                        <RadzenText Text="Medical"/>
-                    </RadzenTabsItem>
-
-                </Tabs>
-            </RadzenTabs>
+            <div class="tabs">
+                <RadzenTabs>
+                    <Tabs >
+                        <RadzenTabsItem Text="Journal" Icon="edit" class="bar">
+                            <CommentForm OnSave="AddCommentAsync" Model="@_comment"/>
+                            @foreach (var comment in _feline.Comments)
+                            {
+                                <CommentCard
+                                    @key="comment.Id"
+                                    Comment="comment"
+                                    OnSave="UpdateCommentAsync"
+                                    OnDelete="DeleteCommentAsync"/>
+                            }
+                        </RadzenTabsItem>
+                        <RadzenTabsItem Icon="task_alt" Text="Tasks">
+                            <ChoresTab FelineId="@FelineId" OnChoreLogged="RefreshAsync"/>
+                        </RadzenTabsItem>
+                    </Tabs>
+                </RadzenTabs>
+            </div>
         </RadzenPanel>
     </RadzenStack>
 }

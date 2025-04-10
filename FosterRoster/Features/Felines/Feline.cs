@@ -1,5 +1,6 @@
 namespace FosterRoster.Features.Felines;
 
+using Chores;
 using Comments;
 using Fosterers;
 using Sources;
@@ -11,6 +12,7 @@ public sealed class Feline
     public string? AnimalId { get; set; }
     public string? Breed { get; set; }
     public Category Category { get; set; }
+    public ICollection<Chore> Chores { get; set; } = [];
     public string? Color { get; set; }
     public ICollection<Comment> Comments { get; set; } = [];
     public Fosterer? Fosterer { get; init; }

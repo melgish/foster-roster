@@ -156,8 +156,9 @@ public sealed class FelineRepository(
                 .Felines
                 .AsNoTracking()
                 .IgnoreQueryFilters()
-                .Include(f => f.Thumbnail)
+                .Include(f => f.Chores)
                 .Include(f => f.Comments)
+                .Include(f => f.Thumbnail)
                 .Where(f => f.Id == felineId)
                 .Select(FelineProjection)
                 .AsSplitQuery()

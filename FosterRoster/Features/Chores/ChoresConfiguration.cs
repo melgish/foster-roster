@@ -20,7 +20,7 @@ internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
         // Configure the relationship to Feline
         builder
             .HasOne(e => e.Feline)
-            .WithMany()
+            .WithMany(e => e.Chores)
             .HasForeignKey(e => e.FelineId)
             .HasConstraintName("FK_Chores_Felines")
             .IsRequired(false)

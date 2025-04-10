@@ -5,7 +5,7 @@
 
 @using FosterRoster.Features.Felines
 
-@inject ChoresRepository ChoresRepository;
+@inject ChoreRepository ChoreRepository;
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager;
 @inject NotificationService NotificationService;
@@ -16,7 +16,7 @@
         <EditForm Model="_model" OnValidSubmit="SaveAsync">
             <FluentValidationValidator/>
             <RadzenStack Gap="0.5rem">
-                <AppFormHeader Text="New Task"/>
+                <AppFormHeader Text="@_name"/>
                 <AppFormRow>
                     <AppFormColumn>
                         <AppTextBox @bind-Value="@_model.Name" Text="Task Name"/>
@@ -76,7 +76,7 @@
             PagingSummaryFormat="Showing {0} to {1} of {2}"
             ShowPagingSummary="true">
             <HeaderTemplate>
-                <AppGridHeader Text="Sources">
+                <AppGridHeader Text="Tasks">
                     <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
                 </AppGridHeader>
             </HeaderTemplate>
@@ -156,7 +156,7 @@
         _isSaving = true;
         try
         {
-            var rs = await ChoresRepository.DeleteByKeyAsync(_model.Id);
+            var rs = await ChoreRepository.DeleteByKeyAsync(_model.Id);
             NotificationService.Notify(rs, $"Deleted {EntityName}", $"Failed to delete {EntityName}");
             if (rs.IsSuccess)
             {
@@ -186,7 +186,7 @@
         _isLoading = true;
         try
         {
-            await using var query = await ChoresRepository.CreateQueryAsync();
+            await using var query = await ChoreRepository.CreateQueryAsync();
             (_data, _count) = await query
                 .AsNoTracking()
                 .Select(e => new GridRow
@@ -226,7 +226,7 @@
     {
         // Reset the model to be edited.
         var rs = ChoreId != 0
-            ? await ChoresRepository.GetByKeyAsync(ChoreId)
+            ? await ChoreRepository.GetByKeyAsync(ChoreId)
             : Result.Ok<Chore>(new());
         if (rs.IsFailed)
         {
@@ -245,8 +245,8 @@
     private async Task SaveAsync(EditContext editContext)
     {
         var rs = _model.Id == 0
-            ? await ChoresRepository.AddAsync(_model.ToChore())
-            : await ChoresRepository.UpdateAsync(_model.Id, _model.ToChore());
+            ? await ChoreRepository.AddAsync(_model.ToChore())
+            : await ChoreRepository.UpdateAsync(_model.Id, _model.ToChore());
         NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");
         if (rs.IsSuccess)
         {

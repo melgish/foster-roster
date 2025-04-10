@@ -1,0 +1,156 @@
+﻿@inject ChoreRepository ChoreRepository
+@inject NotificationService NotificationService
+
+<AppFormPanel>
+    <EditForm FormName="cloneTemplate" Model="_model" OnValidSubmit="CloneTemplateAsync">
+        <FluentValidationValidator/>
+        <RadzenStack
+            AlignItems="AlignItems.Center"
+            Gap="1rem"
+            Orientation="Orientation.Horizontal">
+            <TemplateSelect
+                @bind-Value="_model.ChoreId"
+                Placeholder="Select task to assign"
+                Text="Add From Template"/>
+            <AppFormButton
+                ButtonType="ButtonType.Submit"
+                Text="Add"/>
+        </RadzenStack>
+    </EditForm>
+</AppFormPanel>
+<AppGridPanel>
+    <RadzenDataGrid
+        @ref="_grid"
+        TItem="GridRow"
+        AllowFiltering="false"
+        AllowPaging="false"
+        AllowSorting="false"
+        GridLines="DataGridGridLines.Both"
+        Count="_count"
+        Data="_data"
+        Density="Density.Compact"
+        FilterMode="FilterMode.Simple"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+        IsLoading="_isLoading"
+        LoadData="LoadDataAsync"
+        PageNumbersCount="1"
+        PagerHorizontalAlign="HorizontalAlign.Center"
+        PagerPosition="PagerPosition.Top"
+        PageSize="20"
+        PageSizeOptions="@( [10, 20, 50, 100])"
+        PagingSummaryFormat="Showing {0} to {1} of {2}"
+        ShowPagingSummary="true">
+        <Columns>
+            <RadzenDataGridColumn Width="6ch">
+                <Template Context="data">
+                    <AppGridButton 
+                        ButtonStyle="ButtonStyle.Secondary" 
+                        Click="@(() => LogChoreCompletedAsync(data))"
+                        Text="Log" />
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn
+                MinWidth="12ch"
+                Property="@nameof(GridRow.Name)"
+                Title="@nameof(GridRow.Name)"/>
+            <RadzenDataGridColumn
+                Filterable="false"
+                Property="@nameof(GridRow.Frequency)"
+                Title="@nameof(GridRow.Frequency)"
+                Width="10ch"/>
+            <RadzenDataGridColumn
+                Filterable="false"
+                HeaderCssClass="app-text-right"
+                Property="@nameof(GridRow.Repeats)"
+                Title="@nameof(GridRow.Repeats)"
+                TextAlign="TextAlign.Right"
+                Width="8ch"/>
+        </Columns>
+    </RadzenDataGrid>    
+</AppGridPanel>
+
+
+@code {private class GridRow
+    {
+        public string Frequency { get; init; } = string.Empty;
+        public int Id { get; init; }
+        public string Name { get; init; } = string.Empty;
+        public int Repeats { get; init; }
+    }
+
+    private int _count;
+    private IEnumerable<GridRow>? _data;
+    private RadzenDataGrid<GridRow>? _grid;
+    private bool _isLoading;
+    private CloneTemplateRequest _model = new();
+    
+    [EditorRequired, Parameter] public int FelineId { get; set; }
+    
+    [Parameter] public EventCallback<int> OnChoreLogged { get; set; }
+
+    /// <summary>
+    ///     Set the model when the parameters are set.
+    /// </summary>
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _model = new() { FelineId = FelineId };
+    }
+
+    /// <summary>
+    ///     Clone a template task and assign to the current feline.
+    /// </summary>
+    public async Task CloneTemplateAsync()
+    {
+        var rs = await ChoreRepository.CloneTemplateAsync(_model);
+        NotificationService.Notify(rs, "Task Created", "Failed to create task");
+        if (rs.IsSuccess)
+        {
+            _model = new() { FelineId = FelineId };
+            await _grid!.Reload();
+        }
+    }
+    
+    /// <summary>
+    ///     Loads paged data for the grid.
+    /// </summary>
+    /// <param name="args">Radzen grid arguments.</param>
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        _isLoading = true;
+        try
+        {
+            await using var query = await ChoreRepository.CreateQueryAsync();
+            (_data, _count) = await query
+                .AsNoTracking()
+                .Where(e => e.FelineId == FelineId)
+                .Select(e => new GridRow
+                {
+                    Frequency = e.Frequency,
+                    Id = e.Id, 
+                    Name = e.Name,
+                    Repeats = e.Repeats
+                })
+                .ToGridResultsAsync(args, "Name asc");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+    
+    private async Task LogChoreCompletedAsync(GridRow row)
+    {
+        var rs = await ChoreRepository.LogChoreCompletedAsync(row.Id);
+        NotificationService.Notify(rs, "Task Logged", "Failed to log task");
+        if (rs.IsSuccess)
+        {
+            await OnChoreLogged.InvokeAsync();
+            await _grid!.Reload();
+        }
+    }
+}

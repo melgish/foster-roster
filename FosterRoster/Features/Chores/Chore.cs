@@ -42,5 +42,5 @@ public sealed class Chore
     /// <summary>
     ///     How many times a chore repeats. Default is 1.
     /// </summary>
-    public int Repeats { get; init; } = 1;
+    public int Repeats { get; set; } = 1;
 }
