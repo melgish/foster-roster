@@ -1,0 +1,17 @@
+﻿<AppFormRow>
+    <RadzenColumn Size="12">
+        <RadzenStack AlignItems="AlignItems.Center"
+                     Gap="0.5rem"
+                     JustifyContent="JustifyContent.Start"
+                     Orientation="Orientation.Horizontal">
+            <RadzenText Text="@Text" TextStyle="TextStyle.DisplayH6"/>
+            @ChildContent
+        </RadzenStack>
+    </RadzenColumn>
+</AppFormRow>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
+
+    [Parameter] public string Text { get; set; } = null!;
+}

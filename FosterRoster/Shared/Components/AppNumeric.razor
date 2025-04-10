@@ -1,0 +1,32 @@
+﻿@typeparam TValue
+@inherits AppFormComponent<TValue>
+
+<RadzenStack Gap="0rem">
+    <RadzenFormField
+        AllowFloatingLabel="false"
+        Component="@Name"
+        Text="@Text"
+        Variant="Variant.Text">
+        <RadzenNumeric Disabled="Disabled"
+                       Max="Max"
+                       Min="Min"
+                       Name="@Name"
+                       Placeholder="@Placeholder"
+                       ShowUpDown="false"
+                       Step="@Step"
+                       TValue="TValue"
+                       Value="@Value"
+                       ValueChanged="ValueChanged"
+                       ValueExpression="ValueExpression"
+        />
+    </RadzenFormField>
+    <ValidationMessage TValue="TValue" For="ValueExpression"/>
+</RadzenStack>
+
+@code {
+    [Parameter] public decimal? Max { get; set; }
+
+    [Parameter] public decimal? Min { get; set; }
+
+    [Parameter] public string? Step { get; set; }
+}

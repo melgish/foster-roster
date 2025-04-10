@@ -1,0 +1,10 @@
+﻿.app-grid {
+    /* Exists only to apply the styles to the grid */
+    display: contents;
+}
+
+.app-grid ::deep .app-text-right .rz-column-title {
+    /* Right align the column title */
+    justify-content: flex-end;
+    padding-inline-end: 0.5rem;
+}

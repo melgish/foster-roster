@@ -1,0 +1,7 @@
+﻿.tabs {
+    /* Serves only as anchor for styling children */
+    display: contents;
+}
+.tabs ::deep {
+    --rz-tabs-padding: 0 0 0 0;
+}

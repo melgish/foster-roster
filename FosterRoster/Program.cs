@@ -1,8 +1,15 @@
 // spell-checker: ignore npgsql
 
-using FosterRoster.Components;
-using FosterRoster.Components.Account;
-using FosterRoster.Services;
+using FosterRoster.Data;
+using FosterRoster.Features.Account;
+using FosterRoster.Features.Chores;
+using FosterRoster.Features.Comments;
+using FosterRoster.Features.Felines;
+using FosterRoster.Features.Fosterers;
+using FosterRoster.Features.Sources;
+using FosterRoster.Features.Thumbnails;
+using FosterRoster.Features.Weights;
+using FosterRoster.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
@@ -59,14 +66,15 @@ builder
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddSingleton<TimeProvider, TexasTimeProvider>();
-builder.Services.AddValidatorsFromAssemblyContaining<Feline>();
-builder.Services.AddValidatorsFromAssemblyContaining<App>();
+builder.Services.AddValidatorsFromAssemblyContaining<FelineEditModel>();
 
-builder.Services.AddScoped<ICommentRepository, ServerCommentRepository>();
-builder.Services.AddScoped<IFelineRepository, ServerFelineRepository>();
-builder.Services.AddScoped<IFostererRepository, ServerFostererRepository>();
-builder.Services.AddScoped<ISourceRepository, ServerSourceRepository>();
-builder.Services.AddScoped<IWeightRepository, ServerWeightRepository>();
+builder.Services.AddScoped<ChoreRepository>();
+builder.Services.AddScoped<CommentRepository>();
+builder.Services.AddScoped<FelineRepository>();
+builder.Services.AddScoped<FostererRepository>();
+builder.Services.AddScoped<SourceRepository>();
+builder.Services.AddScoped<ThumbnailRepository>();
+builder.Services.AddScoped<WeightRepository>();
 
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenCookieThemeService(options =>
@@ -107,7 +115,7 @@ app.UseHttpsRedirection();
 app.UseOutputCache();
 app.UseResponseCaching();
 app.UseAntiforgery();
-// Without this, local dev renders differently than docker container
+// Without this, local dev renders differently than docker container.
 app.UseRequestLocalization("en-US");
 
 app.MapStaticAssets();

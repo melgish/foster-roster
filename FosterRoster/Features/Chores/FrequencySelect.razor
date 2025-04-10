@@ -1,0 +1,23 @@
+﻿@inherits AppFormComponent<string>
+
+<AppFormSelect
+    Data="Choices"
+    Text="Frequency"
+    TValue="string"
+    Value="@Value"
+    ValueChanged="ValueChanged"
+    ValueExpression="ValueExpression"
+/>
+
+@code {
+
+    private static readonly string[] Choices =
+    [
+        "Once",
+        "Daily",
+        "Twice Daily",
+        "Weekly",
+        "Bi-Weekly"
+    ];
+
+}

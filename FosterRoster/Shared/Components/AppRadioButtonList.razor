@@ -1,0 +1,28 @@
+﻿@inherits AppFormComponent<TValue>
+@typeparam TValue
+
+<RadzenStack Gap="0rem">
+    <RadzenFormField
+        AllowFloatingLabel="false"
+        Component="@Name"
+        Text="@Text"
+        Variant="Variant.Text">
+        <RadzenRadioButtonList
+            class="rz-pt-3"
+            Disabled="Disabled"
+            Name="@Name"
+            TValue="TValue"
+            Value="@Value"
+            ValueChanged="ValueChanged"
+            ValueExpression="ValueExpression">
+            <Items>
+                @ChildContent
+            </Items>
+        </RadzenRadioButtonList>
+    </RadzenFormField>
+    <ValidationMessage For="ValueExpression"/>
+</RadzenStack>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

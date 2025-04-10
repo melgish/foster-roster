@@ -1,0 +1,43 @@
+@page "/intake"
+@inject FelineRepository FelineRepository
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+@inject TimeProvider TimeProvider
+
+<PageTitle>Intake</PageTitle>
+<RadzenStack>
+    <AppFormPanel>
+        <FelineForm Feline="@_feline" IsNew OnSave="OnSaveAsync"/>
+    </AppFormPanel>
+</RadzenStack>
+
+@code {
+    private Feline _feline = null!;
+
+    protected override void OnInitialized()
+    {
+        _feline = new()
+        {
+            IntakeDate = DateOnly.FromDateTime(TimeProvider.GetLocalNow().DateTime),
+            Category = Category.Kitten,
+            Gender = Gender.Female,
+            Thumbnail = null,
+            Weaned = Weaned.Yes
+        };
+    }
+
+    /// <summary>
+    ///     Save event handler for the FelineForm
+    /// </summary>
+    private async Task OnSaveAsync(FelineEditModel model)
+    {
+        var result = await FelineRepository.AddAsync(model);
+        NotificationService.Notify(result, "Feline saved", "Failed to save feline");
+        if (result.IsSuccess)
+        {
+            var feline = result.Value;
+            NavigationManager.NavigateTo($"/felines/{feline.Id}");
+        }
+    }
+
+}
