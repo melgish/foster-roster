@@ -51,6 +51,11 @@
                     MinWidth="12ch"
                     Title="Name"/>
                 <RadzenDataGridColumn
+                    Property="@nameof(GridRow.AnimalId)"
+                    SortOrder="SortOrder.Ascending"
+                    MinWidth="12ch"
+                    Title="Animal ID"/>
+                <RadzenDataGridColumn
                     Property="@nameof(GridRow.FostererName)"
                     MinWidth="12ch"
                     Title="Fosterer"/>
@@ -80,10 +85,11 @@
 
     private sealed class GridRow
     {
+        public required string AnimalId { get; init; }
+        public required string FostererName { get; init; }
         public int Id { get; init; }
-        public string Name { get; init; } = string.Empty;
-        public string FostererName { get; init; } = string.Empty;
         public bool IsInactive { get; init; }
+        public required string Name { get; init; }
     }
 
     /// <summary>
@@ -102,10 +108,11 @@
                 .Include(f => f.Fosterer)
                 .Select(f => new GridRow
                 {
+                    AnimalId = f.AnimalId != null ? f.AnimalId : "",
+                    FostererName = f.Fosterer != null ? f.Fosterer.Name : "",
                     Id = f.Id,
-                    Name = f.Name,
                     IsInactive = f.IsInactive,
-                    FostererName = f.Fosterer != null ? f.Fosterer.Name : ""
+                    Name = f.Name
                 })
                 .ToGridResultsAsync(args, "Name asc");
         }

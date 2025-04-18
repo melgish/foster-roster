@@ -12,20 +12,20 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FosterRoster.Data.Migrations
 {
     [DbContext(typeof(FosterRosterDbContext))]
-    [Migration("20250403234455_AddChoresTable")]
-    partial class AddChoresTable
+    [Migration("20250416233543_AddChoresAndSchedules")]
+    partial class AddChoresAndSchedules
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.3")
+                .HasAnnotation("ProductVersion", "9.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("FosterRoster.Domain.ApplicationRole", b =>
+            modelBuilder.Entity("FosterRoster.Features.Account.ApplicationRole", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,7 +54,7 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.ApplicationUser", b =>
+            modelBuilder.Entity("FosterRoster.Features.Account.ApplicationUser", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -121,7 +121,7 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Chore", b =>
+            modelBuilder.Entity("FosterRoster.Features.Chores.Chore", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -129,19 +129,19 @@ namespace FosterRoster.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Cron")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
                     b.Property<string>("Description")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<DateTimeOffset?>("DueDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int?>("FelineId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("Frequency")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(48)
-                        .HasColumnType("character varying(48)")
-                        .HasDefaultValue("Once");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -161,7 +161,7 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("Chores", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Comment", b =>
+            modelBuilder.Entity("FosterRoster.Features.Comments.Comment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -194,7 +194,7 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("Comments", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Feline", b =>
+            modelBuilder.Entity("FosterRoster.Features.Felines.Feline", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -269,7 +269,7 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("Felines", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Fosterer", b =>
+            modelBuilder.Entity("FosterRoster.Features.Fosterers.Fosterer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -315,7 +315,35 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("Fosterers", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Source", b =>
+            modelBuilder.Entity("FosterRoster.Features.Schedules.Schedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Cron")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(48)
+                        .HasColumnType("character varying(48)");
+
+                    b.HasKey("Id")
+                        .HasName("PK_Schedules");
+
+                    b.HasIndex("Cron")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Schedules_Cron");
+
+                    b.ToTable("Schedules", (string)null);
+                });
+
+            modelBuilder.Entity("FosterRoster.Features.Sources.Source", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -333,7 +361,7 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("Sources", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Thumbnail", b =>
+            modelBuilder.Entity("FosterRoster.Features.Thumbnails.Thumbnail", b =>
                 {
                     b.Property<int>("FelineId")
                         .HasColumnType("integer");
@@ -357,7 +385,7 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("Thumbnails", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Weight", b =>
+            modelBuilder.Entity("FosterRoster.Features.Weights.Weight", b =>
                 {
                     b.Property<int>("FelineId")
                         .HasColumnType("integer");
@@ -500,10 +528,10 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Chore", b =>
+            modelBuilder.Entity("FosterRoster.Features.Chores.Chore", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.Feline", "Feline")
-                        .WithMany()
+                    b.HasOne("FosterRoster.Features.Felines.Feline", "Feline")
+                        .WithMany("Chores")
                         .HasForeignKey("FelineId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK_Chores_Felines");
@@ -511,9 +539,9 @@ namespace FosterRoster.Data.Migrations
                     b.Navigation("Feline");
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Comment", b =>
+            modelBuilder.Entity("FosterRoster.Features.Comments.Comment", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.Feline", "Feline")
+                    b.HasOne("FosterRoster.Features.Felines.Feline", "Feline")
                         .WithMany("Comments")
                         .HasForeignKey("FelineId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -522,15 +550,15 @@ namespace FosterRoster.Data.Migrations
                     b.Navigation("Feline");
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Feline", b =>
+            modelBuilder.Entity("FosterRoster.Features.Felines.Feline", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.Fosterer", "Fosterer")
+                    b.HasOne("FosterRoster.Features.Fosterers.Fosterer", "Fosterer")
                         .WithMany()
                         .HasForeignKey("FostererId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("FK_Fosterers_Felines");
 
-                    b.HasOne("FosterRoster.Domain.Source", "Source")
+                    b.HasOne("FosterRoster.Features.Sources.Source", "Source")
                         .WithMany()
                         .HasForeignKey("SourceId")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -541,17 +569,17 @@ namespace FosterRoster.Data.Migrations
                     b.Navigation("Source");
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Thumbnail", b =>
+            modelBuilder.Entity("FosterRoster.Features.Thumbnails.Thumbnail", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.Feline", null)
+                    b.HasOne("FosterRoster.Features.Felines.Feline", null)
                         .WithOne("Thumbnail")
-                        .HasForeignKey("FosterRoster.Domain.Thumbnail", "FelineId")
+                        .HasForeignKey("FosterRoster.Features.Thumbnails.Thumbnail", "FelineId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Weight", b =>
+            modelBuilder.Entity("FosterRoster.Features.Weights.Weight", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.Feline", "Feline")
+                    b.HasOne("FosterRoster.Features.Felines.Feline", "Feline")
                         .WithMany("Weights")
                         .HasForeignKey("FelineId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -563,7 +591,7 @@ namespace FosterRoster.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<int>", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.ApplicationRole", null)
+                    b.HasOne("FosterRoster.Features.Account.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -572,7 +600,7 @@ namespace FosterRoster.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<int>", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.ApplicationUser", null)
+                    b.HasOne("FosterRoster.Features.Account.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -581,7 +609,7 @@ namespace FosterRoster.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<int>", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.ApplicationUser", null)
+                    b.HasOne("FosterRoster.Features.Account.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -590,13 +618,13 @@ namespace FosterRoster.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<int>", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.ApplicationRole", null)
+                    b.HasOne("FosterRoster.Features.Account.ApplicationRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FosterRoster.Domain.ApplicationUser", null)
+                    b.HasOne("FosterRoster.Features.Account.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -605,15 +633,17 @@ namespace FosterRoster.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<int>", b =>
                 {
-                    b.HasOne("FosterRoster.Domain.ApplicationUser", null)
+                    b.HasOne("FosterRoster.Features.Account.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FosterRoster.Domain.Feline", b =>
+            modelBuilder.Entity("FosterRoster.Features.Felines.Feline", b =>
                 {
+                    b.Navigation("Chores");
+
                     b.Navigation("Comments");
 
                     b.Navigation("Thumbnail");

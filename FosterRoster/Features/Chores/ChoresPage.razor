@@ -31,18 +31,38 @@
                 </AppFormRow>
                 <AppFormRow>
                     <AppFormColumn SizeSM="12">
-                        <AppTextBox @bind-Value="@_model.Description" Text="Description"/>
+                        <AppTextBox @bind-Value="@_model.Description" 
+                                    Disabled="_isSaving"
+                                    Text="Description"/>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormRow>
                     <AppFormColumn>
-                        <AppNumeric @bind-Value="_model.Repeats" Text="Repeats"/>
+                        <AppDateTime @bind-Value="@_model.DueDate"
+                                    Disabled="_isSaving"
+                                    Text="Due Date"/>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <FrequencySelect @bind-Value="@_model.Frequency" Disabled="_isSaving"/>
+                        <AppNumeric @bind-Value="_model.Repeats"
+                                    Disabled="_isSaving"
+                                    Text="Repeats"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="_model.Cron"
+                                    @oninput="@(e => _model.Cron = e.Value?.ToString() ?? string.Empty)"
+                                    Disabled="_isSaving"
+                                    Placeholder="* * * * *"
+                                    title="Cron Expression to calculate the next due date"
+                                    Text="Cron Expression" />
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>
+                    <div style="margin-right: auto">
+                        <small style="@("color: var(--rz-input-placeholder-color)")">Description:</small>
+                        <CronDescription Cron="@_model.Cron"/>
+                    </div>
                     <AppBusyCircle IsBusy="_isSaving"/>
                     @if (_model.Id != 0)
                     {
@@ -88,20 +108,33 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
                     Property="@nameof(GridRow.Name)"
-                    Title="@nameof(GridRow.Name)"/>
+                    Title="@nameof(GridRow.Name)"
+                    Width="15ch"/>
+                <RadzenDataGridColumn 
+                    Property="@nameof(GridRow.FelineName)" 
+                    Title="Assigned To"
+                    Width="12ch" />
                 <RadzenDataGridColumn
                     Filterable="false"
-                    Property="@nameof(GridRow.Frequency)"
-                    Title="@nameof(GridRow.Frequency)"
-                    Width="20ch"/>
-                <RadzenDataGridColumn Property="@nameof(GridRow.FelineName)" Title="Assigned To"/>
+                    Property="@nameof(GridRow.DueDate)"
+                    Title="Due Date"
+                    Width="15ch">
+                    <Template Context="row">
+                        <AppLocalDateTime Value="row.DueDate"/>
+                    </Template>
+                </RadzenDataGridColumn>
                 <RadzenDataGridColumn
                     Filterable="false"
                     HeaderCssClass="app-text-right"
                     Property="@nameof(GridRow.Repeats)"
                     Title="@nameof(GridRow.Repeats)"
                     TextAlign="TextAlign.Right"
-                    Width="12ch"/>
+                    Width="8ch"/>
+                <RadzenDataGridColumn
+                    Filterable="false"
+                    Property="@nameof(GridRow.Cron)"
+                    Title="@nameof(GridRow.Cron)"
+                    Width="15ch"/>
             </Columns>
         </RadzenDataGrid>
     </AppGridPanel>
@@ -111,10 +144,11 @@
 
     private sealed class GridRow
     {
+        public required string? Cron { get; init; }
+        public required DateTimeOffset? DueDate { get; init; }
+        public required string? FelineName { get; init; }
         public required int Id { get; init; }
         public required string Name { get; init; }
-        public required string Frequency { get; init; }
-        public required string? FelineName { get; init; }
         public required int Repeats { get; init; }
     }
 
@@ -191,8 +225,9 @@
                 .AsNoTracking()
                 .Select(e => new GridRow
                 {
+                    DueDate = e.DueDate,
                     FelineName = e.Feline == null ? "Template" : e.Feline.Name,
-                    Frequency = e.Frequency,
+                    Cron = e.Cron,
                     Id = e.Id, 
                     Name = e.Name,
                     Repeats = e.Repeats
@@ -245,8 +280,8 @@
     private async Task SaveAsync(EditContext editContext)
     {
         var rs = _model.Id == 0
-            ? await ChoreRepository.AddAsync(_model.ToChore())
-            : await ChoreRepository.UpdateAsync(_model.Id, _model.ToChore());
+            ? await ChoreRepository.AddAsync(_model)
+            : await ChoreRepository.UpdateAsync(_model.Id, _model);
         NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");
         if (rs.IsSuccess)
         {

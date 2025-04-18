@@ -8,9 +8,8 @@ public sealed class ChoreEditModelValidator : AbstractValidator<ChoreEditModel>
         RuleFor(e => e.Description)
             .MaximumLength(256);
 
-        RuleFor(e => e.Frequency)
-            .MaximumLength(48)
-            .NotEmpty();
+        RuleFor(e => e.Cron)
+            .MaximumLength(128);
 
         RuleFor(e => e.Name)
             .MaximumLength(64)

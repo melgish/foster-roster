@@ -13,8 +13,15 @@ internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
             .HasKey(e => e.Id)
             .HasName("PK_Chores");
 
+        builder.Property(e => e.Cron)
+            .HasMaxLength(128)
+            .IsRequired(false);
+
         builder.Property(e => e.Description)
             .HasMaxLength(256)
+            .IsRequired(false);
+        
+        builder.Property(e => e.DueDate)
             .IsRequired(false);
 
         // Configure the relationship to Feline
@@ -26,10 +33,9 @@ internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.Property(e => e.Frequency)
-            .HasMaxLength(48)
-            .IsRequired()
-            .HasDefaultValue("Once");
+        builder
+            .Property(e => e.FelineId)
+            .IsRequired(false);
 
         builder
             .Property(e => e.Id)
@@ -49,5 +55,6 @@ internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
         // but include template tasks (where FelineId is null)
         builder
             .HasQueryFilter(e => e.FelineId == null || !e.Feline!.IsInactive);
+        
     }
 }

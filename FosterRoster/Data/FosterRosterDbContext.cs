@@ -8,6 +8,7 @@ using Features.Chores;
 using Features.Comments;
 using Features.Felines;
 using Features.Fosterers;
+using Features.Schedules;
 using Features.Sources;
 using Features.Thumbnails;
 using Features.Weights;
@@ -19,6 +20,7 @@ public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> optio
     public DbSet<Feline> Felines { get; set; } = null!;
     public DbSet<Fosterer> Fosterers { get; set; } = null!;
     public DbSet<Source> Sources { get; set; } = null!;
+    public DbSet<Schedule> Schedules { get; set; } = null!;
     public DbSet<Chore> Chores { get; set; } = null!;
     public DbSet<Thumbnail> Thumbnails { get; set; } = null!;
     public DbSet<Weight> Weights { get; set; } = null!;

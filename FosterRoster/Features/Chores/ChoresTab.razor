@@ -54,9 +54,17 @@
                 Property="@nameof(GridRow.Name)"
                 Title="@nameof(GridRow.Name)"/>
             <RadzenDataGridColumn
+                MinWidth="12ch"
+                Property="@nameof(GridRow.DueDate)"
+                Title="Due Date">
+                <Template Context="row">
+                    <AppLocalDateTime Value="row.DueDate"/>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn
                 Filterable="false"
-                Property="@nameof(GridRow.Frequency)"
-                Title="@nameof(GridRow.Frequency)"
+                Property="@nameof(GridRow.Cron)"
+                Title="@nameof(GridRow.Cron)"
                 Width="10ch"/>
             <RadzenDataGridColumn
                 Filterable="false"
@@ -72,7 +80,8 @@
 
 @code {private class GridRow
     {
-        public string Frequency { get; init; } = string.Empty;
+        public string? Cron { get; init; }
+        public DateTimeOffset? DueDate { get; init; }
         public int Id { get; init; }
         public string Name { get; init; } = string.Empty;
         public int Repeats { get; init; }
@@ -126,7 +135,8 @@
                 .Where(e => e.FelineId == FelineId)
                 .Select(e => new GridRow
                 {
-                    Frequency = e.Frequency,
+                    Cron = e.Cron,
+                    DueDate = e.DueDate,
                     Id = e.Id, 
                     Name = e.Name,
                     Repeats = e.Repeats

@@ -9,6 +9,9 @@ using System.Linq.Expressions;
 /// <typeparam name="TValue"></typeparam>
 public class AppFormComponent<TValue> : ComponentBase
 {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> Attributes { get; set; } = new();
+
     [Parameter] public bool Disabled { get; set; }
 
     protected string Name { get; } = Guid.NewGuid().ToString();

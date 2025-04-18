@@ -1,12 +1,15 @@
 ﻿namespace FosterRoster.Features.Chores;
 
+using Data;
+
 public sealed class ChoreEditModel()
 {
     public ChoreEditModel(Chore task) : this()
     {
+        Cron = task.Cron;
         Description = task.Description;
+        DueDate = task.DueDate;
         FelineId = task.FelineId.GetValueOrDefault();
-        Frequency = task.Frequency;
         Id = task.Id;
         Name = task.Name;
         Repeats = task.Repeats;
@@ -19,6 +22,11 @@ public sealed class ChoreEditModel()
     public string? Description { get; set; }
 
     /// <summary>
+    ///     Date task is due. If null, no due date will be assigned.
+    /// </summary>
+    public DateTimeOffset? DueDate { get; set; }
+    
+    /// <summary>
     ///     Feline associated with the task. If null, the task is
     ///     considered a template task that can be cloned for
     ///     any feline.
@@ -28,7 +36,7 @@ public sealed class ChoreEditModel()
     /// <summary>
     ///     How often the task should be performed. Default is "Once".
     /// </summary>
-    public string Frequency { get; set; } = "Once";
+    public string? Cron { get; set; }
 
     /// <summary>
     ///     Unique identifier for the task.
@@ -48,11 +56,12 @@ public sealed class ChoreEditModel()
     public Chore ToChore() =>
         new()
         {
-            Description = Description,
+            Cron = Cron.TrimToNull(),
+            Description = Description.TrimToNull(),
+            DueDate = DueDate?.UtcDateTime,
             FelineId = FelineId == 0 ? null : FelineId,
-            Frequency = Frequency,
             Id = Id,
-            Name = Name,
+            Name = Name.TrimToNull(),
             Repeats = Repeats
         };
 }

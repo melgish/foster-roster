@@ -1,22 +1,41 @@
 ﻿namespace FosterRoster.Features.Chores;
 
-using Comments;
+using Data;
+using NCrontab;
 
 public sealed class ChoreRepository(
-    IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
+    IDbContextFactory<FosterRosterDbContext> factory,
+    TimeProvider timeProvider
 )
 {
     /// <summary>
     ///     Adds a new chore to the database.
     /// </summary>
-    /// <param name="chore">Chore instance to add.</param>
+    /// <param name="model">Chore data to add.</param>
     /// <returns>A Result with Chore on Success, otherwise Result with Errors.</returns>
-    public async Task<Result<Chore>> AddAsync(Chore chore)
+    public async Task<Result<Chore>> AddAsync(ChoreEditModel model)
     {
-        await using var context = await dbContextFactory.CreateDbContextAsync();
-        var entry = await context.Chores.AddAsync(chore);
-        await context.SaveChangesAsync();
+        await using var db = await factory.CreateDbContextAsync();
+        var entry = await db.Chores.AddAsync(new()
+        {
+            Cron = model.Cron.TrimToNull(),
+            Description = model.Description.TrimToNull(),
+            DueDate = model.DueDate?.UtcDateTime,
+            FelineId = model.FelineId.ZeroToNull(),
+            Name = model.Name.TrimToNull(),
+            Repeats = model.Repeats,
+        });
+        await db.SaveChangesAsync();
         return Result.Ok(entry.Entity);
+    }
+    
+    private DateTimeOffset? GetNextDueDate(DateTimeOffset? dueDate, string? cron)
+    {
+        if (dueDate is null || string.IsNullOrWhiteSpace(cron)) return dueDate;
+        var schedule = CrontabSchedule.Parse(cron);
+        var now = timeProvider.GetLocalNow().LocalDateTime;
+        var nextDue = schedule.GetNextOccurrence(now);
+        return nextDue;
     }
     
     /// <summary>
@@ -26,7 +45,7 @@ public sealed class ChoreRepository(
     /// <returns>Result of clone containing ID of new record.</returns>
     public async Task<Result<int>> CloneTemplateAsync(CloneTemplateRequest request)
     {
-        await using var context = await dbContextFactory.CreateDbContextAsync();
+        await using var context = await factory.CreateDbContextAsync();
         var template = await context
             .Chores
             .AsNoTracking()
@@ -36,9 +55,10 @@ public sealed class ChoreRepository(
         var entry = context.Chores.Add(new()
             {
                 Description = template.Description,
+                DueDate = GetNextDueDate(template.DueDate, template.Cron)?.UtcDateTime,
                 FelineId = request.FelineId,
                 Name = template.Name,
-                Frequency = template.Frequency,
+                Cron = template.Cron,
                 Repeats = template.Repeats,
             });
         await context.SaveChangesAsync();
@@ -52,7 +72,7 @@ public sealed class ChoreRepository(
     /// <returns></returns>
     public async Task<Query<Chore>> CreateQueryAsync()
     {
-        var context = await dbContextFactory.CreateDbContextAsync();
+        var context = await factory.CreateDbContextAsync();
         var queryable = context.Chores;
         return new(context, queryable);
     }
@@ -64,8 +84,8 @@ public sealed class ChoreRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> DeleteByKeyAsync(int choreId)
     {
-        await using var context = await dbContextFactory.CreateDbContextAsync();
-        return await context.Chores.Where(s => s.Id == choreId).ExecuteDeleteAsync() switch
+        await using var db = await factory.CreateDbContextAsync();
+        return await db.Chores.Where(s => s.Id == choreId).ExecuteDeleteAsync() switch
         {
             0 => Result.Fail(new NotFoundError()),
             1 => Result.Ok(),
@@ -80,20 +100,25 @@ public sealed class ChoreRepository(
     /// <returns>Result with Fosterer if successful, or Errors on failure.</returns>
     public async Task<Result<Chore>> GetByKeyAsync(int choreId)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
+        await using var db = await factory.CreateDbContextAsync();
         var chore = await db.Chores.AsNoTracking().FirstOrDefaultAsync(f => f.Id == choreId);
         return chore is null ? Result.Fail(new NotFoundError()) : Result.Ok(chore);
     }
 
+    /// <summary>
+    ///     Creates journal entry that chore has been completed.
+    /// </summary>
+    /// <param name="choreId"></param>
+    /// <returns>Result of operation</returns>
     public async Task<Result> LogChoreCompletedAsync(int choreId)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
+        await using var db = await factory.CreateDbContextAsync();
         var chore = await db.Chores.FindAsync(choreId);
         if (chore is null) return Result.Fail(new NotFoundError());
         if (chore.FelineId is null) return Result.Fail("Task is not assigned to a feline.");
         if (chore.Repeats == 0) return Result.Fail("Task has already been completed.");
         
-        // create journal entry for the chore.
+        // Create a journal entry for the chore.
         db.Comments.Add(new()
         {
             FelineId = chore.FelineId.GetValueOrDefault(),
@@ -108,6 +133,7 @@ public sealed class ChoreRepository(
         else
         {
             chore.Repeats -= 1;
+            chore.DueDate = GetNextDueDate(chore.DueDate, chore.Cron)?.UtcDateTime;
             db.Chores.Update(chore);
         }
         
@@ -120,16 +146,20 @@ public sealed class ChoreRepository(
     ///     Updates an existing Chore in the database.
     /// </summary>
     /// <param name="choreId">ID of chore to update.</param>
-    /// <param name="chore">Data to assign to Chore</param>
+    /// <param name="model">Updated data to assign to Chore</param>
     /// <returns>Result with updated Chore if found, or Errors on failure.</returns>
-    public async Task<Result<Chore>> UpdateAsync(int choreId, Chore chore)
+    public async Task<Result<Chore>> UpdateAsync(int choreId, ChoreEditModel model)
     {
-        await using var db = await dbContextFactory.CreateDbContextAsync();
+        await using var db = await factory.CreateDbContextAsync();
         var existing = await db.Chores.FindAsync(choreId);
         if (existing is null) return Result.Fail(new NotFoundError());
 
-        existing.Description = chore.Description;
-        existing.Name = chore.Name;
+        existing.Cron = model.Cron;
+        existing.Description = model.Description;
+        existing.DueDate = model.DueDate?.UtcDateTime;
+        existing.Name = model.Name;
+        // existing.FelineId = model.FelineId;
+        existing.Repeats = model.Repeats;
 
         await db.SaveChangesAsync();
         return Result.Ok(existing);
