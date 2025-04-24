@@ -1,5 +1,6 @@
 ﻿namespace FosterRoster.Infrastructure;
 
+using Data;
 using System.Collections;
 using System.Linq.Expressions;
 
@@ -10,23 +11,23 @@ using System.Linq.Expressions;
 /// <param name="context"></param>
 /// <param name="set"></param>
 /// <typeparam name="TEntity"></typeparam>
-public sealed class Query<TEntity>(Data.FosterRosterDbContext context, DbSet<TEntity> set)
+public sealed class Query<TEntity>(Data.FosterRosterDbContext context, IQueryable<TEntity> set)
     : IQueryable<TEntity>, IDisposable, IAsyncDisposable
     where TEntity : class
 {
-    private Data.FosterRosterDbContext? _context = context;
-    private readonly IQueryable<TEntity> _set = set;
+    private FosterRosterDbContext? _context = context;
+    
 
     // IQueryable<T> implementation
-    public IEnumerator<TEntity> GetEnumerator() => _set.GetEnumerator();
+    public IEnumerator<TEntity> GetEnumerator() => set.GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_set).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)set).GetEnumerator();
 
-    public Type ElementType => _set.ElementType;
+    public Type ElementType => set.ElementType;
 
-    public Expression Expression => _set.Expression;
+    public Expression Expression => set.Expression;
 
-    public IQueryProvider Provider => _set.Provider;
+    public IQueryProvider Provider => set.Provider;
 
     // IDisposable implementation
     void IDisposable.Dispose()

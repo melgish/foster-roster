@@ -35,7 +35,7 @@
     <AppGridPanel>
         <RadzenDataGrid
             @ref="_grid"
-            TItem="GridRow"
+            TItem="SourceGridDto"
             AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
@@ -64,38 +64,31 @@
                         <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => Edit(data.Id))" Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Name)" Title="@nameof(GridRow.Name)"/>
+                <RadzenDataGridColumn Property="@nameof(SourceGridDto.Name)" Title="@nameof(SourceGridDto.Name)"/>
             </Columns>
         </RadzenDataGrid>
     </AppGridPanel>
 </RadzenStack>
 
 @code {
-    private sealed class GridRow
-    {
-        public required int Id { get; init; }
-        public required string Name { get; init; }
-    }
-
     private const string Route = "/sources";
     private const string EntityName = "Source";
 
     private int _count;
-    private IEnumerable<GridRow>? _data;
-    private RadzenDataGrid<GridRow>? _grid;
+    private IEnumerable<SourceGridDto>? _data;
+    private RadzenDataGrid<SourceGridDto>? _grid;
     private bool _isLoading;
     private bool _isSaving;
-    private SourceEditModel _model = new();
+    private SourceFormDto _model = new();
     private string _name = $"Create New {EntityName}";
 
     /// <summary>
     ///     The ID of the source currently being edited.
     /// </summary>
-    [Parameter]
-    public int SourceId { get; set; }
+    [Parameter] public int SourceId { get; set; }
 
     /// <summary>
-    ///     Prompt the user to confirm deletion of a fosterer.
+    ///     Prompt the user to confirm deletion of a source.
     /// </summary>
     /// <returns>True if user confirms the delete action.</returns>
     private async Task<bool> ConfirmDeleteAsync()
@@ -109,14 +102,14 @@
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (!(_model.Id != 0 && await ConfirmDeleteAsync()))
+        if (_model.Id == 0 || !await ConfirmDeleteAsync())
             return;
 
         _isSaving = true;
         try
         {
             var rs = await SourceRepository.DeleteByKeyAsync(_model.Id);
-            NotificationService.Notify(rs, "Deleted source", "Failed to delete source");
+            NotificationService.Notify(rs, $"{EntityName} Deleted", $"Failed to delete {EntityName}");
             if (rs.IsSuccess)
             {
                 await _grid!.Reload();
@@ -147,8 +140,7 @@
         {
             await using var query = await SourceRepository.CreateQueryAsync();
             (_data, _count) = await query
-                .AsNoTracking()
-                .Select(e => new GridRow { Id = e.Id, Name = e.Name })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "Name asc");
         }
         catch (Exception ex)
@@ -179,7 +171,7 @@
         // Reset the model to be edited.
         var rs = SourceId != 0
             ? await SourceRepository.GetByKeyAsync(SourceId)
-            : Result.Ok<Source>(new());
+            : Result.Ok<SourceFormDto>(new());
         if (rs.IsFailed)
         {
             NavigationManager.NavigateTo("/not-found");
@@ -187,7 +179,7 @@
         }
 
         _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
-        _model = new(rs.Value);
+        _model = rs.Value;
     }
 
     /// <summary>
@@ -197,8 +189,8 @@
     private async Task SaveAsync(EditContext editContext)
     {
         var rs = _model.Id == 0
-            ? await SourceRepository.AddAsync(_model.ToSource())
-            : await SourceRepository.UpdateAsync(_model.Id, _model.ToSource());
+            ? await SourceRepository.AddAsync(_model)
+            : await SourceRepository.UpdateAsync(_model.Id, _model);
         NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");
         if (rs.IsSuccess)
         {

@@ -1,8 +1,6 @@
 ﻿namespace FosterRoster.Features.Schedules;
 
-using Data;
-
-public sealed class Schedule : IKeyBearer
+public sealed class ScheduleFormDto: Data.IKeyBearer
 {
     /// <summary>
     ///     Cron schedule that defines how the next occurrence of
@@ -11,7 +9,7 @@ public sealed class Schedule : IKeyBearer
     public string Cron { get; set; } = string.Empty;
     
     /// <summary>
-    ///     ID of the schedule.
+    ///     Database ID of the schedule.
     /// </summary>
     public int Id { get; init; }
 

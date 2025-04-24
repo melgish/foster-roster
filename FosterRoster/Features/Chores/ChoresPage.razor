@@ -260,17 +260,17 @@
     private async Task ResetAsync()
     {
         // Reset the model to be edited.
-        var rs = ChoreId != 0
-            ? await ChoreRepository.GetByKeyAsync(ChoreId)
-            : Result.Ok<Chore>(new());
+        var rs = ChoreId == 0
+            ? Result.Ok<ChoreEditModel>(new())
+            : await ChoreRepository.GetByKeyAsync(ChoreId);
         if (rs.IsFailed)
         {
             NavigationManager.NavigateTo("/not-found");
             return;
         }
 
+        _model = rs.Value;
         _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
-        _model = new(rs.Value);
     }
 
     /// <summary>
@@ -286,7 +286,7 @@
         if (rs.IsSuccess)
         {
             await _grid!.Reload();
-            Edit(rs.Value.Id);
+            Edit(_model.Id);
         }
     }
 

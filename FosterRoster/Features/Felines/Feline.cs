@@ -2,12 +2,13 @@ namespace FosterRoster.Features.Felines;
 
 using Chores;
 using Comments;
+using Data;
 using Fosterers;
 using Sources;
 using Thumbnails;
 using Weights;
 
-public sealed class Feline
+public sealed class Feline : IKeyBearer
 {
     public string? AnimalId { get; set; }
     public string? Breed { get; set; }

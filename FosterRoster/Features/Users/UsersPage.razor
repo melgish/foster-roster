@@ -1,33 +1,25 @@
-@page "/fosterers"
-@page "/fosterers/{fostererId:int}"
-@using FosterRoster.Data
+﻿@page "/users"
+@page "/users/{userId:int}"
 
 @rendermode @(new InteractiveServerRenderMode(false))
-
 @inject DialogService DialogService
-@inject FostererRepository FostererRepository
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
-@inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
+@inject UserRepository UserRepository
 
-<PageTitle>Fosterers</PageTitle>
+<PageTitle>Users</PageTitle>
 <RadzenStack>
     <AppFormPanel>
-        <EditForm FormName="editFosterer" Model="_model" OnValidSubmit="SaveAsync">
+        <EditForm FormName="editUser" Model="_model" OnValidSubmit="SaveAsync">
             <FluentValidationValidator/>
             <RadzenStack Gap="0.5rem">
                 <AppFormHeader Text="@_name"/>
                 <AppFormRow>
                     <AppFormColumn>
-                        <AppTextBox @bind-Value="_model.Name" Text="Name"/>
+                        <AppTextBox @bind-Value="_model.UserName" Text="User Name"/>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <AppMaskInput
-                            @bind-Value="_model.Phone"
-                            CharacterPattern="[0-9]"
-                            Mask="***-***-****"
-                            Placeholder="000-000-0000"
-                            Text="Phone"/>
+                        <RoleSelect @bind-Value="_model.Role" Text="Role" />
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormRow>
@@ -35,12 +27,18 @@
                         <AppTextBox @bind-Value="_model.Email" Text="Email"/>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <ContactMethodSelect @bind-Value="_model.ContactMethod"/>
+                        <AppTextBox @bind-Value="_model.PhoneNumber" Text="Phone Number"/>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormRow>
                     <AppFormColumn>
-                        <AppTextArea @bind-Value="_model.Address" Placeholder="@("Name\nStreet\nCity, State Zip")"/>
+                        <AppTextBox @bind-Value="_model.Password" Text="Password"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="_model.ConfirmPassword" Text="Confirm Password"/>
+                    </AppFormColumn>
+                    <AppFormColumn SizeSM="12">
+                        To keep current password, leave both fields blank.
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>
@@ -77,7 +75,7 @@
             PagingSummaryFormat="Showing {0} to {1} of {2}"
             ShowPagingSummary="true">
             <HeaderTemplate>
-                <AppGridHeader Text="Fosterers">
+                <AppGridHeader Text="Users">
                     <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
                 </AppGridHeader>
             </HeaderTemplate>
@@ -87,60 +85,55 @@
                         <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => Edit(data.Id))" Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Name)" Title="@nameof(GridRow.Name)"/>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Email)" Title="@nameof(GridRow.Email)"/>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Phone)" Title="@nameof(GridRow.Phone)" Width="13ch"/>
+                <RadzenDataGridColumn 
+                    Property="@nameof(GridRow.UserName)" 
+                    Title="User Name"/>
+                <RadzenDataGridColumn
+                    Property="@nameof(GridRow.Email)"
+                    Title="Email Address"/>
+                <RadzenDataGridColumn
+                    Property="@nameof(GridRow.PhoneNumber)"
+                    Title="Phone Number"/>
             </Columns>
-        </RadzenDataGrid>
+        </RadzenDataGrid>        
     </AppGridPanel>
 </RadzenStack>
 
 @code {
+    private const string Route = "/users";
+    private const string EntityName = "User";
+
     private sealed class GridRow
     {
-        public required int Id { get; init; }
-        public required string Name { get; init; }
         public required string? Email { get; init; }
-        public required string? Phone { get; init; }
+        public required int Id { get; init; }
+        public required string? PhoneNumber { get; init; }
+        public required string UserName { get; init; }
     }
-
+    
     private int _count;
     private IEnumerable<GridRow>? _data;
     private RadzenDataGrid<GridRow>? _grid;
     private bool _isLoading;
     private bool _isSaving;
-    private FostererEditModel _model = new();
-    private string _name = "Create New Fosterer";
+    private string _name = string.Empty;
+    private UserFormDto _model = new();
+
+    [Parameter] public int UserId { get; set; }
 
     /// <summary>
-    ///     The ID of the fosterer currently being edited.
-    /// </summary>
-    [Parameter]
-    public int FostererId { get; set; }
-
-    /// <summary>
-    ///     Prompt the user to confirm deletion of a fosterer.
-    /// </summary>
-    /// <returns>True if user confirms the delete.</returns>
-    private async Task<bool> ConfirmDeleteAsync()
-        => await DialogService.OpenAsync<ConfirmDeleteFosterer>(
-            "Confirm Delete",
-            new() { [nameof(ConfirmDeleteFosterer.Name)] = _name }
-        ) as bool? ?? false;
-
-    /// <summary>
-    /// Delete the fosterer currently being edited.
+    ///     Delete the user currently being edited.
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (_model.Id == 0 || !await ConfirmDeleteAsync())
+        if (_model.Id == 0)
             return;
-
+        
         _isSaving = true;
         try
         {
-            var rs = await DbContextFactory.DeleteByKeyAsync(db => db.Fosterers, _model.Id);
-            NotificationService.Notify(rs, "Deleted Fosterer", "Failed to Delete Fosterer");
+            var rs = await UserRepository.DeleteByKeyAsync(_model.Id);
+            NotificationService.Notify(rs, "Deleted User", "Failed to Delete User");
             if (rs.IsSuccess)
             {
                 await _grid!.Reload();
@@ -152,34 +145,33 @@
             _isSaving = false;
         }
     }
-
     /// <summary>
-    ///     Edit the specified Fosterer.
+    ///     Edit the specified source.
     /// </summary>
-    /// <param name="fostererId">ID of the fosterer to edit or 0 to create a new one.</param>
-    private void Edit(int fostererId)
-        => NavigationManager.NavigateTo(fostererId == 0 ? "/fosterers" : $"/fosterers/{fostererId}");
-
+    /// <param name="entityId">ID of the entity to edit or 0 to create a new one.</param>
+    private void Edit(int entityId)
+        => NavigationManager.NavigateTo(entityId == 0 ? Route : $"{Route}/{entityId}");
+    
     /// <summary>
-    ///     Loads paged data for the grid.
+    ///     Load users for the grid.
     /// </summary>
-    /// <param name="args">Radzen grid arguments</param>
+    /// <param name="args">Grid filters and paging values</param>
     private async Task LoadDataAsync(LoadDataArgs args)
     {
         _isLoading = true;
         try
         {
-            await using var query = await DbContextFactory.CreateQueryAsync(db => db.Fosterers);
+            await using var query = await UserRepository.CreateQueryAsync();
             (_data, _count) = await query
                 .AsNoTracking()
                 .Select(e => new GridRow
                 {
-                    Id = e.Id,
-                    Name = e.Name,
                     Email = e.Email,
-                    Phone = e.Phone
+                    Id = e.Id,
+                    PhoneNumber = e.PhoneNumber,
+                    UserName = e.UserName ?? string.Empty,
                 })
-                .ToGridResultsAsync(args, "Name asc");
+                .ToGridResultsAsync(args, "UserName asc");
         }
         catch (Exception ex)
         {
@@ -200,41 +192,36 @@
         await ResetAsync();
         await base.OnParametersSetAsync();
     }
-
+    
     /// <summary>
-    ///     Invoked when form reset is requested.
+    /// 
     /// </summary>
     private async Task ResetAsync()
     {
-        // Reset the model to be edited.
-        var rs = FostererId != 0
-            ? await DbContextFactory.GetByKeyAsync(db => db.Fosterers, FostererId)
-            : Result.Ok<Fosterer>(new());
+        // Reset the model being edited
+        var rs = UserId == 0
+            ? Result.Ok<UserFormDto>(new())
+            : await UserRepository.GetByKeyAsync(UserId);
         if (rs.IsFailed)
         {
             NavigationManager.NavigateTo("/not-found");
             return;
         }
 
-        _name = rs.Value.Id == 0 ? "Create New Source" : rs.Value.Name;
-        _model = new(rs.Value);
+        _name = rs.Value.Id == 0 ? "Create New User" : rs.Value.UserName!;
+        _model = rs.Value;
     }
 
     /// <summary>
-    ///     Save the Fosterer to the database.
+    ///     Save the user to the database.
     /// </summary>
     /// <param name="editContext">Form context</param>
     private async Task SaveAsync(EditContext editContext)
     {
         var rs = _model.Id == 0
-            ? await FostererRepository.AddAsync(_model.ToFosterer())
-            : await FostererRepository.UpdateAsync(_model.Id, _model.ToFosterer());
-        NotificationService.Notify(rs, "Saved Fosterer", "Failed to Save Fosterer");
-        if (rs.IsSuccess)
-        {
-            await _grid!.Reload();
-            Edit(rs.Value.Id);
-        }
+            ? await UserRepository.AddAsync(_model)
+            : await UserRepository.UpdateAsync(_model.Id, _model);
+        NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");                
+        await Task.CompletedTask;
     }
-
 }

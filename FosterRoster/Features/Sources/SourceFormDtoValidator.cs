@@ -1,9 +1,9 @@
 ﻿namespace FosterRoster.Features.Sources;
 
 [UsedImplicitly]
-public sealed class SourceEditModelValidator : AbstractValidator<SourceEditModel>
+public sealed class SourceFormDtoValidator : AbstractValidator<SourceFormDto>
 {
-    public SourceEditModelValidator()
+    public SourceFormDtoValidator()
     {
         RuleFor(model => model.Name)
             .NotEmpty()

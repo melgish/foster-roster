@@ -1,22 +1,20 @@
 ﻿namespace FosterRoster.Features.Schedules;
 
-using Data;
-
-public sealed class Schedule : IKeyBearer
+public class ScheduleGridDto: Data.IKeyBearer
 {
     /// <summary>
     ///     Cron schedule that defines how the next occurrence of
     ///     a task is calculated.
     /// </summary>
-    public string Cron { get; set; } = string.Empty;
-    
-    /// <summary>
-    ///     ID of the schedule.
-    /// </summary>
-    public int Id { get; init; }
+    public required string Cron { get; init; }
 
+    /// <summary>
+    ///     Database ID of the schedule.
+    /// </summary>
+    public required int Id { get; init; }
+    
     /// <summary>
     ///     Human-readable name of the schedule.
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public required string Name { get; init; }
 }

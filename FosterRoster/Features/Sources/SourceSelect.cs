@@ -13,7 +13,6 @@ public class SourceSelect(SourceRepository sourceRepository) : AppItemSelect<int
             // Get all choices from db.
             await using var query = await sourceRepository.CreateQueryAsync();
             Items = await query
-                .AsNoTracking()
                 .OrderBy(e => e.Name)
                 .Select(e => new Item(e.Id, e.Name))
                 .ToListAsync();

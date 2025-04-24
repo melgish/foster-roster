@@ -1,6 +1,8 @@
 namespace FosterRoster.Features.Fosterers;
 
-public sealed class Fosterer
+using Data;
+
+public sealed class Fosterer : IKeyBearer
 {
     /// <summary>
     ///     Mailing label style address of the Fosterer

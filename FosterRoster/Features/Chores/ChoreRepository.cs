@@ -13,7 +13,7 @@ public sealed class ChoreRepository(
     /// </summary>
     /// <param name="model">Chore data to add.</param>
     /// <returns>A Result with Chore on Success, otherwise Result with Errors.</returns>
-    public async Task<Result<Chore>> AddAsync(ChoreEditModel model)
+    public async Task<Result<ChoreEditModel>> AddAsync(ChoreEditModel model)
     {
         await using var db = await factory.CreateDbContextAsync();
         var entry = await db.Chores.AddAsync(new()
@@ -25,8 +25,9 @@ public sealed class ChoreRepository(
             Name = model.Name.TrimToNull(),
             Repeats = model.Repeats,
         });
+        
         await db.SaveChangesAsync();
-        return Result.Ok(entry.Entity);
+        return Result.Ok<ChoreEditModel>(new(entry.Entity));
     }
     
     private DateTimeOffset? GetNextDueDate(DateTimeOffset? dueDate, string? cron)
@@ -98,11 +99,13 @@ public sealed class ChoreRepository(
     /// </summary>
     /// <param name="choreId">ID of chore to return.</param>
     /// <returns>Result with Fosterer if successful, or Errors on failure.</returns>
-    public async Task<Result<Chore>> GetByKeyAsync(int choreId)
+    public async Task<Result<ChoreEditModel>> GetByKeyAsync(int choreId)
     {
         await using var db = await factory.CreateDbContextAsync();
         var chore = await db.Chores.AsNoTracking().FirstOrDefaultAsync(f => f.Id == choreId);
-        return chore is null ? Result.Fail(new NotFoundError()) : Result.Ok(chore);
+        return chore is null 
+            ? Result.Fail(new NotFoundError())
+            : Result.Ok(new ChoreEditModel(chore));
     }
 
     /// <summary>
@@ -148,7 +151,7 @@ public sealed class ChoreRepository(
     /// <param name="choreId">ID of chore to update.</param>
     /// <param name="model">Updated data to assign to Chore</param>
     /// <returns>Result with updated Chore if found, or Errors on failure.</returns>
-    public async Task<Result<Chore>> UpdateAsync(int choreId, ChoreEditModel model)
+    public async Task<Result<ChoreEditModel>> UpdateAsync(int choreId, ChoreEditModel model)
     {
         await using var db = await factory.CreateDbContextAsync();
         var existing = await db.Chores.FindAsync(choreId);
@@ -162,6 +165,6 @@ public sealed class ChoreRepository(
         existing.Repeats = model.Repeats;
 
         await db.SaveChangesAsync();
-        return Result.Ok(existing);
+        return Result.Ok(new ChoreEditModel(existing));
     }
 }

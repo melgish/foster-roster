@@ -1,13 +1,17 @@
 namespace FosterRoster.Features.Felines;
 
+using Data;
+using FluentResults.Extensions;
 using System.Linq.Expressions;
 using Fosterers;
 
 
 public sealed class FelineRepository(
-    IDbContextFactory<Data.FosterRosterDbContext> contextFactory
+    IDbContextFactory<FosterRosterDbContext> contextFactory
 )
 {
+    private static DbSet<Feline> SetFactory(FosterRosterDbContext db) => db.Felines;
+    
     /// <summary>
     ///     Projection to select only the fields needed for the feline list.
     /// </summary>
@@ -80,26 +84,18 @@ public sealed class FelineRepository(
     /// <summary>
     ///     Adds a new feline to the database.
     /// </summary>
-    /// <param name="feline">Feline instance to add.</param>
+    /// <param name="model">Feline instance to add.</param>
     /// <returns>A Result with added feline, or errors on failure.</returns>
-    public async Task<Result<FelineEditModel>> AddAsync(FelineEditModel feline)
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        var entry = await context.Felines.AddAsync(feline.ToFeline());
-        await context.SaveChangesAsync();
-        return Result.Ok(new FelineEditModel(FelineProjection.Compile().Invoke(entry.Entity)));
-    }
+    public Task<Result<FelineEditModel>> AddAsync(FelineEditModel model)
+        => contextFactory
+            .AddAsync(SetFactory, model.ToFeline())
+            .Map(feline => new FelineEditModel(FelineProjection.Compile().Invoke(feline)));
 
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Feline table.
     /// </summary>
     /// <returns></returns>
-    public async Task<Query<Feline>> CreateQueryAsync()
-    {
-        var context = await contextFactory.CreateDbContextAsync();
-        var queryable = context.Felines;
-        return new(context, queryable);
-    }
+    public Task<Query<Feline>> CreateQueryAsync() => contextFactory.CreateQueryAsync(SetFactory);
 
     /// <summary>
     ///     Sets a feline as inactive in the database.
@@ -130,19 +126,8 @@ public sealed class FelineRepository(
     /// </summary>
     /// <param name="felineId">ID of feline to remove.</param>
     /// <returns>A Result instance indicating success or failure.</returns>
-    public async Task<Result> DeleteByKeyAsync(int felineId)
-    {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
-                .Felines
-                .Where(f => f.Id == felineId)
-                .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
-    }
+    public Task<Result> DeleteByKeyAsync(int felineId)
+        => contextFactory.DeleteByKeyAsync(SetFactory, felineId);
 
     /// <summary>
     ///     Gets a single feline by ID.
