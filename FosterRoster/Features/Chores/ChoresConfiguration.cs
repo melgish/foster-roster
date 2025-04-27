@@ -20,7 +20,7 @@ internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
         builder.Property(e => e.Description)
             .HasMaxLength(256)
             .IsRequired(false);
-        
+
         builder.Property(e => e.DueDate)
             .IsRequired(false);
 
@@ -55,6 +55,5 @@ internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
         // but include template tasks (where FelineId is null)
         builder
             .HasQueryFilter(e => e.FelineId == null || !e.Feline!.IsInactive);
-        
     }
 }

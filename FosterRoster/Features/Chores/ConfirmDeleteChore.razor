@@ -1,25 +1,11 @@
-﻿@inject DialogService DialogService
+﻿@implements IConfirmDelete
 
-<RadzenStack>
-    <RadzenRow>
-        <RadzenColumn>
-            <RadzenText Typo="Typo.body1">
-                If you click Yes, you will delete data about the Task
-                "@Name". Journal entries about this task will not be deleted.
-                <em>This action cannot be undone.</em>
-            </RadzenText>
-        </RadzenColumn>
-    </RadzenRow>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
-        <RadzenButton ButtonStyle="ButtonStyle.Base" Click="@Cancel" Variant="Variant.Text">Cancel</RadzenButton>
-        <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@Confirm" Variant="Variant.Text">Yes</RadzenButton>
-    </RadzenStack>
-</RadzenStack>
+<AppConfirmModal>
+    <p>If you click Yes, you will delete all data about the 
+        Task "@Name". Journal entries about this task will 
+        not be deleted.</p>
+</AppConfirmModal>
 
 @code {
     [Parameter] public string Name { get; set; } = string.Empty;
-
-    void Cancel() => DialogService.Close(false);
-
-    void Confirm() => DialogService.Close(true);
 }

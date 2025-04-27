@@ -12,9 +12,19 @@ using Features.Schedules;
 using Features.Sources;
 using Features.Thumbnails;
 using Features.Weights;
+using Microsoft.AspNetCore.Identity;
 
 public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options)
-    : IdentityDbContext<ApplicationUser, ApplicationRole, int>(options), IDataProtectionKeyContext
+    : IdentityDbContext<
+        ApplicationUser,
+        ApplicationRole,
+        int,
+        IdentityUserClaim<int>,
+        ApplicationUserRole,
+        IdentityUserLogin<int>,
+        IdentityRoleClaim<int>,
+        IdentityUserToken<int>
+    >(options), IDataProtectionKeyContext
 {
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<Feline> Felines { get; set; } = null!;
@@ -30,7 +40,7 @@ public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> optio
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FosterRosterDbContext).Assembly);
         base.OnModelCreating(modelBuilder);
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FosterRosterDbContext).Assembly);
     }
 }

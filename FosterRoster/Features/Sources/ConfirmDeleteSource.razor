@@ -1,8 +1,9 @@
-﻿<AppConfirmModal>
-    If you click Yes, you will delete all data about the Source
-    "@Name". Cats linked to @Name will not be deleted, however the
-    existing Source value will be cleared.
-    <em>This action cannot be undone.</em>    
+﻿@implements IConfirmDelete
+
+<AppConfirmModal>
+    <p>If you click Yes, you will delete all data about the 
+        Source "@Name". Cats linked to @Name will not be deleted, 
+        however the existing Source value will be cleared.</p>
 </AppConfirmModal>
 
 @code {

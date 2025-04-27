@@ -7,7 +7,7 @@ public sealed class FostererRepository(
 )
 {
     private static DbSet<Fosterer> SetFactory(FosterRosterDbContext db) => db.Fosterers;
-        
+
     /// <summary>
     ///     Adds a new fosterer to the database.
     /// </summary>
@@ -30,14 +30,21 @@ public sealed class FostererRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public Task<Result> DeleteByKeyAsync(int fostererId)
         => dbContextFactory.DeleteByKeyAsync(SetFactory, fostererId);
-    
+
     /// <summary>
     ///     Gets single fosterer from the database.
     /// </summary>
     /// <param name="fostererId">ID of fosterer to return.</param>
     /// <returns>Result with Fosterer if successful, or Errors on failure.</returns>
-    public Task<Result<Fosterer>> GetByKeyAsync(int fostererId)
-        => dbContextFactory.GetByKeyAsync(SetFactory, fostererId);
+    public async Task<Result<FostererFormDto>> GetByKeyAsync(int fostererId)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var dto = await db
+            .Fosterers
+            .SelectToFormDto()
+            .FirstOrDefaultAsync(e => e.Id == fostererId);
+        return dto is null ? Result.Fail(new NotFoundError()) : Result.Ok(dto);
+   }
 
     /// <summary>
     ///     Updates an existing Fosterer in the database.

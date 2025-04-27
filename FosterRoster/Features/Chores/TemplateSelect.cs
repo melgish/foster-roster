@@ -1,12 +1,12 @@
 ﻿namespace FosterRoster.Features.Chores;
 
-public sealed class TemplateSelect(ChoreRepository choreRepository): AppItemSelect<int>
+public sealed class TemplateSelect(ChoreRepository choreRepository) : AppItemSelect<int>
 {
     protected override async Task OnParametersSetAsync()
     {
         await using var query = await choreRepository.CreateQueryAsync();
         Items = await query
-            .Where((e => !e.FelineId.HasValue))
+            .Where(e => !e.FelineId.HasValue)
             .OrderBy(e => e.Name)
             .Select(e => new Item(e.Id, e.Name))
             .ToListAsync();

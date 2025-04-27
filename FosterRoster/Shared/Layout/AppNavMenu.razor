@@ -12,6 +12,10 @@
     <AuthorizeView>
         <Authorized>
             <RadzenMenuItem Path="/weights" Text="Weights"/>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin,User">
+        <Authorized>
             <RadzenMenuItem Path="/intake" Text="Intake"/>
             <RadzenMenuItem Text="Admin">
                 <RadzenMenuItem Path="/felines" Text="Felines"/>

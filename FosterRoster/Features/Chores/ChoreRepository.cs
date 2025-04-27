@@ -13,7 +13,7 @@ public sealed class ChoreRepository(
     /// </summary>
     /// <param name="model">Chore data to add.</param>
     /// <returns>A Result with Chore on Success, otherwise Result with Errors.</returns>
-    public async Task<Result<ChoreEditModel>> AddAsync(ChoreEditModel model)
+    public async Task<Result<ChoreFormDto>> AddAsync(ChoreFormDto model)
     {
         await using var db = await factory.CreateDbContextAsync();
         var entry = await db.Chores.AddAsync(new()
@@ -23,13 +23,13 @@ public sealed class ChoreRepository(
             DueDate = model.DueDate?.UtcDateTime,
             FelineId = model.FelineId.ZeroToNull(),
             Name = model.Name.TrimToNull(),
-            Repeats = model.Repeats,
+            Repeats = model.Repeats
         });
-        
+
         await db.SaveChangesAsync();
-        return Result.Ok<ChoreEditModel>(new(entry.Entity));
+        return Result.Ok<ChoreFormDto>(new(entry.Entity));
     }
-    
+
     private DateTimeOffset? GetNextDueDate(DateTimeOffset? dueDate, string? cron)
     {
         if (dueDate is null || string.IsNullOrWhiteSpace(cron)) return dueDate;
@@ -38,7 +38,7 @@ public sealed class ChoreRepository(
         var nextDue = schedule.GetNextOccurrence(now);
         return nextDue;
     }
-    
+
     /// <summary>
     /// Clone the specified template chore for the specified feline.
     /// </summary>
@@ -54,16 +54,16 @@ public sealed class ChoreRepository(
         if (template is null) return Result.Fail(new NotFoundError());
 
         var entry = context.Chores.Add(new()
-            {
-                Description = template.Description,
-                DueDate = GetNextDueDate(template.DueDate, template.Cron)?.UtcDateTime,
-                FelineId = request.FelineId,
-                Name = template.Name,
-                Cron = template.Cron,
-                Repeats = template.Repeats,
-            });
+        {
+            Description = template.Description,
+            DueDate = GetNextDueDate(template.DueDate, template.Cron)?.UtcDateTime,
+            FelineId = request.FelineId,
+            Name = template.Name,
+            Cron = template.Cron,
+            Repeats = template.Repeats
+        });
         await context.SaveChangesAsync();
-        
+
         return Result.Ok(entry.Entity.Id);
     }
 
@@ -93,19 +93,19 @@ public sealed class ChoreRepository(
             _ => Result.Fail(new MultipleChangesError())
         };
     }
-    
+
     /// <summary>
     ///     Gets single fosterer from the database.
     /// </summary>
     /// <param name="choreId">ID of chore to return.</param>
     /// <returns>Result with Fosterer if successful, or Errors on failure.</returns>
-    public async Task<Result<ChoreEditModel>> GetByKeyAsync(int choreId)
+    public async Task<Result<ChoreFormDto>> GetByKeyAsync(int choreId)
     {
         await using var db = await factory.CreateDbContextAsync();
         var chore = await db.Chores.AsNoTracking().FirstOrDefaultAsync(f => f.Id == choreId);
-        return chore is null 
+        return chore is null
             ? Result.Fail(new NotFoundError())
-            : Result.Ok(new ChoreEditModel(chore));
+            : Result.Ok(new ChoreFormDto(chore));
     }
 
     /// <summary>
@@ -120,15 +120,15 @@ public sealed class ChoreRepository(
         if (chore is null) return Result.Fail(new NotFoundError());
         if (chore.FelineId is null) return Result.Fail("Task is not assigned to a feline.");
         if (chore.Repeats == 0) return Result.Fail("Task has already been completed.");
-        
+
         // Create a journal entry for the chore.
         db.Comments.Add(new()
         {
             FelineId = chore.FelineId.GetValueOrDefault(),
             Text = string.IsNullOrWhiteSpace(chore.Description) ? chore.Name : chore.Description,
-            TimeStamp = DateTimeOffset.UtcNow,
+            TimeStamp = DateTimeOffset.UtcNow
         });
-        
+
         if (chore.Repeats == 1)
         {
             db.Chores.Remove(chore);
@@ -139,7 +139,7 @@ public sealed class ChoreRepository(
             chore.DueDate = GetNextDueDate(chore.DueDate, chore.Cron)?.UtcDateTime;
             db.Chores.Update(chore);
         }
-        
+
         await db.SaveChangesAsync();
 
         return Result.Ok();
@@ -151,7 +151,7 @@ public sealed class ChoreRepository(
     /// <param name="choreId">ID of chore to update.</param>
     /// <param name="model">Updated data to assign to Chore</param>
     /// <returns>Result with updated Chore if found, or Errors on failure.</returns>
-    public async Task<Result<ChoreEditModel>> UpdateAsync(int choreId, ChoreEditModel model)
+    public async Task<Result<ChoreFormDto>> UpdateAsync(int choreId, ChoreFormDto model)
     {
         await using var db = await factory.CreateDbContextAsync();
         var existing = await db.Chores.FindAsync(choreId);
@@ -165,6 +165,6 @@ public sealed class ChoreRepository(
         existing.Repeats = model.Repeats;
 
         await db.SaveChangesAsync();
-        return Result.Ok(new ChoreEditModel(existing));
+        return Result.Ok(new ChoreFormDto(existing));
     }
 }

@@ -1,6 +1,6 @@
 ﻿@page "/users"
 @page "/users/{userId:int}"
-
+@attribute [Authorize(Roles = "Admin")]
 @rendermode @(new InteractiveServerRenderMode(false))
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager
@@ -19,7 +19,7 @@
                         <AppTextBox @bind-Value="_model.UserName" Text="User Name"/>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <RoleSelect @bind-Value="_model.Role" Text="Role" />
+                        <RoleSelect @bind-Value="_model.Role" Text="Role"/>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormRow>
@@ -32,10 +32,10 @@
                 </AppFormRow>
                 <AppFormRow>
                     <AppFormColumn>
-                        <AppTextBox @bind-Value="_model.Password" Text="Password"/>
+                        <AppPasswordBox @bind-Value="_model.Password" Text="Password"/>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <AppTextBox @bind-Value="_model.ConfirmPassword" Text="Confirm Password"/>
+                        <AppPasswordBox @bind-Value="_model.ConfirmPassword" Text="Confirm Password"/>
                     </AppFormColumn>
                     <AppFormColumn SizeSM="12">
                         To keep current password, leave both fields blank.
@@ -56,7 +56,7 @@
     <AppGridPanel>
         <RadzenDataGrid
             @ref="_grid"
-            TItem="GridRow"
+            TItem="UserGridDto"
             AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
@@ -76,49 +76,47 @@
             ShowPagingSummary="true">
             <HeaderTemplate>
                 <AppGridHeader Text="Users">
-                    <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
+                    <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
                 </AppGridHeader>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => Edit(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))" Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn 
-                    Property="@nameof(GridRow.UserName)" 
+                <RadzenDataGridColumn
+                    Property="@nameof(UserGridDto.UserName)"
                     Title="User Name"/>
                 <RadzenDataGridColumn
-                    Property="@nameof(GridRow.Email)"
+                    Property="@nameof(UserGridDto.Email)"
                     Title="Email Address"/>
                 <RadzenDataGridColumn
-                    Property="@nameof(GridRow.PhoneNumber)"
+                    Property="@nameof(UserGridDto.PhoneNumber)"
                     Title="Phone Number"/>
+                <RadzenDataGridColumn
+                    Property="@nameof(UserGridDto.Role)"
+                    Title="Role"/>
             </Columns>
-        </RadzenDataGrid>        
+        </RadzenDataGrid>
     </AppGridPanel>
 </RadzenStack>
 
 @code {
-    private const string Route = "/users";
+    private const string PageRoute = "/users";
     private const string EntityName = "User";
 
-    private sealed class GridRow
-    {
-        public required string? Email { get; init; }
-        public required int Id { get; init; }
-        public required string? PhoneNumber { get; init; }
-        public required string UserName { get; init; }
-    }
-    
     private int _count;
-    private IEnumerable<GridRow>? _data;
-    private RadzenDataGrid<GridRow>? _grid;
+    private IEnumerable<UserGridDto>? _data;
+    private RadzenDataGrid<UserGridDto>? _grid;
     private bool _isLoading;
     private bool _isSaving;
     private string _name = string.Empty;
     private UserFormDto _model = new();
 
+    /// <summary>
+    ///     ID of the user currently being edited.
+    /// </summary>
     [Parameter] public int UserId { get; set; }
 
     /// <summary>
@@ -126,18 +124,17 @@
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (_model.Id == 0)
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteUser>(_model.Id, _name))
             return;
-        
+
         _isSaving = true;
         try
         {
             var rs = await UserRepository.DeleteByKeyAsync(_model.Id);
-            NotificationService.Notify(rs, "Deleted User", "Failed to Delete User");
-            if (rs.IsSuccess)
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
             {
                 await _grid!.Reload();
-                Edit(0);
+                await EditAsync(0);
             }
         }
         finally
@@ -145,13 +142,21 @@
             _isSaving = false;
         }
     }
+
     /// <summary>
-    ///     Edit the specified source.
+    ///     Edit the specified user.
     /// </summary>
     /// <param name="entityId">ID of the entity to edit or 0 to create a new one.</param>
-    private void Edit(int entityId)
-        => NavigationManager.NavigateTo(entityId == 0 ? Route : $"{Route}/{entityId}");
-    
+    private async Task EditAsync(int entityId)
+    {
+        if (entityId == UserId)
+        {
+            await ResetAsync();
+            return;
+        }
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");    
+    }
+
     /// <summary>
     ///     Load users for the grid.
     /// </summary>
@@ -163,19 +168,12 @@
         {
             await using var query = await UserRepository.CreateQueryAsync();
             (_data, _count) = await query
-                .AsNoTracking()
-                .Select(e => new GridRow
-                {
-                    Email = e.Email,
-                    Id = e.Id,
-                    PhoneNumber = e.PhoneNumber,
-                    UserName = e.UserName ?? string.Empty,
-                })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "UserName asc");
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+            NotificationService.NotifyFailedToLoad(ex);
         }
         finally
         {
@@ -192,7 +190,7 @@
         await ResetAsync();
         await base.OnParametersSetAsync();
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -208,7 +206,7 @@
             return;
         }
 
-        _name = rs.Value.Id == 0 ? "Create New User" : rs.Value.UserName!;
+        _name = rs.Value.Id == 0 ? "Create New User" : rs.Value.UserName;
         _model = rs.Value;
     }
 
@@ -218,10 +216,15 @@
     /// <param name="editContext">Form context</param>
     private async Task SaveAsync(EditContext editContext)
     {
-        var rs = _model.Id == 0
+        var id = _model.Id;
+        var rs = id == 0
             ? await UserRepository.AddAsync(_model)
             : await UserRepository.UpdateAsync(_model.Id, _model);
-        NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");                
-        await Task.CompletedTask;
+        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
+        {
+            await _grid!.Reload();
+            await EditAsync(id);
+        }
     }
+
 }

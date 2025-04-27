@@ -5,13 +5,12 @@ using FluentResults.Extensions;
 using System.Linq.Expressions;
 using Fosterers;
 
-
 public sealed class FelineRepository(
     IDbContextFactory<FosterRosterDbContext> contextFactory
 )
 {
     private static DbSet<Feline> SetFactory(FosterRosterDbContext db) => db.Felines;
-    
+
     /// <summary>
     ///     Projection to select only the fields needed for the feline list.
     /// </summary>
@@ -86,10 +85,10 @@ public sealed class FelineRepository(
     /// </summary>
     /// <param name="model">Feline instance to add.</param>
     /// <returns>A Result with added feline, or errors on failure.</returns>
-    public Task<Result<FelineEditModel>> AddAsync(FelineEditModel model)
+    public Task<Result<FelineFormDto>> AddAsync(FelineFormDto model)
         => contextFactory
             .AddAsync(SetFactory, model.ToFeline())
-            .Map(feline => new FelineEditModel(FelineProjection.Compile().Invoke(feline)));
+            .Map(feline => new FelineFormDto(FelineProjection.Compile().Invoke(feline)));
 
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Feline table.

@@ -8,7 +8,7 @@ using Sources;
 using Thumbnails;
 using Weights;
 
-public sealed class Feline : IKeyBearer
+public sealed class Feline : IIdBearer
 {
     public string? AnimalId { get; set; }
     public string? Breed { get; set; }

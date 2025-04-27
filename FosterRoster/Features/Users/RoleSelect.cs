@@ -17,7 +17,7 @@ public sealed class RoleSelect(
                 .Roles
                 .AsNoTracking()
                 .OrderBy(e => e.Name)
-                .Select(e => new Item(e.NormalizedName!, e.Name!))
+                .Select(e => new Item(e.Name!, e.Name!))
                 .ToListAsync();
             Items = Items.Prepend(Select);
         }

@@ -21,7 +21,7 @@
 <AppGridPanel>
     <RadzenDataGrid
         @ref="_grid"
-        TItem="GridRow"
+        TItem="ChoreGridDto"
         AllowFiltering="false"
         AllowPaging="false"
         AllowSorting="false"
@@ -43,19 +43,19 @@
         <Columns>
             <RadzenDataGridColumn Width="6ch">
                 <Template Context="data">
-                    <AppGridButton 
-                        ButtonStyle="ButtonStyle.Secondary" 
+                    <AppGridButton
+                        ButtonStyle="ButtonStyle.Secondary"
                         Click="@(() => LogChoreCompletedAsync(data))"
-                        Text="Log" />
+                        Text="Log"/>
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn
                 MinWidth="12ch"
-                Property="@nameof(GridRow.Name)"
-                Title="@nameof(GridRow.Name)"/>
+                Property="@nameof(ChoreGridDto.Name)"
+                Title="@nameof(ChoreGridDto.Name)"/>
             <RadzenDataGridColumn
                 MinWidth="12ch"
-                Property="@nameof(GridRow.DueDate)"
+                Property="@nameof(ChoreGridDto.DueDate)"
                 Title="Due Date">
                 <Template Context="row">
                     <AppLocalDateTime Value="row.DueDate"/>
@@ -63,38 +63,31 @@
             </RadzenDataGridColumn>
             <RadzenDataGridColumn
                 Filterable="false"
-                Property="@nameof(GridRow.Cron)"
-                Title="@nameof(GridRow.Cron)"
+                Property="@nameof(ChoreGridDto.Cron)"
+                Title="@nameof(ChoreGridDto.Cron)"
                 Width="10ch"/>
             <RadzenDataGridColumn
                 Filterable="false"
                 HeaderCssClass="app-text-right"
-                Property="@nameof(GridRow.Repeats)"
-                Title="@nameof(GridRow.Repeats)"
+                Property="@nameof(ChoreGridDto.Repeats)"
+                Title="@nameof(ChoreGridDto.Repeats)"
                 TextAlign="TextAlign.Right"
                 Width="8ch"/>
         </Columns>
-    </RadzenDataGrid>    
+    </RadzenDataGrid>
 </AppGridPanel>
 
 
-@code {private class GridRow
-    {
-        public string? Cron { get; init; }
-        public DateTimeOffset? DueDate { get; init; }
-        public int Id { get; init; }
-        public string Name { get; init; } = string.Empty;
-        public int Repeats { get; init; }
-    }
+@code {
 
     private int _count;
-    private IEnumerable<GridRow>? _data;
-    private RadzenDataGrid<GridRow>? _grid;
+    private IEnumerable<ChoreGridDto>? _data;
+    private RadzenDataGrid<ChoreGridDto>? _grid;
     private bool _isLoading;
     private CloneTemplateRequest _model = new();
-    
-    [EditorRequired, Parameter] public int FelineId { get; set; }
-    
+
+    [EditorRequired][Parameter] public int FelineId { get; set; }
+
     [Parameter] public EventCallback<int> OnChoreLogged { get; set; }
 
     /// <summary>
@@ -112,14 +105,13 @@
     public async Task CloneTemplateAsync()
     {
         var rs = await ChoreRepository.CloneTemplateAsync(_model);
-        NotificationService.Notify(rs, "Task Created", "Failed to create task");
-        if (rs.IsSuccess)
+        if (NotificationService.NotifyResult(rs, "Task", "create", "created"))
         {
             _model = new() { FelineId = FelineId };
             await _grid!.Reload();
         }
     }
-    
+
     /// <summary>
     ///     Loads paged data for the grid.
     /// </summary>
@@ -133,34 +125,27 @@
             (_data, _count) = await query
                 .AsNoTracking()
                 .Where(e => e.FelineId == FelineId)
-                .Select(e => new GridRow
-                {
-                    Cron = e.Cron,
-                    DueDate = e.DueDate,
-                    Id = e.Id, 
-                    Name = e.Name,
-                    Repeats = e.Repeats
-                })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "Name asc");
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+            NotificationService.NotifyFailedToLoad(ex);
         }
         finally
         {
             _isLoading = false;
         }
     }
-    
-    private async Task LogChoreCompletedAsync(GridRow row)
+
+    private async Task LogChoreCompletedAsync(ChoreGridDto row)
     {
         var rs = await ChoreRepository.LogChoreCompletedAsync(row.Id);
-        NotificationService.Notify(rs, "Task Logged", "Failed to log task");
-        if (rs.IsSuccess)
+        if (NotificationService.NotifyResult(rs, "Task", "log", "logged"))
         {
             await OnChoreLogged.InvokeAsync();
             await _grid!.Reload();
         }
     }
+
 }

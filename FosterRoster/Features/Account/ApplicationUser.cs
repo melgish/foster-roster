@@ -3,7 +3,7 @@
 using Data;
 using Microsoft.AspNetCore.Identity;
 
-public sealed class ApplicationUser : IdentityUser<int>, IKeyBearer
+public sealed class ApplicationUser : IdentityUser<int>, IIdBearer
 {
-    public ICollection<IdentityUserRole<int>> UserRoles { get; set; } = [];
+    public ICollection<ApplicationUserRole> UserRoles { get; set; } = [];
 }

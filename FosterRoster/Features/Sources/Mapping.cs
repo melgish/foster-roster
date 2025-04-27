@@ -11,14 +11,14 @@ public static class Mapping
         => query.Select(e => new SourceFormDto
         {
             Id = e.Id,
-            Name = e.Name,
+            Name = e.Name
         });
 
     /// <summary>
-    ///     Map source entities to grid model
+    ///     Map source entities to grid row model
     /// </summary>
-    /// <param name="query"></param>
-    /// <returns></returns>
+    /// <param name="query">query to select from</param>
+    /// <returns>IQueryable with mapping to grid row model</returns>
     public static IQueryable<SourceGridDto> SelectToGridDto(this IQueryable<Source> query)
         => query.Select(e => new SourceGridDto
         {
@@ -35,6 +35,6 @@ public static class Mapping
         => new()
         {
             Id = entity.Id,
-            Name = entity.Name,
+            Name = entity.Name
         };
 }

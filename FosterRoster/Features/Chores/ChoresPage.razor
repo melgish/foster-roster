@@ -31,7 +31,7 @@
                 </AppFormRow>
                 <AppFormRow>
                     <AppFormColumn SizeSM="12">
-                        <AppTextBox @bind-Value="@_model.Description" 
+                        <AppTextBox @bind-Value="@_model.Description"
                                     Disabled="_isSaving"
                                     Text="Description"/>
                     </AppFormColumn>
@@ -39,8 +39,8 @@
                 <AppFormRow>
                     <AppFormColumn>
                         <AppDateTime @bind-Value="@_model.DueDate"
-                                    Disabled="_isSaving"
-                                    Text="Due Date"/>
+                                     Disabled="_isSaving"
+                                     Text="Due Date"/>
                     </AppFormColumn>
                     <AppFormColumn>
                         <AppNumeric @bind-Value="_model.Repeats"
@@ -55,7 +55,7 @@
                                     Disabled="_isSaving"
                                     Placeholder="* * * * *"
                                     title="Cron Expression to calculate the next due date"
-                                    Text="Cron Expression" />
+                                    Text="Cron Expression"/>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>
@@ -77,46 +77,46 @@
     <AppGridPanel>
         <RadzenDataGrid
             @ref="_grid"
-            TItem="GridRow"
+            TItem="ChoreGridDto"
             AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
             Count="_count"
             Data="_data"
-            Density="Density.Compact"
+            Density="@Grid.Density"
             FilterMode="FilterMode.Simple"
-            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            FilterCaseSensitivity="@Grid.FilterCaseSensitivity"
             IsLoading="_isLoading"
             LoadData="LoadDataAsync"
-            PageNumbersCount="1"
-            PagerHorizontalAlign="HorizontalAlign.Center"
-            PagerPosition="PagerPosition.Top"
-            PageSize="20"
-            PageSizeOptions="@( [10, 20, 50, 100])"
-            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            PageNumbersCount="Grid.PageNumbersCount"
+            PagerHorizontalAlign="Grid.PagerHorizontalAlign"
+            PagerPosition="Grid.PagerPosition"
+            PageSize="Grid.PageSize"
+            PageSizeOptions="Grid.PageSizeOptions"
+            PagingSummaryFormat="@Grid.PagingSummaryFormat"
             ShowPagingSummary="true">
             <HeaderTemplate>
                 <AppGridHeader Text="Tasks">
-                    <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
+                    <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
                 </AppGridHeader>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => Edit(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))" Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
-                    Property="@nameof(GridRow.Name)"
-                    Title="@nameof(GridRow.Name)"
+                    Property="@nameof(ChoreGridDto.Name)"
+                    Title="@nameof(ChoreGridDto.Name)"
                     Width="15ch"/>
-                <RadzenDataGridColumn 
-                    Property="@nameof(GridRow.FelineName)" 
+                <RadzenDataGridColumn
+                    Property="@nameof(ChoreGridDto.FelineName)"
                     Title="Assigned To"
-                    Width="12ch" />
+                    Width="12ch"/>
                 <RadzenDataGridColumn
                     Filterable="false"
-                    Property="@nameof(GridRow.DueDate)"
+                    Property="@nameof(ChoreGridDto.DueDate)"
                     Title="Due Date"
                     Width="15ch">
                     <Template Context="row">
@@ -126,14 +126,14 @@
                 <RadzenDataGridColumn
                     Filterable="false"
                     HeaderCssClass="app-text-right"
-                    Property="@nameof(GridRow.Repeats)"
-                    Title="@nameof(GridRow.Repeats)"
+                    Property="@nameof(ChoreGridDto.Repeats)"
+                    Title="@nameof(ChoreGridDto.Repeats)"
                     TextAlign="TextAlign.Right"
                     Width="8ch"/>
                 <RadzenDataGridColumn
                     Filterable="false"
-                    Property="@nameof(GridRow.Cron)"
-                    Title="@nameof(GridRow.Cron)"
+                    Property="@nameof(ChoreGridDto.Cron)"
+                    Title="@nameof(ChoreGridDto.Cron)"
                     Width="15ch"/>
             </Columns>
         </RadzenDataGrid>
@@ -141,26 +141,15 @@
 </RadzenStack>
 
 @code {
-
-    private sealed class GridRow
-    {
-        public required string? Cron { get; init; }
-        public required DateTimeOffset? DueDate { get; init; }
-        public required string? FelineName { get; init; }
-        public required int Id { get; init; }
-        public required string Name { get; init; }
-        public required int Repeats { get; init; }
-    }
-
     private const string PageRoute = "/tasks";
     private const string EntityName = "Task";
 
     private int _count;
-    private IEnumerable<GridRow>? _data;
-    private RadzenDataGrid<GridRow>? _grid;
+    private IEnumerable<ChoreGridDto>? _data;
+    private RadzenDataGrid<ChoreGridDto>? _grid;
     private bool _isLoading;
     private bool _isSaving;
-    private ChoreEditModel _model = new();
+    private ChoreFormDto _model = new();
     private string _name = $"Create New {EntityName}";
 
     /// <summary>
@@ -170,32 +159,21 @@
     public int ChoreId { get; set; }
 
     /// <summary>
-    ///     Prompt the user to confirm deletion of a fosterer.
-    /// </summary>
-    /// <returns>True if user confirms the delete action.</returns>
-    private async Task<bool> ConfirmDeleteAsync()
-        => await DialogService.OpenAsync<ConfirmDeleteChore>(
-            "Confirm Delete",
-            new() { [nameof(ConfirmDeleteChore.Name)] = _name }
-        ) as bool? ?? false;
-
-    /// <summary>
     ///     Delete the chore currently being edited.
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (!(_model.Id != 0 && await ConfirmDeleteAsync()))
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteChore>(_model.Id,_name))
             return;
 
         _isSaving = true;
         try
         {
             var rs = await ChoreRepository.DeleteByKeyAsync(_model.Id);
-            NotificationService.Notify(rs, $"Deleted {EntityName}", $"Failed to delete {EntityName}");
-            if (rs.IsSuccess)
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
             {
                 await _grid!.Reload();
-                Edit(0);
+                await EditAsync(0);
             }
         }
         finally
@@ -205,11 +183,18 @@
     }
 
     /// <summary>
-    ///     Edit the specified chore.
+    ///     Edit the specified entity.
     /// </summary>
-    /// <param name="choreId">ID of the chore to edit or 0 to create a new one.</param>
-    private void Edit(int choreId)
-        => NavigationManager.NavigateTo(choreId == 0 ? PageRoute : $"{PageRoute}/{choreId}");
+    /// <param name="entityId">ID of the entity to edit or 0 to create a new one.</param>
+    private async Task EditAsync(int entityId)
+    {
+        if (entityId == ChoreId)
+        {
+            await ResetAsync();
+            return;
+        }
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");    
+    }
 
     /// <summary>
     ///     Loads paged data for the grid.
@@ -222,28 +207,19 @@
         {
             await using var query = await ChoreRepository.CreateQueryAsync();
             (_data, _count) = await query
-                .AsNoTracking()
-                .Select(e => new GridRow
-                {
-                    DueDate = e.DueDate,
-                    FelineName = e.Feline == null ? "Template" : e.Feline.Name,
-                    Cron = e.Cron,
-                    Id = e.Id, 
-                    Name = e.Name,
-                    Repeats = e.Repeats
-                })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "Name asc");
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+            NotificationService.NotifyFailedToLoad(ex);
         }
         finally
         {
             _isLoading = false;
         }
     }
-    
+
     /// <summary>
     ///     Invoked when the component is initialized.
     /// </summary>
@@ -261,16 +237,13 @@
     {
         // Reset the model to be edited.
         var rs = ChoreId == 0
-            ? Result.Ok<ChoreEditModel>(new())
+            ? Result.Ok<ChoreFormDto>(new())
             : await ChoreRepository.GetByKeyAsync(ChoreId);
-        if (rs.IsFailed)
+        if (NavigationManager.VerifyFound(rs))
         {
-            NavigationManager.NavigateTo("/not-found");
-            return;
+            _model = rs.Value;
+            _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
         }
-
-        _model = rs.Value;
-        _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
     }
 
     /// <summary>
@@ -282,11 +255,10 @@
         var rs = _model.Id == 0
             ? await ChoreRepository.AddAsync(_model)
             : await ChoreRepository.UpdateAsync(_model.Id, _model);
-        NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");
-        if (rs.IsSuccess)
+        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
         {
             await _grid!.Reload();
-            Edit(_model.Id);
+            await EditAsync(_model.Id);
         }
     }
 

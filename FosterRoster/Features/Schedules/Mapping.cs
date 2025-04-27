@@ -18,8 +18,8 @@ public static class Mapping
     /// <summary>
     ///     Map supplied entity for the grid
     /// </summary>
-    /// <param name="query"></param>
-    /// <returns></returns>
+    /// <param name="query">query to select from</param>
+    /// <returns>IQueryable with mapping to grid row model</returns>
     public static IQueryable<ScheduleGridDto> SelectToGridDto(this IQueryable<Schedule> query)
         => query.Select(e => new ScheduleGridDto
         {

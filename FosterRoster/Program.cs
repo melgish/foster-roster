@@ -68,7 +68,7 @@ builder
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddSingleton<TimeProvider, TexasTimeProvider>();
-builder.Services.AddValidatorsFromAssemblyContaining<FelineEditModel>();
+builder.Services.AddValidatorsFromAssemblyContaining<FelineFormDto>();
 
 builder.Services.AddScoped<ChoreRepository>();
 builder.Services.AddScoped<CommentRepository>();

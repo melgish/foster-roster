@@ -3,17 +3,19 @@
 /// <summary>
 ///     Error when primary entity in an operation is not found.
 /// </summary>
-/// <param name="message"></param>
-public sealed class NotFoundError(string message = "Entity was not found") : Error(message);
+public sealed class NotFoundError() : Error("Entity was not found");
 
 /// <summary>
 ///     Error when operation results in 0 changes.
 /// </summary>
-/// <param name="message"></param>
-public sealed class NoChangesError(string message = "Entity was not changed") : Error(message);
+public sealed class NoChangesError() : Error("Entity was not changed");
 
 /// <summary>
 ///     Error when operation unexpectedly results in multiple changes.
 /// </summary>
-/// <param name="message"></param>
-public sealed class MultipleChangesError(string message = "Multiple entities were changed") : Error(message);
+public sealed class MultipleChangesError() : Error("Multiple entities were changed");
+
+/// <summary>
+///     Error for conditions outside normal expectations.
+/// </summary>
+public sealed class UnexpectedError() : Error("Unexpected error");

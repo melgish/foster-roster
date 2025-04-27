@@ -6,7 +6,7 @@ public static class Grid
 {
     public static readonly Density Density = Density.Compact;
     public static readonly FilterCaseSensitivity FilterCaseSensitivity = FilterCaseSensitivity.CaseInsensitive;
-    public const int PageNumbersCount = 1;    
+    public const int PageNumbersCount = 1;
     public const HorizontalAlign PagerHorizontalAlign = HorizontalAlign.Center;
     public static readonly PagerPosition PagerPosition = PagerPosition.Top;
     public const int PageSize = 20;

@@ -13,22 +13,22 @@ public class UserFormDto()
     ///     Unique ID for the user
     /// </summary>
     public int Id { get; set; }
-    
+
     /// <summary>
     ///     Unique name for the user. Must be an email address.
     /// </summary>
     public string UserName { get; set; } = string.Empty;
-    
+
     /// <summary>
     ///     Email address of the user
     /// </summary>
     public string Email { get; set; } = string.Empty;
-    
+
     /// <summary>
     ///     True if user has been locked out.
     /// </summary>
     public DateTimeOffset? LockoutEnd { get; set; }
-    
+
     /// <summary>
     ///     Password for new users or to change password for existing users.
     /// </summary>
@@ -44,4 +44,3 @@ public class UserFormDto()
     /// </summary>
     public string Role { get; set; } = string.Empty;
 }
-

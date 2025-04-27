@@ -1,6 +1,6 @@
 ﻿namespace FosterRoster.Features.Schedules;
 
-public class ScheduleGridDto: Data.IKeyBearer
+public class ScheduleGridDto : IIdBearer
 {
     /// <summary>
     ///     Cron schedule that defines how the next occurrence of
@@ -12,7 +12,7 @@ public class ScheduleGridDto: Data.IKeyBearer
     ///     Database ID of the schedule.
     /// </summary>
     public required int Id { get; init; }
-    
+
     /// <summary>
     ///     Human-readable name of the schedule.
     /// </summary>

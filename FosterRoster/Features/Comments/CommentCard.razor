@@ -31,13 +31,13 @@ else
 
 @code {
     private MarkupString? _html;
-    private CommentEditModel? _model;
+    private CommentFormDto? _model;
 
     [EditorRequired] [Parameter] public Comment Comment { get; set; } = null!;
 
     [Parameter] public EventCallback<Comment> OnDelete { get; set; }
 
-    [Parameter] public EventCallback<Comment> OnSave { get; set; }
+    [Parameter] public EventCallback<CommentFormDto> OnSave { get; set; }
 
     private async Task DeleteAsync() => await OnDelete.InvokeAsync(Comment);
 
@@ -49,7 +49,7 @@ else
 
     private Task EditAsync()
     {
-        _model = new(Comment);
+        _model = Comment.ToFormDto();
         return Task.CompletedTask;
     }
 
@@ -59,9 +59,9 @@ else
         _model = null;
     }
 
-    private async Task SaveAsync(CommentEditModel model)
+    private async Task SaveAsync(CommentFormDto model)
     {
-        await OnSave.InvokeAsync(model.ToComment());
+        await OnSave.InvokeAsync(model);
         _model = null;
     }
 

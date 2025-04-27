@@ -11,12 +11,12 @@ public sealed class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
         builder
             .HasKey(e => e.Id)
             .HasName("PK_Schedules");
-        
+
         builder
             .Property(e => e.Cron)
             .HasMaxLength(128)
             .IsRequired();
-        
+
         builder
             .Property(e => e.Id)
             .UseIdentityAlwaysColumn();

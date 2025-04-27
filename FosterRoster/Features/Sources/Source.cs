@@ -1,6 +1,6 @@
 namespace FosterRoster.Features.Sources;
 
-public sealed class Source : Data.IKeyBearer
+public sealed class Source : IIdBearer
 {
     /// <summary>
     ///     Unique identifier for the source.

@@ -2,14 +2,14 @@
 
 using Data;
 
-public sealed class Schedule : IKeyBearer
+public sealed class Schedule : IIdBearer
 {
     /// <summary>
     ///     Cron schedule that defines how the next occurrence of
     ///     a task is calculated.
     /// </summary>
     public string Cron { get; set; } = string.Empty;
-    
+
     /// <summary>
     ///     ID of the schedule.
     /// </summary>

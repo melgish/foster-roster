@@ -55,13 +55,13 @@
             ShowPagingSummary="true">
             <HeaderTemplate>
                 <AppGridHeader Text="Sources">
-                    <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
+                    <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
                 </AppGridHeader>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => Edit(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))" Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(SourceGridDto.Name)" Title="@nameof(SourceGridDto.Name)"/>
@@ -71,7 +71,7 @@
 </RadzenStack>
 
 @code {
-    private const string Route = "/sources";
+    private const string PageRoute = "/sources";
     private const string EntityName = "Source";
 
     private int _count;
@@ -85,35 +85,25 @@
     /// <summary>
     ///     The ID of the source currently being edited.
     /// </summary>
-    [Parameter] public int SourceId { get; set; }
-
-    /// <summary>
-    ///     Prompt the user to confirm deletion of a source.
-    /// </summary>
-    /// <returns>True if user confirms the delete action.</returns>
-    private async Task<bool> ConfirmDeleteAsync()
-        => await DialogService.OpenAsync<ConfirmDeleteSource>(
-            "Confirm Delete",
-            new() { [nameof(ConfirmDeleteSource.Name)] = _name }
-        ) as bool? ?? false;
+    [Parameter]
+    public int SourceId { get; set; }
 
     /// <summary>
     ///     Delete the source currently being edited.
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (_model.Id == 0 || !await ConfirmDeleteAsync())
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteSource>(_model.Id ,_name))
             return;
 
         _isSaving = true;
         try
         {
             var rs = await SourceRepository.DeleteByKeyAsync(_model.Id);
-            NotificationService.Notify(rs, $"{EntityName} Deleted", $"Failed to delete {EntityName}");
-            if (rs.IsSuccess)
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
             {
                 await _grid!.Reload();
-                Edit(0);
+                await EditAsync(0);
             }
         }
         finally
@@ -123,11 +113,18 @@
     }
 
     /// <summary>
-    ///     Edit the specified source.
+    ///     Edit the specified entity.
     /// </summary>
     /// <param name="entityId">ID of the entity to edit or 0 to create a new one.</param>
-    private void Edit(int entityId)
-        => NavigationManager.NavigateTo(entityId == 0 ? Route : $"{Route}/{entityId}");
+    private async Task EditAsync(int entityId)
+    {
+        if (entityId == SourceId)
+        {
+            await ResetAsync();
+            return;
+        }
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");    
+    }
 
     /// <summary>
     ///     Loads paged data for the grid.
@@ -145,7 +142,7 @@
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+            NotificationService.NotifyFailedToLoad(ex);
         }
         finally
         {
@@ -172,14 +169,11 @@
         var rs = SourceId != 0
             ? await SourceRepository.GetByKeyAsync(SourceId)
             : Result.Ok<SourceFormDto>(new());
-        if (rs.IsFailed)
+        if (NavigationManager.VerifyFound(rs))
         {
-            NavigationManager.NavigateTo("/not-found");
-            return;
+            _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
+            _model = rs.Value;
         }
-
-        _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
-        _model = rs.Value;
     }
 
     /// <summary>
@@ -191,12 +185,10 @@
         var rs = _model.Id == 0
             ? await SourceRepository.AddAsync(_model)
             : await SourceRepository.UpdateAsync(_model.Id, _model);
-        NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");
-        if (rs.IsSuccess)
+        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
         {
             await _grid!.Reload();
-            Edit(_model.Id);
+            await EditAsync(_model.Id);
         }
     }
-
 }

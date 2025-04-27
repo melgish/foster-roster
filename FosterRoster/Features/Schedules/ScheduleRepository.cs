@@ -21,7 +21,7 @@ public sealed class ScheduleRepository(
             Name = model.Name.TrimToNull()
         });
         await db.SaveChangesAsync();
-        
+
         return Result.Ok(entry.Entity.ToFromDto());
     }
 
@@ -29,7 +29,7 @@ public sealed class ScheduleRepository(
     ///     Captures a new database context and creates a queryable for the Schedule table.
     /// </summary>
     /// <returns></returns>
-    public Task<Query<Schedule>> CreateQueryAsync() 
+    public Task<Query<Schedule>> CreateQueryAsync()
         => dbContextFactory.CreateQueryAsync(db => db.Schedules.AsNoTracking());
 
     /// <summary>
@@ -63,7 +63,7 @@ public sealed class ScheduleRepository(
             .Schedules
             .SelectToFormDto()
             .FirstOrDefaultAsync(e => e.Id == scheduleId);
-        return (model is null) ? Result.Fail(new NotFoundError()) : Result.Ok(model);
+        return model is null ? Result.Fail(new NotFoundError()) : Result.Ok(model);
     }
 
     /// <summary>
@@ -79,14 +79,13 @@ public sealed class ScheduleRepository(
         var schedule = await db.Schedules.FindAsync(scheduleId);
         if (schedule is null)
             return Result.Fail<ScheduleFormDto>(new NotFoundError());
-        
+
         schedule.Cron = model.Cron.TrimToNull();
         schedule.Name = model.Name.TrimToNull();
-        
+
         var entry = db.Schedules.Update(schedule);
         await db.SaveChangesAsync();
-        
+
         return Result.Ok(entry.Entity.ToFromDto());
     }
-        
 }

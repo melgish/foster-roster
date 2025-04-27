@@ -60,7 +60,7 @@ public sealed class SourceRepository(
             .Sources
             .SelectToFormDto()
             .FirstOrDefaultAsync(e => e.Id == sourceId);
-        return (dto is null) ? Result.Fail(new NotFoundError()) : Result.Ok(dto);
+        return dto is null ? Result.Fail(new NotFoundError()) : Result.Ok(dto);
     }
 
     /// <summary>
@@ -77,7 +77,7 @@ public sealed class SourceRepository(
             return Result.Fail(new NotFoundError());
 
         source.Name = dto.Name.TrimToNull();
-        
+
         await db.SaveChangesAsync();
         return Result.Ok(source.ToFormDto());
     }

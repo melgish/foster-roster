@@ -8,41 +8,43 @@
 <PageTitle>Weights</PageTitle>
 
 <RadzenStack>
-    <AppFormPanel>
-        <EditForm FormName="weightForm"
-                  Model="_model"
-                  OnValidSubmit="SaveAsync">
-            <FluentValidationValidator/>
-            <RadzenStack Gap="0.5rem">
-                <AppFormHeader Text="Enter Weight"/>
-                <AppFormRow>
-                    <AppFormColumn>
-                        <FelineSelect @bind-Value="@_model.FelineId"/>
-                    </AppFormColumn>
-                    <AppFormColumn>
-                        <AppDateTime @bind-Value="_model.DateTime" Text="Date"/>
-                    </AppFormColumn>
-                </AppFormRow>
-                <AppFormRow>
-                    <AppFormColumn>
-                        <AppNumeric @bind-Value="_model.Value" Min="0.0m" Step="0.1" Text="Weight" TValue="float"/>
-                    </AppFormColumn>
-                    <AppFormColumn>
-                        <WeightUnitSelect @bind-Value="@_model.Units"/>
-                    </AppFormColumn>
-                </AppFormRow>
-                <AppFormFooter>
-                    <AppBusyCircle IsBusy="_isSaving"/>
-                    <AppFormSaveButton Disabled="_isSaving"/>
-                    <AppFormResetButton Click="Reset" Disabled="_isSaving"/>
-                </AppFormFooter>
-            </RadzenStack>
-        </EditForm>
-    </AppFormPanel>
+    <AuthorizeView Roles="Admin,User" Context="user">
+        <AppFormPanel>
+            <EditForm FormName="weightForm"
+                      Model="_model"
+                      OnValidSubmit="SaveAsync">
+                <FluentValidationValidator/>
+                <RadzenStack Gap="0.5rem">
+                    <AppFormHeader Text="Enter Weight"/>
+                    <AppFormRow>
+                        <AppFormColumn>
+                            <FelineSelect @bind-Value="@_model.FelineId"/>
+                        </AppFormColumn>
+                        <AppFormColumn>
+                            <AppDateTime @bind-Value="_model.DateTime" Text="Date"/>
+                        </AppFormColumn>
+                    </AppFormRow>
+                    <AppFormRow>
+                        <AppFormColumn>
+                            <AppNumeric @bind-Value="_model.Value" Min="0.0m" Step="0.1" Text="Weight" TValue="float"/>
+                        </AppFormColumn>
+                        <AppFormColumn>
+                            <WeightUnitSelect @bind-Value="@_model.Units"/>
+                        </AppFormColumn>
+                    </AppFormRow>
+                    <AppFormFooter>
+                        <AppBusyCircle IsBusy="_isSaving"/>
+                        <AppFormSaveButton Disabled="_isSaving"/>
+                        <AppFormResetButton Click="Reset" Disabled="_isSaving"/>
+                    </AppFormFooter>
+                </RadzenStack>
+            </EditForm>
+        </AppFormPanel>
+    </AuthorizeView>
     <AppGridPanel>
         <RadzenDataGrid
             @ref="_grid"
-            TItem="GridRow"
+            TItem="WeightGridDto"
             AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
@@ -73,23 +75,27 @@
                             <RadzenSelectBarItem Text="oz" Value="WeightUnit.oz"/>
                         </Items>
                     </RadzenSelectBar>
-                    <AppToggle Text="Actions" @bind-Value="_showActions"/>
+                    <AuthorizeView Roles="Admin,User">
+                        <AppToggle Text="Actions" @bind-Value="_showActions"/>
+                    </AuthorizeView>
                 </AppGridHeader>
             </HeaderTemplate>
             <Columns>
+                <AuthorizeView Roles="Admin,User">
+                    <RadzenDataGridColumn
+                        Filterable="false"
+                        Sortable="false"
+                        Visible="_showActions"
+                        Width="8ch">
+                        <Template Context="data">
+                            <AppGridButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteAsync(data))"
+                                           Text="Delete"/>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </AuthorizeView>
                 <RadzenDataGridColumn
                     Filterable="false"
-                    Sortable="false"
-                    Visible="_showActions"
-                    Width="8ch">
-                    <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Danger" Click="@(() => DeleteAsync(data))"
-                                       Text="Delete"/>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn
-                    Filterable="false"
-                    Property="@nameof(GridRow.DateTime)"
+                    Property="@nameof(WeightGridDto.DateTime)"
                     Title="Date"
                     Width="13ch">
                     <Template Context="row">
@@ -98,13 +104,13 @@
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
                     MinWidth="12ch"
-                    Property="@nameof(GridRow.Name)"
+                    Property="@nameof(WeightGridDto.Name)"
                     Title="Name"/>
                 <RadzenDataGridColumn
                     CssClass="rz-py-2"
                     HeaderCssClass="app-text-right"
                     Filterable="false"
-                    Property="@nameof(GridRow.Value)"
+                    Property="@nameof(WeightGridDto.Value)"
                     Sortable="false"
                     TextAlign="TextAlign.End"
                     Title="Weight"
@@ -117,25 +123,14 @@
 </RadzenStack>
 
 @code {
-
-    /// <summary>
-    ///     Data for a single row in the grid.
-    /// </summary>
-    private sealed record GridRow
-    {
-        public int FelineId { get; init; }
-        public DateTimeOffset DateTime { get; init; }
-        public string Name { get; init; } = string.Empty;
-        public float Value { get; init; }
-        public WeightUnit Units { get; init; }
-    }
-
+    private const string EntityName = "Weight";
+    
     private int _count;
-    private IEnumerable<GridRow>? _data;
-    private RadzenDataGrid<GridRow>? _grid;
+    private IEnumerable<WeightGridDto>? _data;
+    private RadzenDataGrid<WeightGridDto>? _grid;
     private bool _isLoading;
     private bool _isSaving;
-    private WeightEditModel _model = new();
+    private WeightFromDto _model = new();
     private bool _showActions;
 
     /// <summary>
@@ -144,30 +139,19 @@
     public WeightUnit Units { get; set; } = WeightUnit.lbs;
 
     /// <summary>
-    ///     Prompt the user to confirm deletion of a fosterer.
-    /// </summary>
-    /// <returns>True if user confirms the delete action.</returns>
-    private async Task<bool> ConfirmDeleteAsync(GridRow row)
-        => await DialogService.OpenAsync<ConfirmDeleteWeight>(
-            "Confirm Delete",
-            new() { [nameof(ConfirmDeleteWeight.Name)] = row.Name }
-        ) as bool? ?? false;
-
-    /// <summary>
     ///     Delete the weight for the selected row.
     /// </summary>
     /// <param name="data"></param>
-    private async Task DeleteAsync(GridRow data)
+    private async Task DeleteAsync(WeightGridDto data)
     {
-        if (!await ConfirmDeleteAsync(data))
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteWeight>(1, data.Name))
             return;
 
         _isSaving = true;
         try
         {
             var rs = await WeightRepository.DeleteByKeyAsync(data.FelineId, data.DateTime);
-            NotificationService.Notify(rs, "Weight deleted", "Failed to delete weight");
-            if (rs.IsSuccess)
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
             {
                 await _grid!.Reload();
             }
@@ -190,16 +174,8 @@
         {
             await using var query = await WeightRepository.CreateQueryAsync();
             (_data, _count) = await query
-                .AsNoTracking()
                 .ForFeline(_model.FelineId)
-                .Select(w => new GridRow
-                {
-                    FelineId = w.FelineId,
-                    DateTime = w.DateTime,
-                    Name = w.Feline.Name,
-                    Value = w.Value,
-                    Units = w.Units
-                })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "DateTime desc");
         }
         finally
@@ -227,8 +203,7 @@
     {
         _isSaving = true;
         var rs = await WeightRepository.AddAsync(_model.ToWeight());
-        NotificationService.Notify(rs, "Weight saved", "Failed to save weight");
-        if (rs.IsSuccess)
+        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
         {
             Reset();
             await _grid!.Reload();

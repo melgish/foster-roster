@@ -47,7 +47,9 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             [FromForm] string returnUrl) =>
         {
             await signInManager.SignOutAsync();
-            return TypedResults.LocalRedirect($"~/{returnUrl}");
+            // return TypedResults.LocalRedirect($"/{returnUrl}");
+            // Redirect to dashboard after logout
+            return TypedResults.Redirect("/");
         });
 
         var manageGroup = accountGroup.MapGroup("/Manage").RequireAuthorization();
