@@ -1,4 +1,4 @@
-﻿namespace FosterRoster.Shared.Interfaces;
+﻿namespace FosterRoster.Shared.Models;
 
 public interface IIdBearer
 {
@@ -7,3 +7,5 @@ public interface IIdBearer
     /// </summary>
     int Id { get; }
 }
+
+

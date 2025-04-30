@@ -72,9 +72,9 @@ public sealed class SourceRepository(
     public async Task<Result<SourceFormDto>> UpdateAsync(int sourceId, SourceFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
+
         var source = await db.Sources.FindAsync(sourceId);
-        if (source is null)
-            return Result.Fail(new NotFoundError());
+        if (source is null) return Result.Fail(new NotFoundError());
 
         source.Name = dto.Name.TrimToNull();
 

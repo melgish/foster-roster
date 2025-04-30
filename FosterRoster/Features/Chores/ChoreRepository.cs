@@ -27,9 +27,15 @@ public sealed class ChoreRepository(
         });
 
         await db.SaveChangesAsync();
-        return Result.Ok<ChoreFormDto>(new(entry.Entity));
+        return Result.Ok(entry.Entity.ToFormDto());
     }
 
+    /// <summary>
+    ///     Determine the next due date of a task.
+    /// </summary>
+    /// <param name="dueDate"></param>
+    /// <param name="cron"></param>
+    /// <returns></returns>
     private DateTimeOffset? GetNextDueDate(DateTimeOffset? dueDate, string? cron)
     {
         if (dueDate is null || string.IsNullOrWhiteSpace(cron)) return dueDate;
@@ -86,7 +92,7 @@ public sealed class ChoreRepository(
     public async Task<Result> DeleteByKeyAsync(int choreId)
     {
         await using var db = await factory.CreateDbContextAsync();
-        return await db.Chores.Where(s => s.Id == choreId).ExecuteDeleteAsync() switch
+        return await db.Chores.Where(e => e.Id == choreId).ExecuteDeleteAsync() switch
         {
             0 => Result.Fail(new NotFoundError()),
             1 => Result.Ok(),
@@ -102,10 +108,12 @@ public sealed class ChoreRepository(
     public async Task<Result<ChoreFormDto>> GetByKeyAsync(int choreId)
     {
         await using var db = await factory.CreateDbContextAsync();
-        var chore = await db.Chores.AsNoTracking().FirstOrDefaultAsync(f => f.Id == choreId);
-        return chore is null
-            ? Result.Fail(new NotFoundError())
-            : Result.Ok(new ChoreFormDto(chore));
+        var dto = await db
+            .Chores
+            .Where(e => e.Id == choreId)
+            .SelectToFormDto()
+            .FirstOrDefaultAsync();
+        return dto is null ? Result.Fail(new NotFoundError()) : Result.Ok(dto);
     }
 
     /// <summary>
@@ -165,6 +173,6 @@ public sealed class ChoreRepository(
         existing.Repeats = model.Repeats;
 
         await db.SaveChangesAsync();
-        return Result.Ok(new ChoreFormDto(existing));
+        return Result.Ok(existing.ToFormDto());
     }
 }

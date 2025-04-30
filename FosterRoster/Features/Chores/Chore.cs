@@ -2,7 +2,7 @@
 
 using Felines;
 
-public sealed class Chore
+public sealed class Chore : IIdBearer
 {
     /// <summary>
     ///     Cron expression that defines how the next occurrence of

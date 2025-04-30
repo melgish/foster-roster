@@ -1,6 +1,6 @@
 ﻿namespace FosterRoster.Features.Schedules;
 
-public static class Mapping
+public static class Queries
 {
     /// <summary>
     ///     Map entities to edit model

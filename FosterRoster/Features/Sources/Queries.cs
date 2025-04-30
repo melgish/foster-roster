@@ -1,6 +1,8 @@
 ﻿namespace FosterRoster.Features.Sources;
 
-public static class Mapping
+using Radzen.Blazor.Markdown;
+
+public static class Queries
 {
     /// <summary>
     ///     Map source entities to edit model
@@ -25,6 +27,14 @@ public static class Mapping
             Id = e.Id,
             Name = e.Name
         });
+
+    /// <summary>
+    ///     Map supplied query results to list item
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public static IQueryable<ListItemDto<int>> SelectToListItemDto(this IQueryable<Source> query)
+        => query.Select(e => new ListItemDto<int>(e.Id, e.Name));
 
     /// <summary>
     ///     Map supplied source entity to edit model

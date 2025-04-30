@@ -4,7 +4,7 @@ public sealed class RoleSelect(
     IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
 ) : AppItemSelect<string>
 {
-    private static readonly Item Select = new("", "Select a role...");
+    private static readonly ListItemDto<string> Select = new("", "Select a role...");
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -13,13 +13,16 @@ public sealed class RoleSelect(
         {
             // Get all choices from db.
             await using var db = await dbContextFactory.CreateDbContextAsync();
-            Items = await db
-                .Roles
-                .AsNoTracking()
-                .OrderBy(e => e.Name)
-                .Select(e => new Item(e.Name!, e.Name!))
-                .ToListAsync();
-            Items = Items.Prepend(Select);
+            Items =
+            [
+                Select,
+                .. await db
+                    .Roles
+                    .AsNoTracking()
+                    .OrderBy(e => e.Name)
+                    .Select(e => new ListItemDto<string>(e.Name!, e.Name!))
+                    .ToListAsync()
+            ];
         }
 
         await base.SetParametersAsync(ParameterView.Empty);

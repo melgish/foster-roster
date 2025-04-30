@@ -3,7 +3,9 @@
 [UsedImplicitly]
 public sealed class UserFromDtoValidator : AbstractValidator<UserFormDto>
 {
-    const string PasswordErrorMessage = "Password must be at least 6 characters long and contain at least one non-alphanumeric character";
+    private const string PasswordErrorMessage =
+        "Password must be at least 6 characters long and contain at least one non-alphanumeric character";
+
     public UserFromDtoValidator()
     {
         RuleFor(x => x.UserName)
@@ -16,10 +18,7 @@ public sealed class UserFromDtoValidator : AbstractValidator<UserFormDto>
             .EmailAddress()
             .WithMessage("Email must be a valid email address.");
 
-        When(x => x.Id == 0, () =>
-        {
-            RuleFor(x => x.Password).NotEmpty().WithMessage(PasswordErrorMessage);
-        });
+        When(x => x.Id == 0, () => { RuleFor(x => x.Password).NotEmpty().WithMessage(PasswordErrorMessage); });
 
         When(x => !string.IsNullOrEmpty(x.Password), () =>
         {

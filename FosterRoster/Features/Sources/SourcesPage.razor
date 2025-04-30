@@ -61,7 +61,8 @@
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                       Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(SourceGridDto.Name)" Title="@nameof(SourceGridDto.Name)"/>
@@ -93,7 +94,7 @@
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteSource>(_model.Id ,_name))
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteSource>(_model.Id, _name))
             return;
 
         _isSaving = true;
@@ -123,7 +124,8 @@
             await ResetAsync();
             return;
         }
-        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");    
+
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
     }
 
     /// <summary>
@@ -191,4 +193,5 @@
             await EditAsync(_model.Id);
         }
     }
+
 }

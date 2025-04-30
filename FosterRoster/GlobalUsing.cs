@@ -1,6 +1,6 @@
 global using FosterRoster.Infrastructure;
 global using FosterRoster.Shared.Components;
-global using FosterRoster.Shared.Interfaces;
+global using FosterRoster.Shared.Models;
 global using FluentResults;
 global using FluentValidation;
 global using JetBrains.Annotations;

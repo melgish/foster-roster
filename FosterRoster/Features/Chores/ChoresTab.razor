@@ -86,7 +86,7 @@
     private bool _isLoading;
     private CloneTemplateRequest _model = new();
 
-    [EditorRequired][Parameter] public int FelineId { get; set; }
+    [EditorRequired] [Parameter] public int FelineId { get; set; }
 
     [Parameter] public EventCallback<int> OnChoreLogged { get; set; }
 
@@ -123,8 +123,7 @@
         {
             await using var query = await ChoreRepository.CreateQueryAsync();
             (_data, _count) = await query
-                .AsNoTracking()
-                .Where(e => e.FelineId == FelineId)
+                .ForFeline(FelineId)
                 .SelectToGridDto()
                 .ToGridResultsAsync(args, "Name asc");
         }

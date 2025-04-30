@@ -6,9 +6,9 @@ public sealed class TemplateSelect(ChoreRepository choreRepository) : AppItemSel
     {
         await using var query = await choreRepository.CreateQueryAsync();
         Items = await query
-            .Where(e => !e.FelineId.HasValue)
+            .OnlyTemplates()
             .OrderBy(e => e.Name)
-            .Select(e => new Item(e.Id, e.Name))
+            .SelectToListItemDto()
             .ToListAsync();
     }
 }

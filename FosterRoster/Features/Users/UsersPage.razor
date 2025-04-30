@@ -82,7 +82,8 @@
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                       Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
@@ -117,7 +118,8 @@
     /// <summary>
     ///     ID of the user currently being edited.
     /// </summary>
-    [Parameter] public int UserId { get; set; }
+    [Parameter]
+    public int UserId { get; set; }
 
     /// <summary>
     ///     Delete the user currently being edited.
@@ -154,7 +156,8 @@
             await ResetAsync();
             return;
         }
-        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");    
+
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
     }
 
     /// <summary>

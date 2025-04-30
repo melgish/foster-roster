@@ -2,7 +2,7 @@
 
 public class SourceSelect(SourceRepository sourceRepository) : AppItemSelect<int>
 {
-    private static readonly Item Select = new(0, "Select a source...");
+    private static readonly ListItemDto<int> Select = new(0, "Select a source...");
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -12,11 +12,14 @@ public class SourceSelect(SourceRepository sourceRepository) : AppItemSelect<int
         {
             // Get all choices from db.
             await using var query = await sourceRepository.CreateQueryAsync();
-            Items = await query
-                .OrderBy(e => e.Name)
-                .Select(e => new Item(e.Id, e.Name))
-                .ToListAsync();
-            Items = Items.Prepend(Select);
+            Items =
+            [
+                Select,
+                .. await query
+                    .OrderBy(e => e.Name)
+                    .SelectToListItemDto()
+                    .ToListAsync()
+            ];
         }
 
         await base.SetParametersAsync(ParameterView.Empty);

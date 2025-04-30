@@ -16,9 +16,9 @@ public static class Mapping
             Id = e.Id,
             PhoneNumber = e.PhoneNumber ?? string.Empty,
             Role = e.UserRoles.Select(r => r.Role.Name).FirstOrDefault() ?? string.Empty,
-            UserName = e.UserName ?? string.Empty,
+            UserName = e.UserName ?? string.Empty
         });
- 
+
     /// <summary>
     ///     Map user entity to edit model.
     /// </summary>

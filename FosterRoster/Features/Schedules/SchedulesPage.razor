@@ -72,7 +72,8 @@
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                       Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(ScheduleGridDto.Name)" Title="@nameof(ScheduleGridDto.Name)"/>
@@ -138,9 +139,10 @@
             await ResetAsync();
             return;
         }
-        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");    
+
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
     }
-    
+
     /// <summary>
     ///     Loads paged data for the grid.
     /// </summary>

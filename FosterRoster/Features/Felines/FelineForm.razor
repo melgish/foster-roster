@@ -153,7 +153,7 @@ else
     {
         if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteFeline>(_model!.Id, _name))
             return;
-        
+
         _isSaving = true;
         await OnDelete.InvokeAsync(Feline.Id);
         _isSaving = false;

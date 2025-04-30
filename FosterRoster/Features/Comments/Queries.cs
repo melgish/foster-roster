@@ -1,6 +1,6 @@
 ﻿namespace FosterRoster.Features.Comments;
 
-public static class Mapping
+public static class Queries
 {
     /// <summary>
     ///     Map supplied comment entity to edit model
@@ -14,5 +14,4 @@ public static class Mapping
             Id = entity.Id,
             Text = entity.Text
         };
-    
 }

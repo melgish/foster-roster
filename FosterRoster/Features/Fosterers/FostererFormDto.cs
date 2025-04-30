@@ -1,6 +1,6 @@
 namespace FosterRoster.Features.Fosterers;
 
-public sealed class FostererFormDto()
+public sealed class FostererFormDto
 {
     /// <summary>
     ///     Mailing label style address of the Fosterer
@@ -31,15 +31,4 @@ public sealed class FostererFormDto()
     ///     Primary contact phone.
     /// </summary>
     public string? Phone { get; set; }
-
-    public Fosterer ToFosterer() =>
-        new()
-        {
-            Address = string.IsNullOrWhiteSpace(Address) ? null : Address.Trim(),
-            ContactMethod = ContactMethod,
-            Email = string.IsNullOrWhiteSpace(Email) ? null : Email.Trim(),
-            Id = Id,
-            Name = Name.Trim(),
-            Phone = string.IsNullOrWhiteSpace(Phone) ? null : Phone.Trim()
-        };
 }

@@ -8,7 +8,6 @@
 @inject FostererRepository FostererRepository
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
-@inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
 
 <PageTitle>Fosterers</PageTitle>
 <RadzenStack>
@@ -84,12 +83,14 @@
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                       Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn Property="@nameof(FostererGridDto.Name)" Title="@nameof(FostererGridDto.Name)"/>
                 <RadzenDataGridColumn Property="@nameof(FostererGridDto.Email)" Title="@nameof(FostererGridDto.Email)"/>
-                <RadzenDataGridColumn Property="@nameof(FostererGridDto.Phone)" Title="@nameof(FostererGridDto.Phone)" Width="13ch"/>
+                <RadzenDataGridColumn Property="@nameof(FostererGridDto.Phone)" Title="@nameof(FostererGridDto.Phone)"
+                                      Width="13ch"/>
             </Columns>
         </RadzenDataGrid>
     </AppGridPanel>
@@ -124,7 +125,7 @@
         _isSaving = true;
         try
         {
-            var rs = await DbContextFactory.DeleteByKeyAsync(db => db.Fosterers, _model.Id);
+            var rs = await FostererRepository.DeleteByKeyAsync(_model.Id);
             if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
             {
                 await _grid!.Reload();
@@ -148,7 +149,8 @@
             await ResetAsync();
             return;
         }
-        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");    
+
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
     }
 
     /// <summary>
@@ -160,15 +162,9 @@
         _isLoading = true;
         try
         {
-            await using var query = await DbContextFactory.CreateQueryAsync(db => db.Fosterers);
+            await using var query = await FostererRepository.CreateQueryAsync();
             (_data, _count) = await query
-                .Select(e => new FostererGridDto
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    Email = e.Email,
-                    Phone = e.Phone
-                })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "Name asc");
         }
         catch (Exception ex)
@@ -214,12 +210,12 @@
     private async Task SaveAsync(EditContext editContext)
     {
         var rs = _model.Id == 0
-            ? await FostererRepository.AddAsync(_model.ToFosterer())
-            : await FostererRepository.UpdateAsync(_model.Id, _model.ToFosterer());
+            ? await FostererRepository.AddAsync(_model)
+            : await FostererRepository.UpdateAsync(_model.Id, _model);
         if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
         {
             await _grid!.Reload();
-            await EditAsync(rs.Value.Id);
+            await EditAsync(_model.Id);
         }
     }
 

@@ -1,4 +1,4 @@
-﻿namespace FosterRoster.Shared.Interfaces;
+﻿namespace FosterRoster.Shared.Models;
 
 public interface IConfirmDelete
 {

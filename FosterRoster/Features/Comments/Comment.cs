@@ -5,7 +5,7 @@ using Felines;
 /// <summary>
 /// Represents a single journal entry
 /// </summary>
-public sealed class Comment
+public sealed class Comment : IIdBearer
 {
     /// <summary>
     ///     Feline the comment is associated with.

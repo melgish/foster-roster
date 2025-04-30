@@ -6,11 +6,9 @@ using System.Linq.Expressions;
 using Fosterers;
 
 public sealed class FelineRepository(
-    IDbContextFactory<FosterRosterDbContext> contextFactory
+    IDbContextFactory<FosterRosterDbContext> dbContextFactory
 )
 {
-    private static DbSet<Feline> SetFactory(FosterRosterDbContext db) => db.Felines;
-
     /// <summary>
     ///     Projection to select only the fields needed for the feline list.
     /// </summary>
@@ -64,7 +62,7 @@ public sealed class FelineRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> ActivateAsync(int felineId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
+        await using var context = await dbContextFactory.CreateDbContextAsync();
         return await context
                 .Felines
                 .IgnoreQueryFilters()
@@ -85,16 +83,27 @@ public sealed class FelineRepository(
     /// </summary>
     /// <param name="model">Feline instance to add.</param>
     /// <returns>A Result with added feline, or errors on failure.</returns>
-    public Task<Result<FelineFormDto>> AddAsync(FelineFormDto model)
-        => contextFactory
-            .AddAsync(SetFactory, model.ToFeline())
-            .Map(feline => new FelineFormDto(FelineProjection.Compile().Invoke(feline)));
+    public async Task<Result<FelineFormDto>> AddAsync(FelineFormDto model)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var entry = db.Felines.AddAsync(new()
+        {
+            AnimalId = model.AnimalId,
+            Breed = model.Breed,
+            Category = model.Category,
+            Color = model.Color,
+            FostererId = model.FostererId
+        });
+        await db.SaveChangesAsync();
+        return Result.Ok();
+    }
 
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Feline table.
     /// </summary>
     /// <returns></returns>
-    public Task<Query<Feline>> CreateQueryAsync() => contextFactory.CreateQueryAsync(SetFactory);
+    public Task<Query<Feline>> CreateQueryAsync()
+        => dbContextFactory.CreateQueryAsync(db => db.Felines.AsNoTracking());
 
     /// <summary>
     ///     Sets a feline as inactive in the database.
@@ -104,8 +113,8 @@ public sealed class FelineRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> DeactivateAsync(int felineId, DateTimeOffset dateTimeUtc)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db
                 .Felines
                 .Where(f => f.Id == felineId)
                 .ExecuteUpdateAsync(f => f
@@ -125,8 +134,18 @@ public sealed class FelineRepository(
     /// </summary>
     /// <param name="felineId">ID of feline to remove.</param>
     /// <returns>A Result instance indicating success or failure.</returns>
-    public Task<Result> DeleteByKeyAsync(int felineId)
-        => contextFactory.DeleteByKeyAsync(SetFactory, felineId);
+    public async Task<Result> DeleteByKeyAsync(int felineId)
+    {
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db.Felines
+                .Where(e => e.Id == felineId)
+                .ExecuteDeleteAsync() switch
+            {
+                0 => Result.Fail(new NotFoundError()),
+                1 => Result.Ok(),
+                _ => Result.Fail(new MultipleChangesError())
+            };
+    }
 
     /// <summary>
     ///     Gets a single feline by ID.
@@ -135,18 +154,17 @@ public sealed class FelineRepository(
     /// <returns>A Result with Feline if found, or errors on failure</returns>
     public async Task<Result<Feline>> GetByKeyAsync(int felineId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db
                 .Felines
                 .AsNoTracking()
                 .IgnoreQueryFilters()
                 .Include(f => f.Chores)
                 .Include(f => f.Comments)
                 .Include(f => f.Thumbnail)
-                .Where(f => f.Id == felineId)
                 .Select(FelineProjection)
                 .AsSplitQuery()
-                .SingleOrDefaultAsync() switch
+                .SingleOrDefaultAsync(f => f.Id == felineId) switch
             {
                 null => Result.Fail(new NotFoundError()),
                 { } feline => Result.Ok(feline)
@@ -161,8 +179,8 @@ public sealed class FelineRepository(
     /// <returns>A Result with Feline if updated, or errors on failure.</returns>
     public async Task<Result<Feline>> UpdateAsync(int felineId, Feline feline)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        var existing = await context
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var existing = await db
             .Felines
             .Include(f => f.Thumbnail)
             .SingleOrDefaultAsync(e => e.Id == felineId);
@@ -181,7 +199,7 @@ public sealed class FelineRepository(
         existing.SourceId = feline.SourceId;
         if (existing.Thumbnail is not null && feline.Thumbnail is null)
         {
-            context.Remove(existing.Thumbnail);
+            db.Remove(existing.Thumbnail);
             existing.Thumbnail = null;
         }
         else if (feline.Thumbnail?.ImageData.Length > 0)
@@ -193,7 +211,7 @@ public sealed class FelineRepository(
 
         existing.Weaned = feline.Weaned;
 
-        await context.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
         // Remove thumbnail data from the returned object.
         return Result.Ok(FelineProjection.Compile().Invoke(existing));

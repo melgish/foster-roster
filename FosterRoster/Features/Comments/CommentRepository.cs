@@ -13,7 +13,8 @@ public sealed class CommentRepository(
     public async Task<Result<Comment>> AddAsync(CommentFormDto comment)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync();
-        var entry = await context.Comments.AddAsync(new() {
+        var entry = await context.Comments.AddAsync(new()
+        {
             FelineId = comment.FelineId,
             Text = comment.Text,
             // Workaround because of issues getting ValueGeneratedOnAdd() to work.
@@ -33,7 +34,7 @@ public sealed class CommentRepository(
         await using var context = await dbContextFactory.CreateDbContextAsync();
         return await context
                 .Comments
-                .Where(c => c.Id == commentId)
+                .Where(e => e.Id == commentId)
                 .ExecuteDeleteAsync() switch
             {
                 0 => Result.Fail(new NotFoundError()),
@@ -52,11 +53,11 @@ public sealed class CommentRepository(
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         var existing = await db.Comments.FindAsync(commentId);
-        if (existing is null) 
+        if (existing is null)
             return Result.Fail(new NotFoundError());
 
         // Only update if comment text has actually been changed.
-        if (existing.Text.Equals(dto.Text)) 
+        if (existing.Text.Equals(dto.Text))
             return Result.Ok(existing);
 
         existing.Text = dto.Text;

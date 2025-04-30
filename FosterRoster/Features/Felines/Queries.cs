@@ -1,6 +1,6 @@
 ﻿namespace FosterRoster.Features.Felines;
 
-public static class Mapping
+public static class Queries
 {
     /// <summary>
     ///     Map feline entity to grid row model.

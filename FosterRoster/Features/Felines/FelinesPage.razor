@@ -82,7 +82,7 @@
     private IEnumerable<FelineGridDto>? _data;
     private bool? _isInactiveFilter = false;
     private RadzenDataGrid<FelineGridDto>? _grid;
-    
+
     /// <summary>
     ///     Called by grid to fetch data.
     /// </summary>
@@ -117,7 +117,8 @@
                 .First(e => e.Property == nameof(FelineGridDto.IsInactive))
                 .SetFilterValueAsync(_isInactiveFilter);
         }
-        
+
         await base.OnAfterRenderAsync(firstRender);
     }
+
 }

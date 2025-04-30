@@ -64,7 +64,7 @@ public static class RadzenExtensions
         int entityId,
         string name)
         where TComponent : ComponentBase, IConfirmDelete
-        =>  entityId != 0 && await Convert.ToBoolean(
+        => entityId != 0 && await Convert.ToBoolean(
             await dialogService.OpenAsync<TComponent>(
                 "Confirm Delete",
                 new() { ["Name"] = name })
@@ -102,6 +102,7 @@ public static class RadzenExtensions
             service.Notify(Success, $"{target} {actioned}", result.Successes.FirstReason());
             return true;
         }
+
         service.Notify(Error, $"Failed to {action} {target}", result.Errors.FirstReason());
         return false;
     }

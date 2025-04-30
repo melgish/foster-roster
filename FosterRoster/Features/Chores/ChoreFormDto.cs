@@ -1,20 +1,7 @@
 ﻿namespace FosterRoster.Features.Chores;
 
-using Data;
-
-public sealed class ChoreFormDto()
+public sealed class ChoreFormDto
 {
-    public ChoreFormDto(Chore task) : this()
-    {
-        Cron = task.Cron;
-        Description = task.Description;
-        DueDate = task.DueDate;
-        FelineId = task.FelineId.GetValueOrDefault();
-        Id = task.Id;
-        Name = task.Name;
-        Repeats = task.Repeats;
-    }
-
     /// <summary>
     ///     Description of the task. Description will be added
     ///     to journal entry when task is completed.
@@ -41,7 +28,7 @@ public sealed class ChoreFormDto()
     /// <summary>
     ///     Unique identifier for the task.
     /// </summary>
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     /// <summary>
     ///     Name of task to display to the user.
@@ -52,16 +39,4 @@ public sealed class ChoreFormDto()
     ///     How many times a task repeats. Default is 1.
     /// </summary>
     public int Repeats { get; set; } = 1;
-
-    public Chore ToChore() =>
-        new()
-        {
-            Cron = Cron.TrimToNull(),
-            Description = Description.TrimToNull(),
-            DueDate = DueDate?.UtcDateTime,
-            FelineId = FelineId == 0 ? null : FelineId,
-            Id = Id,
-            Name = Name.TrimToNull(),
-            Repeats = Repeats
-        };
 }
