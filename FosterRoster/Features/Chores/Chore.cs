@@ -2,7 +2,7 @@
 
 using Felines;
 
-public sealed class Chore
+public sealed class Chore : IIdBearer
 {
     /// <summary>
     ///     Cron expression that defines how the next occurrence of
@@ -21,7 +21,7 @@ public sealed class Chore
     ///     no due date will be assigned.
     /// </summary>
     public DateTimeOffset? DueDate { get; set; }
-    
+
     /// <summary>
     ///     Feline associated with the chore. If null, the chore is
     ///     considered a template chore that can be cloned for

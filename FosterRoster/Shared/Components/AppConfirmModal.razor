@@ -1,0 +1,24 @@
+﻿@inject DialogService DialogService
+
+<RadzenStack>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenText Typo="Typo.body1">
+                @ChildContent
+                <p><em>This action cannot be undone.</em></p>
+            </RadzenText>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton ButtonStyle="ButtonStyle.Base" Click="@Cancel" Variant="Variant.Text">Cancel</RadzenButton>
+        <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@Confirm" Variant="Variant.Text">Yes</RadzenButton>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    void Cancel() => DialogService.Close(false);
+
+    void Confirm() => DialogService.Close(true);
+}

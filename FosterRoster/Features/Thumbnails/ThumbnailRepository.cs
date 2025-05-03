@@ -44,9 +44,9 @@ public sealed class ThumbnailRepository(
         feline.Thumbnail ??= new() { FelineId = feline.Id };
         feline.Thumbnail.ImageData = thumbnail.ImageData;
         feline.Thumbnail.ContentType = thumbnail.ContentType;
-        
+
         await context.SaveChangesAsync();
- 
+
         return Result.Ok(new SetThumbnailResponse(felineId, feline.Thumbnail.Version));
     }
 }

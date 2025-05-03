@@ -12,8 +12,7 @@ public sealed class CronDescription : ComponentBase
         Use24HourTimeFormat = false
     };
 
-    [Parameter]
-    public string? Cron { get; set; }
+    [Parameter] public string? Cron { get; set; }
 
     private string? _description;
 
@@ -26,7 +25,7 @@ public sealed class CronDescription : ComponentBase
 
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
-        base.BuildRenderTree(builder);  
+        base.BuildRenderTree(builder);
         builder.AddContent(0, _description ?? string.Empty);
     }
 }

@@ -1,0 +1,233 @@
+﻿@page "/users"
+@page "/users/{userId:int}"
+@attribute [Authorize(Roles = "Admin")]
+@rendermode @(new InteractiveServerRenderMode(false))
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+@inject UserRepository UserRepository
+
+<PageTitle>Users</PageTitle>
+<RadzenStack>
+    <AppFormPanel>
+        <EditForm FormName="editUser" Model="_model" OnValidSubmit="SaveAsync">
+            <FluentValidationValidator/>
+            <RadzenStack Gap="0.5rem">
+                <AppFormHeader Text="@_name"/>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="_model.UserName" Text="User Name"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <RoleSelect @bind-Value="_model.Role" Text="Role"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="_model.Email" Text="Email"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="_model.PhoneNumber" Text="Phone Number"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppPasswordBox @bind-Value="_model.Password" Text="Password"/>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppPasswordBox @bind-Value="_model.ConfirmPassword" Text="Confirm Password"/>
+                    </AppFormColumn>
+                    <AppFormColumn SizeSM="12">
+                        To keep current password, leave both fields blank.
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormFooter>
+                    <AppBusyCircle IsBusy="_isSaving"/>
+                    @if (_model.Id != 0)
+                    {
+                        <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving"/>
+                    }
+                    <AppFormSaveButton Disabled="_isSaving"/>
+                    <AppFormResetButton Click="ResetAsync" Disabled="_isSaving"/>
+                </AppFormFooter>
+            </RadzenStack>
+        </EditForm>
+    </AppFormPanel>
+    <AppGridPanel>
+        <RadzenDataGrid
+            @ref="_grid"
+            TItem="UserGridDto"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowSorting="true"
+            Count="_count"
+            Data="_data"
+            Density="Density.Compact"
+            FilterMode="FilterMode.Simple"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="1"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            PagerPosition="PagerPosition.Top"
+            PageSize="20"
+            PageSizeOptions="@( [10, 20, 50, 100])"
+            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            ShowPagingSummary="true">
+            <HeaderTemplate>
+                <AppGridHeader Text="Users">
+                    <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
+                </AppGridHeader>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn Width="6ch">
+                    <Template Context="data">
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                       Text="Edit"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="@nameof(UserGridDto.UserName)"
+                    Title="User Name"/>
+                <RadzenDataGridColumn
+                    Property="@nameof(UserGridDto.Email)"
+                    Title="Email Address"/>
+                <RadzenDataGridColumn
+                    Property="@nameof(UserGridDto.PhoneNumber)"
+                    Title="Phone Number"/>
+                <RadzenDataGridColumn
+                    Property="@nameof(UserGridDto.Role)"
+                    Title="Role"/>
+            </Columns>
+        </RadzenDataGrid>
+    </AppGridPanel>
+</RadzenStack>
+
+@code {
+    private const string PageRoute = "/users";
+    private const string EntityName = "User";
+
+    private int _count;
+    private IEnumerable<UserGridDto>? _data;
+    private RadzenDataGrid<UserGridDto>? _grid;
+    private bool _isLoading;
+    private bool _isSaving;
+    private string _name = string.Empty;
+    private UserFormDto _model = new();
+
+    /// <summary>
+    ///     ID of the user currently being edited.
+    /// </summary>
+    [Parameter]
+    public int UserId { get; set; }
+
+    /// <summary>
+    ///     Delete the user currently being edited.
+    /// </summary>
+    private async Task DeleteAsync()
+    {
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteUser>(_model.Id, _name))
+            return;
+
+        _isSaving = true;
+        try
+        {
+            var rs = await UserRepository.DeleteByKeyAsync(_model.Id);
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
+            {
+                await _grid!.Reload();
+                await EditAsync(0);
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+
+    /// <summary>
+    ///     Edit the specified user.
+    /// </summary>
+    /// <param name="entityId">ID of the entity to edit or 0 to create a new one.</param>
+    private async Task EditAsync(int entityId)
+    {
+        if (entityId == UserId)
+        {
+            await ResetAsync();
+            return;
+        }
+
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
+    }
+
+    /// <summary>
+    ///     Load users for the grid.
+    /// </summary>
+    /// <param name="args">Grid filters and paging values</param>
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        _isLoading = true;
+        try
+        {
+            await using var query = await UserRepository.CreateQueryAsync();
+            (_data, _count) = await query
+                .SelectToGridDto()
+                .ToGridResultsAsync(args, "UserName asc");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.NotifyFailedToLoad(ex);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    /// <summary>
+    ///     Invoked when the component is initialized.
+    /// </summary>
+    protected override async Task OnParametersSetAsync()
+    {
+        // Initialize the model to be edited.
+        await ResetAsync();
+        await base.OnParametersSetAsync();
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    private async Task ResetAsync()
+    {
+        // Reset the model being edited
+        var rs = UserId == 0
+            ? Result.Ok<UserFormDto>(new())
+            : await UserRepository.GetByKeyAsync(UserId);
+        if (rs.IsFailed)
+        {
+            NavigationManager.NavigateTo("/not-found");
+            return;
+        }
+
+        _name = rs.Value.Id == 0 ? "Create New User" : rs.Value.UserName;
+        _model = rs.Value;
+    }
+
+    /// <summary>
+    ///     Save the user to the database.
+    /// </summary>
+    /// <param name="editContext">Form context</param>
+    private async Task SaveAsync(EditContext editContext)
+    {
+        var id = _model.Id;
+        var rs = id == 0
+            ? await UserRepository.AddAsync(_model)
+            : await UserRepository.UpdateAsync(_model.Id, _model);
+        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
+        {
+            await _grid!.Reload();
+            await EditAsync(id);
+        }
+    }
+
+}

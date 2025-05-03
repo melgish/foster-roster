@@ -8,7 +8,7 @@
     <AppGridPanel>
         <RadzenDataGrid
             @ref="_grid"
-            TItem="GridRow"
+            TItem="FelineGridDto"
             AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
@@ -37,7 +37,7 @@
                 <RadzenDataGridColumn
                     Filterable="false"
                     Sortable="false"
-                    Property="@nameof(GridRow.Id)"
+                    Property="@nameof(FelineGridDto.Id)"
                     Width="6ch">
                     <Template>
                         <RadzenLink Path="@($"/felines/{context.Id}")">
@@ -46,22 +46,22 @@
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
-                    Property="@nameof(GridRow.Name)"
+                    Property="@nameof(FelineGridDto.Name)"
                     SortOrder="SortOrder.Ascending"
                     MinWidth="12ch"
                     Title="Name"/>
                 <RadzenDataGridColumn
-                    Property="@nameof(GridRow.AnimalId)"
+                    Property="@nameof(FelineGridDto.AnimalId)"
                     SortOrder="SortOrder.Ascending"
                     MinWidth="12ch"
                     Title="Animal ID"/>
                 <RadzenDataGridColumn
-                    Property="@nameof(GridRow.FostererName)"
+                    Property="@nameof(FelineGridDto.FostererName)"
                     MinWidth="12ch"
                     Title="Fosterer"/>
                 <RadzenDataGridColumn
                     FilterValue="@_isInactiveFilter"
-                    Property="@nameof(GridRow.IsInactive)"
+                    Property="@nameof(FelineGridDto.IsInactive)"
                     Title="Inactive"
                     Width="19ch">
                     <FilterTemplate>
@@ -79,18 +79,9 @@
 @code {
     private bool _isLoading;
     private int _count;
-    private IEnumerable<GridRow>? _data;
+    private IEnumerable<FelineGridDto>? _data;
     private bool? _isInactiveFilter = false;
-    private RadzenDataGrid<GridRow>? _grid;
-
-    private sealed class GridRow
-    {
-        public required string AnimalId { get; init; }
-        public required string FostererName { get; init; }
-        public int Id { get; init; }
-        public bool IsInactive { get; init; }
-        public required string Name { get; init; }
-    }
+    private RadzenDataGrid<FelineGridDto>? _grid;
 
     /// <summary>
     ///     Called by grid to fetch data.
@@ -104,21 +95,12 @@
             await using var query = await FelineRepository.CreateQueryAsync();
             (_data, _count) = await query
                 .IgnoreQueryFilters()
-                .AsNoTracking()
-                .Include(f => f.Fosterer)
-                .Select(f => new GridRow
-                {
-                    AnimalId = f.AnimalId != null ? f.AnimalId : "",
-                    FostererName = f.Fosterer != null ? f.Fosterer.Name : "",
-                    Id = f.Id,
-                    IsInactive = f.IsInactive,
-                    Name = f.Name
-                })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "Name asc");
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+            NotificationService.NotifyFailedToLoad(ex);
         }
         finally
         {
@@ -132,7 +114,7 @@
         {
             // Load initial filter values into the grid.
             await _grid.ColumnsCollection
-                .First(e => e.Property == nameof(GridRow.IsInactive))
+                .First(e => e.Property == nameof(FelineGridDto.IsInactive))
                 .SetFilterValueAsync(_isInactiveFilter);
         }
 

@@ -68,9 +68,9 @@ else
 
 @code
 {
-    [Parameter] public CommentEditModel? Model { get; set; }
+    [Parameter] public CommentFormDto? Model { get; set; }
 
-    [Parameter] public EventCallback<CommentEditModel> OnSave { get; set; }
+    [Parameter] public EventCallback<CommentFormDto> OnSave { get; set; }
 
     [Parameter] public EventCallback OnCancel { get; set; }
 

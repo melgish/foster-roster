@@ -9,6 +9,7 @@ using FosterRoster.Features.Fosterers;
 using FosterRoster.Features.Schedules;
 using FosterRoster.Features.Sources;
 using FosterRoster.Features.Thumbnails;
+using FosterRoster.Features.Users;
 using FosterRoster.Features.Weights;
 using FosterRoster.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -65,9 +66,8 @@ builder
     .PersistKeysToDbContext<FosterRosterDbContext>();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
 builder.Services.AddSingleton<TimeProvider, TexasTimeProvider>();
-builder.Services.AddValidatorsFromAssemblyContaining<FelineEditModel>();
+builder.Services.AddValidatorsFromAssemblyContaining<FelineFormDto>();
 
 builder.Services.AddScoped<ChoreRepository>();
 builder.Services.AddScoped<CommentRepository>();
@@ -76,6 +76,7 @@ builder.Services.AddScoped<FostererRepository>();
 builder.Services.AddScoped<ScheduleRepository>();
 builder.Services.AddScoped<SourceRepository>();
 builder.Services.AddScoped<ThumbnailRepository>();
+builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<WeightRepository>();
 
 builder.Services.AddRadzenComponents();
@@ -93,7 +94,7 @@ var app = builder.Build();
 // Apply database migrations when requested by configuration.
 if (builder.Configuration.GetValue("AutoMigrate", false))
 {
-    using var scope = app.Services.CreateScope();
+    await using var scope = app.Services.CreateAsyncScope();
     var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<FosterRosterDbContext>>();
     await using var context = await factory.CreateDbContextAsync();
     string[] migrations = [.. await context.Database.GetPendingMigrationsAsync()];

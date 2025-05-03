@@ -1,9 +1,9 @@
 ﻿@page "/schedules"
 @page "/schedules/{scheduleId:int}"
-@using CronExpressionDescriptor
 
 @rendermode @(new InteractiveServerRenderMode(false))
 
+@inject DialogService DialogService
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
 @inject ScheduleRepository ScheduleRepository
@@ -12,7 +12,7 @@
 <RadzenStack>
     <AppFormPanel>
         <EditForm FormName="editSchedule" Model="_model" OnValidSubmit="SaveAsync">
-            <FluentValidationValidator />
+            <FluentValidationValidator/>
             <RadzenStack Gap="0.5rem">
                 <AppFormHeader Text="@_name"/>
                 <AppFormRow>
@@ -20,16 +20,16 @@
                         <AppTextBox @bind-Value="@_model.Name" Disabled="_isSaving" Text="Name"/>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <AppTextBox 
+                        <AppTextBox
                             @bind-Value="@_model.Cron"
                             @oninput="@(e => _model.Cron = e.Value?.ToString() ?? string.Empty)"
-                            Disabled="_isSaving" 
+                            Disabled="_isSaving"
                             Text="Cron Expression"/>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>
                     <div style="margin-right: auto">
-                        <small style="color: var(--rz-input-placeholder-color)">Description:</small>
+                        <small style="@("color: var(--rz-input-placeholder-color)")">Description:</small>
                         <CronDescription Cron="@_model.Cron"/>
                     </div>
                     <AppBusyCircle IsBusy="_isSaving"/>
@@ -40,13 +40,13 @@
                     <AppFormSaveButton Disabled="_isSaving"/>
                     <AppFormResetButton Click="ResetAsync" Disabled="_isSaving"/>
                 </AppFormFooter>
-            </RadzenStack>            
+            </RadzenStack>
         </EditForm>
     </AppFormPanel>
     <AppGridPanel>
         <RadzenDataGrid
             @ref="_grid"
-            TItem="GridRow"
+            TItem="ScheduleGridDto"
             AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
@@ -66,19 +66,20 @@
             ShowPagingSummary="true">
             <HeaderTemplate>
                 <AppGridHeader Text="Schedules">
-                    <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
+                    <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
                 </AppGridHeader>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => Edit(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                       Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Name)" Title="@nameof(GridRow.Name)"/>
+                <RadzenDataGridColumn Property="@nameof(ScheduleGridDto.Name)" Title="@nameof(ScheduleGridDto.Name)"/>
                 <RadzenDataGridColumn
                     Filterable="false"
-                    Property="@nameof(GridRow.Cron)" 
+                    Property="@nameof(ScheduleGridDto.Cron)"
                     Title="Cron Expression"/>
             </Columns>
         </RadzenDataGrid>
@@ -86,44 +87,39 @@
 </RadzenStack>
 
 @code {
-    private sealed class GridRow
-    {
-        public required string Cron { get; init; }
-        public required int Id { get; init; }
-        public required string Name { get; init; }
-    }
-    
-    private const string Route = "/schedules";
+    private const string PageRoute = "/schedules";
     private const string EntityName = "Schedule";
-    
+
     private int _count;
-    private IEnumerable<GridRow>? _data;
-    private RadzenDataGrid<GridRow>? _grid;
+    private IEnumerable<ScheduleGridDto>? _data;
+    private RadzenDataGrid<ScheduleGridDto>? _grid;
     private bool _isLoading;
     private bool _isSaving;
-    private ScheduleEditModel _model = new();
+    private ScheduleFormDto _model = new();
     private string _name = $"Create New {EntityName}";
-    private string _description = string.Empty;
-    
-    [Parameter] public int ScheduleId { get; set; }
-    
+
+    /// <summary>
+    ///     The ID of the schedule currently being edited.
+    /// </summary>
+    [Parameter]
+    public int ScheduleId { get; set; }
+
     /// <summary>
     ///     Delete the schedule currently being edited.
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (_model.Id == 0)
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteSchedule>(_model.Id, _name))
             return;
 
         _isSaving = true;
         try
         {
             var rs = await ScheduleRepository.DeleteByKeyAsync(_model.Id);
-            NotificationService.Notify(rs, "Deleted schedule", "Failed to delete schedule");
-            if (rs.IsSuccess)
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
             {
                 await _grid!.Reload();
-                Edit(0);
+                await EditAsync(0);
             }
         }
         finally
@@ -131,21 +127,22 @@
             _isSaving = false;
         }
     }
-    
+
     /// <summary>
-    ///     Edit the specified schedule.
+    ///     Edit the specified entity.
     /// </summary>
     /// <param name="entityId">ID of the entity to edit or 0 to create a new one.</param>
-    private void Edit(int entityId)
-        => NavigationManager.NavigateTo(entityId == 0 ? Route : $"{Route}/{entityId}");
-
-    private static string GetDescription(string expression)
+    private async Task EditAsync(int entityId)
     {
-        if (string.IsNullOrWhiteSpace(expression))
-            return string.Empty;
-        return ExpressionDescriptor.GetDescription(expression);
+        if (entityId == ScheduleId)
+        {
+            await ResetAsync();
+            return;
+        }
+
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
     }
-    
+
     /// <summary>
     ///     Loads paged data for the grid.
     /// </summary>
@@ -157,20 +154,19 @@
         {
             await using var query = await ScheduleRepository.CreateQueryAsync();
             (_data, _count) = await query
-                .AsNoTracking()
-                .Select(e => new GridRow { Cron = e.Cron, Id = e.Id, Name = e.Name })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "Name asc");
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+            NotificationService.NotifyFailedToLoad(ex);
         }
         finally
         {
             _isLoading = false;
         }
     }
-    
+
     /// <summary>
     ///     Invoked when the component is initialized.
     /// </summary>
@@ -189,15 +185,12 @@
         // Reset the model to be edited.
         var rs = ScheduleId != 0
             ? await ScheduleRepository.GetByKeyAsync(ScheduleId)
-            : Result.Ok<Schedule>(new());
-        if (rs.IsFailed)
+            : Result.Ok<ScheduleFormDto>(new());
+        if (NavigationManager.VerifyFound(rs))
         {
-            NavigationManager.NavigateTo("/not-found");
-            return;
+            _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
+            _model = rs.Value;
         }
-
-        _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
-        _model = new(rs.Value);
     }
 
     /// <summary>
@@ -209,12 +202,13 @@
         var rs = _model.Id == 0
             ? await ScheduleRepository.AddAsync(_model)
             : await ScheduleRepository.UpdateAsync(_model.Id, _model);
-        NotificationService.Notify(rs, $"Saved {EntityName}", $"Failed to save {EntityName}");
-        if (rs.IsSuccess)
+        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
         {
             await _grid!.Reload();
-            Edit(_model.Id);
+            // If editing an existing schedule, continue editing.
+            // If creating a new schedule, start a new one.
+            await EditAsync(_model.Id);
         }
     }
-    
+
 }

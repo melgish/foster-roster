@@ -1,59 +1,9 @@
 namespace FosterRoster.Features.Felines;
 
-using System.Linq.Expressions;
-using Fosterers;
-
-
 public sealed class FelineRepository(
-    IDbContextFactory<Data.FosterRosterDbContext> contextFactory
+    IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
 )
 {
-    /// <summary>
-    ///     Projection to select only the fields needed for the feline list.
-    /// </summary>
-    private static readonly Expression<Func<Feline, Feline>> FelineProjection =
-        f => new()
-        {
-            Id = f.Id,
-            AnimalId = f.AnimalId,
-            Breed = f.Breed,
-            Category = f.Category,
-            Color = f.Color,
-            Comments = f.Comments.OrderByDescending(c => c.TimeStamp).ToList(),
-            // Just include the name for grid layout.
-            Fosterer = f.Fosterer == null
-                ? null
-                : new Fosterer
-                {
-                    Id = f.Fosterer!.Id,
-                    Name = f.Fosterer!.Name
-                },
-            FostererId = f.FostererId,
-            Gender = f.Gender,
-            IntakeAgeInWeeks = f.IntakeAgeInWeeks,
-            IntakeDate = f.IntakeDate,
-            Name = f.Name,
-            RegistrationDate = f.RegistrationDate,
-            SourceId = f.SourceId,
-            // Don't include the file data, just enough to generate the thumbnail URL
-            Thumbnail = f.Thumbnail == null
-                ? null
-                : new()
-                {
-                    FelineId = f.Thumbnail.FelineId,
-                    ContentType = f.Thumbnail.ContentType,
-                    Version = f.Thumbnail.Version
-                },
-            Weaned = f.Weaned,
-            // Only include 7 days of weights.
-            Weights = f.Weights
-                .OrderByDescending(w => w.DateTime)
-                .Take(7)
-                .ToList(),
-            InactivatedAtUtc = f.InactivatedAtUtc,
-            IsInactive = f.IsInactive
-        };
-
     /// <summary>
     ///     Restores identified feline to active status.
     /// </summary>
@@ -61,7 +11,7 @@ public sealed class FelineRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> ActivateAsync(int felineId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
+        await using var context = await dbContextFactory.CreateDbContextAsync();
         return await context
                 .Felines
                 .IgnoreQueryFilters()
@@ -80,26 +30,38 @@ public sealed class FelineRepository(
     /// <summary>
     ///     Adds a new feline to the database.
     /// </summary>
-    /// <param name="feline">Feline instance to add.</param>
+    /// <param name="model">Feline instance to add.</param>
     /// <returns>A Result with added feline, or errors on failure.</returns>
-    public async Task<Result<FelineEditModel>> AddAsync(FelineEditModel feline)
+    public async Task<Result<IdOnlyDto>> AddAsync(FelineFormDto model)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        var entry = await context.Felines.AddAsync(feline.ToFeline());
-        await context.SaveChangesAsync();
-        return Result.Ok(new FelineEditModel(FelineProjection.Compile().Invoke(entry.Entity)));
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var entry = db.Felines.Add(new()
+        {
+            AnimalId = model.AnimalId,
+            Breed = model.Breed,
+            Category = model.Category,
+            Color = model.Color,
+            FostererId = model.FostererId,
+            Gender = model.Gender,
+            IntakeAgeInWeeks = model.IntakeAgeInWeeks,
+            IntakeDate = model.IntakeDate.GetValueOrDefault(),
+            Name = model.Name,
+            RegistrationDate = model.RegistrationDate,
+            SourceId = model.SourceId,
+            Weaned = model.Weaned,
+
+            Thumbnail = model.Thumbnail
+        });
+        await db.SaveChangesAsync();
+        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
     }
 
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Feline table.
     /// </summary>
     /// <returns></returns>
-    public async Task<Query<Feline>> CreateQueryAsync()
-    {
-        var context = await contextFactory.CreateDbContextAsync();
-        var queryable = context.Felines;
-        return new(context, queryable);
-    }
+    public Task<Query<Feline>> CreateQueryAsync()
+        => dbContextFactory.CreateQueryAsync(db => db.Felines.AsNoTracking());
 
     /// <summary>
     ///     Sets a feline as inactive in the database.
@@ -109,8 +71,8 @@ public sealed class FelineRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> DeactivateAsync(int felineId, DateTimeOffset dateTimeUtc)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db
                 .Felines
                 .Where(f => f.Id == felineId)
                 .ExecuteUpdateAsync(f => f
@@ -132,10 +94,9 @@ public sealed class FelineRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> DeleteByKeyAsync(int felineId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
-                .Felines
-                .Where(f => f.Id == felineId)
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db.Felines
+                .Where(e => e.Id == felineId)
                 .ExecuteDeleteAsync() switch
             {
                 0 => Result.Fail(new NotFoundError()),
@@ -149,20 +110,17 @@ public sealed class FelineRepository(
     /// </summary>
     /// <param name="felineId">ID of feline to get.</param>
     /// <returns>A Result with Feline if found, or errors on failure</returns>
-    public async Task<Result<Feline>> GetByKeyAsync(int felineId)
+    public async Task<Result<FelineFormDto>> GetByKeyAsync(int felineId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db
                 .Felines
                 .AsNoTracking()
                 .IgnoreQueryFilters()
                 .Include(f => f.Chores)
-                .Include(f => f.Comments)
                 .Include(f => f.Thumbnail)
-                .Where(f => f.Id == felineId)
-                .Select(FelineProjection)
-                .AsSplitQuery()
-                .SingleOrDefaultAsync() switch
+                .SelectToFormDto()
+                .SingleOrDefaultAsync(f => f.Id == felineId) switch
             {
                 null => Result.Fail(new NotFoundError()),
                 { } feline => Result.Ok(feline)
@@ -173,45 +131,44 @@ public sealed class FelineRepository(
     ///     Updates a feline in the database.
     /// </summary>
     /// <param name="felineId">ID of feline to update</param>
-    /// <param name="feline">Data to assign to feline</param>
+    /// <param name="model">Data to assign to feline</param>
     /// <returns>A Result with Feline if updated, or errors on failure.</returns>
-    public async Task<Result<Feline>> UpdateAsync(int felineId, Feline feline)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int felineId, FelineFormDto model)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        var existing = await context
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var existing = await db
             .Felines
             .Include(f => f.Thumbnail)
             .SingleOrDefaultAsync(e => e.Id == felineId);
         if (existing == null) return Result.Fail(new NotFoundError());
 
-        existing.AnimalId = feline.AnimalId;
-        existing.Breed = feline.Breed;
-        existing.Category = feline.Category;
-        existing.Color = feline.Color;
-        existing.FostererId = feline.FostererId;
-        existing.Gender = feline.Gender;
-        existing.IntakeAgeInWeeks = feline.IntakeAgeInWeeks;
-        existing.IntakeDate = feline.IntakeDate;
-        existing.Name = feline.Name;
-        existing.RegistrationDate = feline.RegistrationDate;
-        existing.SourceId = feline.SourceId;
-        if (existing.Thumbnail is not null && feline.Thumbnail is null)
+        existing.AnimalId = model.AnimalId;
+        existing.Breed = model.Breed;
+        existing.Category = model.Category;
+        existing.Color = model.Color;
+        existing.FostererId = model.FostererId;
+        existing.Gender = model.Gender;
+        existing.IntakeAgeInWeeks = model.IntakeAgeInWeeks;
+
+        existing.Name = model.Name;
+        existing.RegistrationDate = model.RegistrationDate;
+        existing.SourceId = model.SourceId;
+        if (existing.Thumbnail is not null && model.Thumbnail is null)
         {
-            context.Remove(existing.Thumbnail);
+            db.Remove(existing.Thumbnail);
             existing.Thumbnail = null;
         }
-        else if (feline.Thumbnail?.ImageData.Length > 0)
+        else if (model.Thumbnail?.ImageData.Length > 0)
         {
             existing.Thumbnail ??= new() { FelineId = existing.Id };
-            existing.Thumbnail.ImageData = feline.Thumbnail.ImageData;
-            existing.Thumbnail.ContentType = feline.Thumbnail.ContentType;
+            existing.Thumbnail.ImageData = model.Thumbnail.ImageData;
+            existing.Thumbnail.ContentType = model.Thumbnail.ContentType;
         }
 
-        existing.Weaned = feline.Weaned;
+        existing.Weaned = model.Weaned;
 
-        await context.SaveChangesAsync();
+        await db.SaveChangesAsync();
 
-        // Remove thumbnail data from the returned object.
-        return Result.Ok(FelineProjection.Compile().Invoke(existing));
+        return Result.Ok(new IdOnlyDto(existing.Id));
     }
 }

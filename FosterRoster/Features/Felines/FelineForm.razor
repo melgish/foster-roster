@@ -1,5 +1,4 @@
 @inject DialogService DialogService
-
 @using FosterRoster.Features.Fosterers
 @using FosterRoster.Features.Sources
 
@@ -20,61 +19,63 @@ else
                     <RadzenStack JustifyContent="JustifyContent.SpaceAround" Orientation="Orientation.Horizontal">
                         <AppThumbnail
                             Path="@_model.Thumbnail.GetUrl()"
-                            disabled="@_model.IsInactive"
+                            Disabled="IsDisabled"
                             OnChange="OnFilesChangedAsync"/>
                     </RadzenStack>
                 </AppFormColumn>
                 <AppFormColumn>
                     <RadzenStack Gap="1rem">
-                        <AppDateOnly @bind-Value="_model.IntakeDate" Disabled="_model.IsInactive" Text="Intake Date"/>
-                        <AppTextBox @bind-Value="@_model.Name" Disabled="_model.IsInactive" Text="Name"/>
-                        <AppRadioButtonList @bind-Value="@_model.Gender" Disabled="_model.IsInactive" Text="Gender">
-                            <RadzenRadioButtonListItem Text="Female" Value="@Gender.Female"/>
-                            <RadzenRadioButtonListItem Text="Male" Value="@Gender.Male"/>
+                        <AppDateOnly @bind-Value="_model.IntakeDate" Disabled="IsDisabled" Text="Intake Date"/>
+                        <AppTextBox @bind-Value="@_model.Name" Disabled="IsDisabled" Text="Name"/>
+                        <AppRadioButtonList @bind-Value="@_model.Gender" Disabled="IsDisabled" Text="Gender">
+                            <RadzenRadioButtonListItem Text="Female" Value="Gender.Female"/>
+                            <RadzenRadioButtonListItem Text="Male" Value="Gender.Male"/>
                         </AppRadioButtonList>
-                        <AppNumeric @bind-Value="_model.IntakeAgeInWeeks" Disabled="_model.IsInactive" Min="0"
+                        <AppNumeric @bind-Value="_model.IntakeAgeInWeeks" Disabled="IsDisabled" Min="0"
                                     Text="Age at Intake (weeks)"/>
                     </RadzenStack>
                 </AppFormColumn>
             </AppFormRow>
             <AppFormRow>
                 <AppFormColumn>
-                    <AppTextBox @bind-Value="@_model.Breed" Disabled="_model.IsInactive" Text="Breed"/>
+                    <AppTextBox @bind-Value="@_model.Breed" Disabled="IsDisabled" Text="Breed"/>
                 </AppFormColumn>
                 <AppFormColumn>
-                    <AppTextBox @bind-Value="@_model.Color" Disabled="_model.IsInactive" Text="Color"/>
-                </AppFormColumn>
-            </AppFormRow>
-            <AppFormRow>
-                <AppFormColumn>
-                    <SourceSelect @bind-Value="_model.SourceId" Disabled="@_model.IsInactive"/>
-                </AppFormColumn>
-                <AppFormColumn>
-                    <FostererSelect @bind-Value="_model.FostererId" Disabled="@_model.IsInactive"/>
+                    <AppTextBox @bind-Value="@_model.Color" Disabled="IsDisabled" Text="Color"/>
                 </AppFormColumn>
             </AppFormRow>
             <AppFormRow>
                 <AppFormColumn>
-                    <CategorySelect @bind-Value="_model.Category" Disabled="_model.IsInactive"/>
+                    <SourceSelect @bind-Value="_model.SourceId" Disabled="@IsDisabled" Text="Source"/>
+                </AppFormColumn>
+                <AppFormColumn>
+                    <FostererSelect @bind-Value="_model.FostererId" Disabled="@IsDisabled" Text="Fosterer"/>
+                </AppFormColumn>
+            </AppFormRow>
+            <AppFormRow>
+                <AppFormColumn>
+                    <CategorySelect @bind-Value="_model.Category" Disabled="IsDisabled"/>
                 </AppFormColumn>
                 <AppFormColumn>
                     <AppDateOnly @bind-Value="_model.RegistrationDate"
-                                 Disabled="_model.IsInactive"
+                                 Disabled="IsDisabled"
                                  Text="Registration Date"/>
                 </AppFormColumn>
             </AppFormRow>
             <AppFormRow>
                 <AppFormColumn>
-                    <AppTextBox @bind-Value="@_model.AnimalId" Disabled="_model.IsInactive" Text="Animal ID"/>
+                    <AppTextBox @bind-Value="@_model.AnimalId" Disabled="IsDisabled" Text="Animal ID"/>
                 </AppFormColumn>
                 <AppFormColumn>
-                    <AppRadioButtonList @bind-Value="_model.Weaned" Disabled="_model.IsInactive" Text="Weaned">
+                    <AppRadioButtonList @bind-Value="_model.Weaned" Disabled="IsDisabled" Text="Weaned">
                         <RadzenRadioButtonListItem Text="No" Value="@Weaned.No"/>
                         <RadzenRadioButtonListItem Text="In Progress" Value="@Weaned.InProgress"/>
                         <RadzenRadioButtonListItem Text="Yes" Value="@Weaned.Yes"/>
                     </AppRadioButtonList>
                 </AppFormColumn>
             </AppFormRow>
+            @if (!ReadOnly)
+            {
             <AppFormFooter>
                 <AppBusyCircle IsBusy="_isSaving"/>
                 @if (Feline.Id != 0)
@@ -102,22 +103,23 @@ else
                         Click="@PrintAsync"
                         Disabled="_isSaving"
                         Text="Print"/>
-                    <AppFormDeleteButton Click="DeleteAsync" Disabled="@(_isSaving || _model.IsInactive)"/>
+                    <AppFormDeleteButton Click="DeleteAsync" Disabled="@IsDisabled"/>
                 }
                 <AppFormSaveButton Disabled="@(_isSaving || _model.IsInactive)"/>
-                <AppFormResetButton Click="ResetAsync" Disabled="@(_isSaving || _model.IsInactive)"/>
+                <AppFormResetButton Click="ResetAsync" Disabled="@IsDisabled"/>
             </AppFormFooter>
+            }
         </RadzenStack>
     </EditForm>
 }
 
 @code {
 
-    private bool _isSaving = false;
+    private bool _isSaving;
     private string _name = string.Empty;
-    private FelineEditModel? _model = null;
+    private FelineFormDto? _model;
 
-    [EditorRequired] [Parameter] public Feline Feline { get; set; } = null!;
+    [EditorRequired] [Parameter] public FelineFormDto Feline { get; set; } = null!;
 
     [Parameter] public bool IsNew { get; set; }
 
@@ -129,7 +131,11 @@ else
     public EventCallback<DateTimeOffset> OnInactivate { get; set; } =
         EventCallback<DateTimeOffset>.Empty;
 
-    [Parameter] public EventCallback<FelineEditModel> OnSave { get; set; } = EventCallback<FelineEditModel>.Empty;
+    [Parameter] public EventCallback<FelineFormDto> OnSave { get; set; } = EventCallback<FelineFormDto>.Empty;
+    
+    [Parameter] public bool ReadOnly { get; set; }
+
+    private bool IsDisabled => ReadOnly || _isSaving || _model is null || _model.IsInactive;
 
     /// <summary>
     ///     Re-activates an inactive cat.
@@ -151,19 +157,12 @@ else
     /// </summary>
     private async Task DeleteAsync()
     {
-        var parameters = new Dictionary<string, object>
-        {
-            { nameof(ConfirmDeleteFelineDialog.Model), _model! }
-        };
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteFeline>(_model!.Id, _name))
+            return;
 
-        bool result = await DialogService
-            .OpenAsync<ConfirmDeleteFelineDialog>("Confirm Delete", parameters);
-        if (result)
-        {
-            _isSaving = true;
-            await OnDelete.InvokeAsync(Feline.Id);
-            _isSaving = false;
-        }
+        _isSaving = true;
+        await OnDelete.InvokeAsync(Feline.Id);
+        _isSaving = false;
     }
 
     /// <summary>
@@ -173,11 +172,11 @@ else
     {
         var parameters = new Dictionary<string, object>
         {
-            { nameof(ConfirmInactivateFelineDialog.Feline), _model! }
+            { nameof(ConfirmInactivateFeline.Feline), _model! }
         };
 
         DateTimeOffset? result = await DialogService
-            .OpenAsync<ConfirmInactivateFelineDialog>("Confirm Inactivate", parameters);
+            .OpenAsync<ConfirmInactivateFeline>("Confirm Inactivate", parameters);
         if (result.HasValue)
         {
             _isSaving = true;
@@ -206,7 +205,26 @@ else
 
     private Task ResetAsync()
     {
-        _model = new(Feline);
+        _model = new()
+        {
+            AnimalId = Feline.AnimalId,
+            Breed = Feline.Breed,
+            Category = Feline.Category,
+            Color = Feline.Color,
+            FostererId = Feline.FostererId,
+            Gender = Feline.Gender,
+            Id = Feline.Id,
+            IntakeAgeInWeeks = Feline.IntakeAgeInWeeks,
+            IsInactive = Feline.IsInactive,
+            InactivatedAtUtc = Feline.InactivatedAtUtc,
+            IntakeDate = Feline.IntakeDate,
+            Name = Feline.Name,
+            RegistrationDate = Feline.RegistrationDate,
+            SourceId = Feline.SourceId,
+            Thumbnail = Feline.Thumbnail,
+            Weaned = Feline.Weaned
+        };
+
         _name = IsNew ? "Intake" : _model.Name;
         return Task.CompletedTask;
     }

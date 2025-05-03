@@ -4,7 +4,10 @@
     <RadzenImage AlternateText="@(AlternateText ?? "Thumbnail")"
                  Path="@Path"
                  Style="width:256px;height:256px;background-color:var(--rz-primary-lighter);"/>
-    <AppFileInput OnChange="OnChange" Rounded="true"/>
+    @if (!Disabled)
+    {
+        <AppFileInput OnChange="OnChange" Rounded="true"/>
+    }
 </div>
 
 @code {

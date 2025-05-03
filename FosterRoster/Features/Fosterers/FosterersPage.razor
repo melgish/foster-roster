@@ -56,7 +56,7 @@
     <AppGridPanel>
         <RadzenDataGrid
             @ref="_grid"
-            TItem="GridRow"
+            TItem="FostererGridDto"
             AllowFiltering="true"
             AllowPaging="true"
             AllowSorting="true"
@@ -76,40 +76,36 @@
             ShowPagingSummary="true">
             <HeaderTemplate>
                 <AppGridHeader Text="Fosterers">
-                    <AppGridButton Click="@(() => Edit(0))" Text="Add"/>
+                    <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
                 </AppGridHeader>
             </HeaderTemplate>
             <Columns>
                 <RadzenDataGridColumn Width="6ch">
                     <Template Context="data">
-                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => Edit(data.Id))" Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                       Text="Edit"/>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Name)" Title="@nameof(GridRow.Name)"/>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Email)" Title="@nameof(GridRow.Email)"/>
-                <RadzenDataGridColumn Property="@nameof(GridRow.Phone)" Title="@nameof(GridRow.Phone)" Width="13ch"/>
+                <RadzenDataGridColumn Property="@nameof(FostererGridDto.Name)" Title="@nameof(FostererGridDto.Name)"/>
+                <RadzenDataGridColumn Property="@nameof(FostererGridDto.Email)" Title="@nameof(FostererGridDto.Email)"/>
+                <RadzenDataGridColumn Property="@nameof(FostererGridDto.Phone)" Title="@nameof(FostererGridDto.Phone)"
+                                      Width="13ch"/>
             </Columns>
         </RadzenDataGrid>
     </AppGridPanel>
 </RadzenStack>
 
 @code {
-
-    private sealed class GridRow
-    {
-        public required int Id { get; init; }
-        public required string Name { get; init; }
-        public required string? Email { get; init; }
-        public required string? Phone { get; init; }
-    }
+    private const string PageRoute = "/fosterers";
+    private const string EntityName = "Fosterer";
 
     private int _count;
-    private IEnumerable<GridRow>? _data;
-    private RadzenDataGrid<GridRow>? _grid;
+    private IEnumerable<FostererGridDto>? _data;
+    private RadzenDataGrid<FostererGridDto>? _grid;
     private bool _isLoading;
     private bool _isSaving;
-    private FostererEditModel _model = new();
-    private string _name = "Create New Fosterer";
+    private FostererFormDto _model = new();
+    private string _name = $"Create New {EntityName}";
 
     /// <summary>
     ///     The ID of the fosterer currently being edited.
@@ -118,32 +114,21 @@
     public int FostererId { get; set; }
 
     /// <summary>
-    ///     Prompt the user to confirm deletion of a fosterer.
-    /// </summary>
-    /// <returns>True if user confirms the delete.</returns>
-    private async Task<bool> ConfirmDeleteAsync()
-        => await DialogService.OpenAsync<ConfirmDeleteFosterer>(
-            "Confirm Delete",
-            new() { [nameof(ConfirmDeleteFosterer.Name)] = _name }
-        ) as bool? ?? false;
-
-    /// <summary>
     /// Delete the fosterer currently being edited.
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (!(_model.Id != 0 && await ConfirmDeleteAsync()))
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteFosterer>(_model.Id, _name))
             return;
 
         _isSaving = true;
         try
         {
             var rs = await FostererRepository.DeleteByKeyAsync(_model.Id);
-            NotificationService.Notify(rs, "Deleted Fosterer", "Failed to Delete Fosterer");
-            if (rs.IsSuccess)
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
             {
                 await _grid!.Reload();
-                Edit(0);
+                await EditAsync(0);
             }
         }
         finally
@@ -153,11 +138,19 @@
     }
 
     /// <summary>
-    ///     Edit the specified Fosterer.
+    ///     Edit the specified entity.
     /// </summary>
-    /// <param name="fostererId">ID of the fosterer to edit or 0 to create a new one.</param>
-    private void Edit(int fostererId)
-        => NavigationManager.NavigateTo(fostererId == 0 ? "/fosterers" : $"/fosterers/{fostererId}");
+    /// <param name="entityId">ID of the entity to edit or 0 to create a new one.</param>
+    private async Task EditAsync(int entityId)
+    {
+        if (entityId == FostererId)
+        {
+            await ResetAsync();
+            return;
+        }
+
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
+    }
 
     /// <summary>
     ///     Loads paged data for the grid.
@@ -170,19 +163,12 @@
         {
             await using var query = await FostererRepository.CreateQueryAsync();
             (_data, _count) = await query
-                .AsNoTracking()
-                .Select(e => new GridRow
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    Email = e.Email,
-                    Phone = e.Phone
-                })
+                .SelectToGridDto()
                 .ToGridResultsAsync(args, "Name asc");
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Failed to load data", ex.GetBaseException().Message);
+            NotificationService.NotifyFailedToLoad(ex);
         }
         finally
         {
@@ -208,15 +194,12 @@
         // Reset the model to be edited.
         var rs = FostererId != 0
             ? await FostererRepository.GetByKeyAsync(FostererId)
-            : Result.Ok<Fosterer>(new());
-        if (rs.IsFailed)
+            : Result.Ok<FostererFormDto>(new());
+        if (NavigationManager.VerifyFound(rs))
         {
-            NavigationManager.NavigateTo("/not-found");
-            return;
+            _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
+            _model = rs.Value;
         }
-
-        _name = rs.Value.Id == 0 ? "Create New Source" : rs.Value.Name;
-        _model = new(rs.Value);
     }
 
     /// <summary>
@@ -226,13 +209,12 @@
     private async Task SaveAsync(EditContext editContext)
     {
         var rs = _model.Id == 0
-            ? await FostererRepository.AddAsync(_model.ToFosterer())
-            : await FostererRepository.UpdateAsync(_model.Id, _model.ToFosterer());
-        NotificationService.Notify(rs, "Saved Fosterer", "Failed to Save Fosterer");
-        if (rs.IsSuccess)
+            ? await FostererRepository.AddAsync(_model)
+            : await FostererRepository.UpdateAsync(_model.Id, _model);
+        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
         {
             await _grid!.Reload();
-            Edit(rs.Value.Id);
+            await EditAsync(_model.Id);
         }
     }
 

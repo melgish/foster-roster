@@ -1,32 +1,33 @@
 namespace FosterRoster.Features.Sources;
 
+using Data;
+
 public sealed class SourceRepository(
-    IDbContextFactory<Data.FosterRosterDbContext> contextFactory
+    IDbContextFactory<FosterRosterDbContext> dbContextFactory
 )
 {
     /// <summary>
     ///     Adds a new Source to the database.
     /// </summary>
-    /// <param name="source">Source to add</param>
-    /// <returns>A Result with Source if successful, or Errors on failure.</returns>
-    public async Task<Result<Source>> AddAsync(Source source)
+    /// <param name="dto">Source to add</param>
+    /// <returns>A Result with Updated Dto if successful, or Errors on failure.</returns>
+    public async Task<Result<IdOnlyDto>> AddAsync(SourceFormDto dto)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        var entry = await context.Sources.AddAsync(source);
-        await context.SaveChangesAsync();
-        return Result.Ok(entry.Entity);
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var entry = db.Sources.Add(new()
+        {
+            Name = dto.Name.TrimToNull()
+        });
+        await db.SaveChangesAsync();
+        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
     }
 
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Source table.
     /// </summary>
     /// <returns></returns>
-    public async Task<Query<Source>> CreateQueryAsync()
-    {
-        var context = await contextFactory.CreateDbContextAsync();
-        var queryable = context.Sources;
-        return new(context, queryable);
-    }
+    public Task<Query<Source>> CreateQueryAsync()
+        => dbContextFactory.CreateQueryAsync(db => db.Sources.AsNoTracking());
 
     /// <summary>
     ///     Deletes an existing Source from the database by its ID.
@@ -35,13 +36,16 @@ public sealed class SourceRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> DeleteByKeyAsync(int sourceId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context.Sources.Where(s => s.Id == sourceId).ExecuteDeleteAsync() switch
-        {
-            0 => Result.Fail(new NotFoundError()),
-            1 => Result.Ok(),
-            _ => Result.Fail(new MultipleChangesError())
-        };
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db
+                .Sources
+                .Where(e => e.Id == sourceId)
+                .ExecuteDeleteAsync() switch
+            {
+                0 => Result.Fail(new NotFoundError()),
+                1 => Result.Ok(),
+                _ => Result.Fail(new MultipleChangesError())
+            };
     }
 
     /// <summary>
@@ -49,33 +53,32 @@ public sealed class SourceRepository(
     /// </summary>
     /// <param name="sourceId">ID of source to fetch.</param>
     /// <returns>Result with Source if successful, or Errors on failure.</returns>
-    public async Task<Result<Source>> GetByKeyAsync(int sourceId)
+    public async Task<Result<SourceFormDto>> GetByKeyAsync(int sourceId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
-                .Sources
-                .AsNoTracking()
-                .FirstOrDefaultAsync(s => s.Id == sourceId) switch
-            {
-                null => Result.Fail(new NotFoundError()),
-                { } source => Result.Ok(source)
-            };
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var dto = await db
+            .Sources
+            .SelectToFormDto()
+            .FirstOrDefaultAsync(e => e.Id == sourceId);
+        return dto is null ? Result.Fail(new NotFoundError()) : Result.Ok(dto);
     }
 
     /// <summary>
     ///     Updates an existing Source in the database.
     /// </summary>
     /// <param name="sourceId">ID of source to update.</param>
-    /// <param name="source">Data to assign to Source</param>
+    /// <param name="dto">Data to assign to Source</param>
     /// <returns>Result with updated Source if found, or Errors on failure.</returns>
-    public async Task<Result<Source>> UpdateAsync(int sourceId, Source source)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int sourceId, SourceFormDto dto)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        var existing = await context.Sources.FindAsync(sourceId);
-        if (existing is null) return Result.Fail(new NotFoundError());
+        await using var db = await dbContextFactory.CreateDbContextAsync();
 
-        existing.Name = source.Name;
-        await context.SaveChangesAsync();
-        return Result.Ok(existing);
+        var source = await db.Sources.FindAsync(sourceId);
+        if (source is null) return Result.Fail(new NotFoundError());
+
+        source.Name = dto.Name.TrimToNull();
+
+        await db.SaveChangesAsync();
+        return Result.Ok(new IdOnlyDto(source.Id));
     }
 }

@@ -9,16 +9,16 @@
         <ContainerRepository>foster-roster</ContainerRepository>
         <ContainerImageTag>next</ContainerImageTag>
         <RuntimeFrameworkVersion>9.0.1</RuntimeFrameworkVersion>
-        <Version>1.2.6</Version>
+        <Version>1.3.0</Version>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />
-        <PackageReference Include="CronExpressionDescriptor" Version="2.40.0" />
+        <PackageReference Include="CronExpressionDescriptor" Version="2.41.0" />
         <PackageReference Include="FluentResults" Version="3.16.0" />
         <PackageReference Include="FluentValidation" Version="11.11.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
-        <PackageReference Include="HtmlSanitizer" Version="9.0.876" />
+        <PackageReference Include="HtmlSanitizer" Version="9.0.884" />
         <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.4" />
         <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.4" />
@@ -30,13 +30,20 @@
         <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.4" />
         <PackageReference Include="NCrontab" Version="3.3.3" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-        <PackageReference Include="Radzen.Blazor" Version="6.6.1" />
+        <PackageReference Include="Radzen.Blazor" Version="6.6.4" />
         <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
     </ItemGroup>
 
+    <!-- 
+    Remove Registration and External Logins from the project.
+    Note to restore, be sure to remove conditional EXTERNAL_LOGINS
+    in IdentityComponentsEndpointRouteBuilderExtensions.cs  
+    -->
     <ItemGroup>
-      <AdditionalFiles Include="Features\Comments\CommentCard.razor" />
-      <AdditionalFiles Include="Features\Comments\CommentForm.razor" />
+        <Content Remove="Features/Account/Pages/Register.razor" />
+        <Content Remove="Features/Account/Pages/ExternalLogin.razor" />
+        <Content Remove="Features/Account/Pages/RegisterConfirmation.razor" />
+        <Content Remove="Features/Account/Pages/Manage/ExternalLogins.razor" />
     </ItemGroup>
 
 </Project>

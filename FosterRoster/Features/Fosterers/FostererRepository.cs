@@ -1,32 +1,35 @@
 namespace FosterRoster.Features.Fosterers;
 
 public sealed class FostererRepository(
-    IDbContextFactory<Data.FosterRosterDbContext> contextFactory
+    IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
 )
 {
     /// <summary>
     ///     Adds a new fosterer to the database.
     /// </summary>
-    /// <param name="fosterer">Fosterer instance to add.</param>
+    /// <param name="model">Fosterer data to add.</param>
     /// <returns>Result with Fosterer after add, or Errors on failure.</returns>
-    public async Task<Result<Fosterer>> AddAsync(Fosterer fosterer)
+    public async Task<Result<IdOnlyDto>> AddAsync(FostererFormDto model)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        var entry = await context.Fosterers.AddAsync(fosterer);
-        await context.SaveChangesAsync();
-        return Result.Ok(entry.Entity);
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var entry = db.Fosterers.Add(new()
+        {
+            Address = model.Address,
+            ContactMethod = model.ContactMethod,
+            Email = model.Email,
+            Phone = model.Phone,
+            Name = model.Name
+        });
+        await db.SaveChangesAsync();
+        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
     }
 
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Weight table.
     /// </summary>
     /// <returns></returns>
-    public async Task<Query<Fosterer>> CreateQueryAsync()
-    {
-        var context = await contextFactory.CreateDbContextAsync();
-        var queryable = context.Fosterers;
-        return new(context, queryable);
-    }
+    public Task<Query<Fosterer>> CreateQueryAsync()
+        => dbContextFactory.CreateQueryAsync(db => db.Fosterers.AsNoTracking());
 
     /// <summary>
     ///     Deletes a Fosterer by its ID.
@@ -35,10 +38,10 @@ public sealed class FostererRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> DeleteByKeyAsync(int fostererId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        return await db
                 .Fosterers
-                .Where(f => f.Id == fostererId)
+                .Where(e => e.Id == fostererId)
                 .ExecuteDeleteAsync() switch
             {
                 0 => Result.Fail(new NotFoundError()),
@@ -52,41 +55,35 @@ public sealed class FostererRepository(
     /// </summary>
     /// <param name="fostererId">ID of fosterer to return.</param>
     /// <returns>Result with Fosterer if successful, or Errors on failure.</returns>
-    public async Task<Result<Fosterer>> GetByKeyAsync(int fostererId)
+    public async Task<Result<FostererFormDto>> GetByKeyAsync(int fostererId)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        return await context
-                .Fosterers
-                .AsNoTracking()
-                .FirstOrDefaultAsync(f => f.Id == fostererId) switch
-            {
-                null => Result.Fail(new NotFoundError()),
-                { } fosterer => Result.Ok(fosterer)
-            };
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var dto = await db
+            .Fosterers
+            .SelectToFormDto()
+            .FirstOrDefaultAsync(e => e.Id == fostererId);
+        return dto is null ? Result.Fail(new NotFoundError()) : Result.Ok(dto);
     }
 
     /// <summary>
     ///     Updates an existing Fosterer in the database.
     /// </summary>
     /// <param name="fostererId">ID of Fosterer to update</param>
-    /// <param name="fosterer">Data to assign to Fosterer</param>
+    /// <param name="model">Data to assign to Fosterer</param>
     /// <returns>Result with updated Fosterer if found, or Errors on failure.</returns>
-    public async Task<Result<Fosterer>> UpdateAsync(int fostererId, Fosterer fosterer)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int fostererId, FostererFormDto model)
     {
-        await using var context = await contextFactory.CreateDbContextAsync();
-        var existing = await context
-            .Fosterers
-            .FirstOrDefaultAsync(e => e.Id == fostererId);
-        if (existing is null) return Result.Fail(new NotFoundError());
+        await using var db = await dbContextFactory.CreateDbContextAsync();
+        var existing = await db.Fosterers.FindAsync(fostererId);
+        if (existing == null) return Result.Fail(new NotFoundError());
 
-        existing.Address = fosterer.Address;
-        existing.ContactMethod = fosterer.ContactMethod;
-        existing.Email = fosterer.Email;
-        existing.Phone = fosterer.Phone;
-        existing.Name = fosterer.Name;
+        existing.Address = model.Address.TrimToNull();
+        existing.ContactMethod = model.ContactMethod;
+        existing.Email = model.Email.TrimToNull();
+        existing.Phone = model.Phone.TrimToNull();
+        existing.Name = model.Name.TrimToNull();
+        await db.SaveChangesAsync();
 
-        await context.SaveChangesAsync();
-
-        return Result.Ok(existing);
+        return Result.Ok(new IdOnlyDto(existing.Id));
     }
 }

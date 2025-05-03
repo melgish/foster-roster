@@ -12,7 +12,7 @@
 </RadzenStack>
 
 @code {
-    private Feline _feline = null!;
+    private FelineFormDto _feline = null!;
 
     protected override void OnInitialized()
     {
@@ -29,13 +29,12 @@
     /// <summary>
     ///     Save event handler for the FelineForm
     /// </summary>
-    private async Task OnSaveAsync(FelineEditModel model)
+    private async Task OnSaveAsync(FelineFormDto model)
     {
-        var result = await FelineRepository.AddAsync(model);
-        NotificationService.Notify(result, "Feline saved", "Failed to save feline");
-        if (result.IsSuccess)
+        var rs = await FelineRepository.AddAsync(model);
+        if (NotificationService.NotifyResult(rs, "Feline", "save", "saved"))
         {
-            var feline = result.Value;
+            var feline = rs.Value;
             NavigationManager.NavigateTo($"/felines/{feline.Id}");
         }
     }

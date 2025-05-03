@@ -58,8 +58,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var rs = await LocalStorage.GetAsync<PrintOptions>(nameof(PrintOptions));
-        _model = rs.Value ?? new();
+        try
+        {
+            var rs = await LocalStorage.GetAsync<PrintOptions>(nameof(PrintOptions));
+            _model = rs.Value ?? new();
+        }
+        catch
+        {
+            _model = new();
+        }
     }
 
     async Task PersistOptions()

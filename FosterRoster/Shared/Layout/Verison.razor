@@ -1,6 +1,6 @@
 @using System.Reflection
-<RadzenText Text="@_version" TextStyle="TextStyle.Body1"/>
+<RadzenText Text="@Version" TextStyle="TextStyle.Body1"/>
 
 @code {
-    private static string _version = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
+    private static readonly string Version = $"v{Assembly.GetExecutingAssembly().GetName().Version}";
 }

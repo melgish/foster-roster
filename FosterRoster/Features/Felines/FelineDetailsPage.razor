@@ -1,5 +1,5 @@
 @page "/felines/{FelineId:int}"
-
+@attribute [AllowAnonymous]
 @rendermode @(new InteractiveServerRenderMode(false))
 
 @using FosterRoster.Features.Comments
@@ -20,40 +20,49 @@ else
 {
     <RadzenStack>
         <AppFormPanel>
-            <FelineForm Feline="@_feline"
-                        OnActivate="OnActivateAsync"
-                        OnDelete="DeleteFelineAsync"
-                        OnInactivate="OnInactivateAsync"
-                        OnSave="SaveFelineAsync"/>
+        <AuthorizeView Roles="Admin,User">
+            <Authorized>
+                <FelineForm Feline="@_feline"
+                            OnActivate="OnActivateAsync"
+                            OnDelete="DeleteFelineAsync"
+                            OnInactivate="OnInactivateAsync"
+                            OnSave="SaveFelineAsync"/>
+            </Authorized>
+            <NotAuthorized>
+                <FelineForm Feline="@_feline" ReadOnly="true"/>
+            </NotAuthorized>
+        </AuthorizeView>
         </AppFormPanel>
-        <RadzenPanel class="rz-p-0 rz-shadow-3">
-            <div class="tabs">
-                <RadzenTabs>
-                    <Tabs >
-                        <RadzenTabsItem Text="Journal" Icon="edit" class="bar">
-                            <CommentForm OnSave="AddCommentAsync" Model="@_comment"/>
-                            @foreach (var comment in _feline.Comments)
-                            {
-                                <CommentCard
-                                    @key="comment.Id"
-                                    Comment="comment"
-                                    OnSave="UpdateCommentAsync"
-                                    OnDelete="DeleteCommentAsync"/>
-                            }
-                        </RadzenTabsItem>
-                        <RadzenTabsItem Icon="task_alt" Text="Tasks">
-                            <ChoresTab FelineId="@FelineId" OnChoreLogged="RefreshAsync"/>
-                        </RadzenTabsItem>
-                    </Tabs>
-                </RadzenTabs>
-            </div>
-        </RadzenPanel>
+        <AuthorizeView Roles="Admin,User">
+            <RadzenPanel class="rz-p-0 rz-shadow-3">
+                <div class="tabs">
+                    <RadzenTabs>
+                        <Tabs>
+                            <RadzenTabsItem Text="Journal" Icon="edit" class="bar">
+                                <CommentForm OnSave="AddCommentAsync" Model="@_comment"/>
+                                @foreach (var comment in _feline.Comments)
+                                {
+                                    <CommentCard
+                                        @key="comment.Id"
+                                        Comment="comment"
+                                        OnSave="UpdateCommentAsync"
+                                        OnDelete="DeleteCommentAsync"/>
+                                }
+                            </RadzenTabsItem>
+                            <RadzenTabsItem Icon="task_alt" Text="Tasks">
+                                <ChoresTab FelineId="@FelineId" OnChoreLogged="RefreshAsync"/>
+                            </RadzenTabsItem>
+                        </Tabs>
+                    </RadzenTabs>
+                </div>
+            </RadzenPanel>
+        </AuthorizeView>
     </RadzenStack>
 }
 
 @code {
-    private Feline? _feline;
-    private CommentEditModel _comment = new();
+    private FelineFormDto? _feline;
+    private CommentFormDto _comment = new();
 
     private string Name => _feline?.Name ?? string.Empty;
 
@@ -63,63 +72,53 @@ else
     ///     Add a new comment to the current feline.
     /// </summary>
     /// <param name="model"></param>
-    private async Task AddCommentAsync(CommentEditModel model)
+    private async Task AddCommentAsync(CommentFormDto model)
     {
         if (_feline is null) return;
-        
-        var rs = await CommentRepository.AddAsync(model.ToComment());
-        NotificationService.Notify(rs, "Comment Added", "Failed to add comment");
-        if (rs.IsSuccess)
+
+        var rs = await CommentRepository.AddAsync(model);
+        if (NotificationService.NotifyResult(rs, "Comment", "add", "added"))
         {
-            _feline.Comments = [.. _feline.Comments.Prepend(rs.Value)];
+            var rsc = await CommentRepository.GetByKeyAsync(rs.Value.Id);
+            _feline.Comments = [rsc.ValueOrDefault.ToFormDto(), .. _feline.Comments];
             _comment = new() { FelineId = FelineId };
         }
     }
-
-    /// <summary>
-    ///     Prompt the user to confirm deletion of a comment.
-    /// </summary>
-    /// <returns>True if user confirms the delete action.</returns>
-    private async Task<bool> ConfirmDeleteCommentAsync()
-        => await DialogService.OpenAsync<ConfirmDeleteComment>("Confirm Delete") as bool? ?? false;
 
     /// <summary>
     ///     Delete the supplied comment from the current feline.
     /// </summary>
     /// <param name="comment">Comment to delete</param>
-    private async Task DeleteCommentAsync(Comment comment)
+    private async Task DeleteCommentAsync(IIdBearer comment)
     {
-        if (!(comment.Id != 0 && _feline is not null && await ConfirmDeleteCommentAsync()))
-        {
+        if (_feline is null || !await DialogService.ConfirmDeleteAsync<ConfirmDeleteComment>(_comment.Id, string.Empty))
             return;
-        }
 
         var rs = await CommentRepository.DeleteByKeyAsync(comment.Id);
-        NotificationService.Notify(rs, "Comment Deleted", "Failed to delete comment");
-        if (rs.IsSuccess)
+        if (NotificationService.NotifyResult(rs, "Comment", "delete", "deleted"))
         {
             _feline.Comments = [.. _feline.Comments.Where(c => c.Id != comment.Id)];
             _comment = new() { FelineId = FelineId };
         }
     }
-    
+
     /// <summary>
     ///     Handle when user clicks delete button.
     /// </summary>
     private async Task DeleteFelineAsync()
     {
         var rs = await FelineRepository.DeleteByKeyAsync(FelineId);
-        NotificationService.Notify(rs, "Deleted", "Failed to Delete");
-        if (rs.IsFailed)
+        if (NotificationService.NotifyResult(rs, "Feline", "delete", "deleted"))
         {
-            await RefreshAsync();
+            // Navigate back to the dashboard.
+            NavigationManager.NavigateTo("/");
             return;
         }
 
-        NavigationManager.NavigateTo("/");
+        await RefreshAsync();
     }
 
-    private async Task<Feline?> LoadAsync()
+    private async Task<FelineFormDto?> LoadAsync()
         => (await FelineRepository.GetByKeyAsync(FelineId)).ValueOrDefault;
 
     protected override async Task OnInitializedAsync()
@@ -138,7 +137,7 @@ else
     private async Task OnActivateAsync()
     {
         var rs = await FelineRepository.ActivateAsync(FelineId);
-        NotificationService.Notify(rs, "Activated", "Failed to Activate");
+        NotificationService.NotifyResult(rs, "Feline", "activate", "activated");
         await RefreshAsync();
     }
 
@@ -149,7 +148,7 @@ else
     private async Task OnInactivateAsync(DateTimeOffset asOf)
     {
         var rs = await FelineRepository.DeactivateAsync(FelineId, asOf);
-        NotificationService.Notify(rs, "Deactivated", "Failed to Deactivate");
+        NotificationService.NotifyResult(rs, "Feline", "deactivate", "deactivated");
         await RefreshAsync();
     }
 
@@ -161,13 +160,13 @@ else
     /// <summary>
     ///     Save event handler for the FelineForm
     /// </summary>
-    private async Task SaveFelineAsync(FelineEditModel model)
+    private async Task SaveFelineAsync(FelineFormDto model)
     {
-        var rs = await FelineRepository.UpdateAsync(FelineId, model.ToFeline());
-        NotificationService.Notify(rs, "Saved", "Failed to save");
-        if (rs.IsSuccess)
+        var rs = await FelineRepository.UpdateAsync(FelineId, model);
+        if (NotificationService.NotifyResult(rs, "Feline", "save", "saved"))
         {
-            _feline = rs.Value;
+            var rsc = await FelineRepository.GetByKeyAsync(rs.Value.Id);
+            _feline = rsc.Value;
         }
 
         await RefreshAsync();
@@ -176,16 +175,18 @@ else
     /// <summary>
     ///     Update an existing comment.
     /// </summary>
-    /// <param name="comment"></param>
-    private async Task UpdateCommentAsync(Comment comment)
+    /// <param name="dto"></param>
+    private async Task UpdateCommentAsync(CommentFormDto dto)
     {
         if (_feline is null) return;
-        
-        var rs = await CommentRepository.UpdateAsync(comment.Id, comment);
-        NotificationService.Notify(rs, "Comment Updated", "Failed to update comment");
-        if (rs.IsSuccess)
+
+        var rs = await CommentRepository.UpdateAsync(dto.Id, dto);
+        if (NotificationService.NotifyResult(rs, "Comment", "update", "updated"))
         {
-            _feline.Comments = [.. _feline.Comments.Select(c => c.Id == rs.Value.Id ? rs.Value : c)];
+            var rsc = await CommentRepository.GetByKeyAsync(rs.Value.Id);
+            var foo = rsc.ValueOrDefault.ToFormDto();
+
+            _feline.Comments = [.. _feline.Comments.Select(c => c.Id == foo.Id ? foo : c)];
         }
     }
 

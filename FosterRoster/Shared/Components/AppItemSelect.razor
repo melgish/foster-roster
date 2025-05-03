@@ -11,19 +11,16 @@
                         Disabled="@Disabled"
                         Name="@Name"
                         Placeholder="@Placeholder"
-                        TextProperty="@nameof(Item.Name)"
+                        TextProperty="@nameof(ListItemDto<TValue>.Name)"
                         TValue="TValue"
                         Value="@Value"
                         ValueChanged="ValueChanged"
                         ValueExpression="ValueExpression"
-                        ValueProperty="@nameof(Item.Id)"/>
+                        ValueProperty="@nameof(ListItemDto<TValue>.Id)"/>
     </RadzenFormField>
     <ValidationMessage For="ValueExpression" TValue="TValue"/>
 </RadzenStack>
 
 @code {
-
-    public sealed record Item([UsedImplicitly] TValue Id, string Name);
-
-    [Parameter] public IEnumerable<Item>? Items { get; set; }
+    [Parameter] public IEnumerable<ListItemDto<TValue>>? Items { get; set; }
 }

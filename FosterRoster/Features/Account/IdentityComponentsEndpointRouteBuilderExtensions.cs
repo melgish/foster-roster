@@ -1,25 +1,44 @@
 ﻿namespace FosterRoster.Features.Account;
 
+#if EXTERNAL_LOGINS
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
+#endif
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+#if EXTERNAL_LOGINS
 using Microsoft.Extensions.Primitives;
 using Pages;
 using Pages.Manage;
+#endif
 using System.Security.Claims;
+#if EXTERNAL_LOGINS
 using System.Text.Json;
+#endif
 
 internal static class IdentityComponentsEndpointRouteBuilderExtensions
 {
     // These endpoints are required by the Identity Razor components defined in the /Components/Account/Pages directory of this project.
+    [UsedImplicitly]
     public static IEndpointConventionBuilder MapAdditionalIdentityEndpoints(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
         var accountGroup = endpoints.MapGroup("/Account");
 
+        accountGroup.MapPost("/Logout", async (
+            ClaimsPrincipal _,
+            [FromServices] SignInManager<ApplicationUser> signInManager,
+            [FromForm] string returnUrl) =>
+        {
+            await signInManager.SignOutAsync();
+            // return TypedResults.LocalRedirect($"/{returnUrl}");
+            // Redirect to dashboard after logout
+            return TypedResults.Redirect("/");
+        });
+
+#if EXTERNAL_LOGINS        
         accountGroup.MapPost("/PerformExternalLogin", (
             HttpContext context,
             [FromServices] SignInManager<ApplicationUser> signInManager,
@@ -41,17 +60,7 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             return TypedResults.Challenge(properties, [provider]);
         });
 
-        accountGroup.MapPost("/Logout", async (
-            ClaimsPrincipal _,
-            [FromServices] SignInManager<ApplicationUser> signInManager,
-            [FromForm] string returnUrl) =>
-        {
-            await signInManager.SignOutAsync();
-            return TypedResults.LocalRedirect($"~/{returnUrl}");
-        });
-
         var manageGroup = accountGroup.MapGroup("/Manage").RequireAuthorization();
-
         manageGroup.MapPost("/LinkExternalLogin", async (
             HttpContext context,
             [FromServices] SignInManager<ApplicationUser> signInManager,
@@ -71,6 +80,7 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
         });
 
         var loggerFactory = endpoints.ServiceProvider.GetRequiredService<ILoggerFactory>();
+
         var downloadLogger = loggerFactory.CreateLogger("DownloadPersonalData");
 
         manageGroup.MapPost("/DownloadPersonalData", async (
@@ -100,7 +110,7 @@ internal static class IdentityComponentsEndpointRouteBuilderExtensions
             context.Response.Headers.TryAdd("Content-Disposition", "attachment; filename=PersonalData.json");
             return TypedResults.File(fileBytes, "application/json", "PersonalData.json");
         });
-
+#endif
         return accountGroup;
     }
 }

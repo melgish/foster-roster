@@ -2,7 +2,7 @@
 
 public sealed class FostererSelect(FostererRepository fostererRepository) : AppItemSelect<int>
 {
-    private static readonly Item Select = new(0, "Select a fosterer...");
+    private static readonly ListItemDto<int> Select = new(0, "Select a fosterer...");
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
@@ -12,12 +12,14 @@ public sealed class FostererSelect(FostererRepository fostererRepository) : AppI
         {
             // Get all choices from db.
             await using var query = await fostererRepository.CreateQueryAsync();
-            Items = await query
-                .AsNoTracking()
-                .OrderBy(e => e.Name)
-                .Select(e => new Item(e.Id, e.Name))
-                .ToListAsync();
-            Items = Items.Prepend(Select);
+            Items =
+            [
+                Select,
+                .. await query
+                    .OrderBy(e => e.Name)
+                    .SelectToListItemDto()
+                    .ToListAsync()
+            ];
         }
 
         await base.SetParametersAsync(ParameterView.Empty);

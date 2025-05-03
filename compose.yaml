@@ -3,12 +3,12 @@ volumes:
 
 services:
   db:
-    image: postgres:17
     environment:
         # localhost development settings. change these in the real world.
         POSTGRES_DB: mydb
         POSTGRES_USER: myuser
         POSTGRES_PASSWORD: mypassword
+    image: postgres:17
     ports:
         # exposed for development. Lock down in the real world.
         - "5432:5432"
@@ -17,11 +17,11 @@ services:
       - data:/var/lib/postgresql/data
 
   web:
-    image: foster-roster:next
-    ports:
-        - "8080:8080"
     environment:
       # localhost development settings. change these in the real world.
       ConnectionStrings__Default: "Server=db;Port=5432;UserId=myuser;Password=mypassword;Database=mydb;"
       AutoMigrate: "true"
+    image: foster-roster:next
+    ports:
+        - "8080:8080"
       
