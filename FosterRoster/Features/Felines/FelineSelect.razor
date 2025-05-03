@@ -28,7 +28,11 @@
 
 @code {
 
-    private sealed record Item(int Id, string Name, bool IsActive);
+    private sealed record Item(
+        int Id, 
+        [UsedImplicitly] string Name, 
+        bool IsActive
+    );
 
     private List<Item>? _data;
     private IEnumerable<Item>? _choices;

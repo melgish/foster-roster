@@ -35,5 +35,5 @@ public sealed class Comment : IIdBearer
     /// <summary>
     ///     Time comment was added to system.
     /// </summary>
-    public DateTimeOffset TimeStamp { get; set; }
+    public DateTimeOffset TimeStamp { get; init; }
 }

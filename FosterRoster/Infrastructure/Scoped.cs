@@ -14,6 +14,7 @@ public class Scoped<TService>(object scope, TService instance) : IDisposable, IA
     public void Dispose()
     {
         if (scope is IDisposable disposable) disposable.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     // IAsyncDisposable implementation
@@ -23,6 +24,7 @@ public class Scoped<TService>(object scope, TService instance) : IDisposable, IA
             await asyncScope.DisposeAsync();
         else
             Dispose();
+        GC.SuppressFinalize(this);
     }
 }
 

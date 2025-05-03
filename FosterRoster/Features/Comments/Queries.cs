@@ -12,6 +12,8 @@ public static class Queries
         {
             FelineId = entity.FelineId,
             Id = entity.Id,
-            Text = entity.Text
+            Modified = entity.Modified,
+            Text = entity.Text,
+            TimeStamp = entity.TimeStamp
         };
 }

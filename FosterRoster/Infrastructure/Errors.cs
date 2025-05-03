@@ -14,8 +14,3 @@ public sealed class NoChangesError() : Error("Entity was not changed");
 ///     Error when operation unexpectedly results in multiple changes.
 /// </summary>
 public sealed class MultipleChangesError() : Error("Multiple entities were changed");
-
-/// <summary>
-///     Error for conditions outside normal expectations.
-/// </summary>
-public sealed class UnexpectedError() : Error("Unexpected error");

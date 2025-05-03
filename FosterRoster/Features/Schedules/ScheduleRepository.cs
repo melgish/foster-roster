@@ -1,10 +1,7 @@
 ﻿namespace FosterRoster.Features.Schedules;
 
-using Data;
-using System.Linq.Expressions;
-
 public sealed class ScheduleRepository(
-    IDbContextFactory<FosterRosterDbContext> dbContextFactory
+    IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
 )
 {
     /// <summary>
@@ -12,7 +9,7 @@ public sealed class ScheduleRepository(
     /// </summary>
     /// <param name="model">Schedule to add</param>
     /// <returns>A Result with Schedule if successful, or Errors on failure.</returns>
-    public async Task<Result<ScheduleFormDto>> AddAsync(ScheduleFormDto model)
+    public async Task<Result<IdOnlyDto>> AddAsync(ScheduleFormDto model)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         var entry = db.Schedules.Add(new()
@@ -22,7 +19,7 @@ public sealed class ScheduleRepository(
         });
         await db.SaveChangesAsync();
 
-        return Result.Ok(entry.Entity.ToFromDto());
+        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
     }
 
     /// <summary>
@@ -72,20 +69,19 @@ public sealed class ScheduleRepository(
     /// <param name="scheduleId">ID of schedule to update.</param>
     /// <param name="model">Data to assign to Schedule</param>
     /// <returns>Result with updated Schedule if found, or Errors on failure.</returns>
-    public async Task<Result<ScheduleFormDto>> UpdateAsync(int scheduleId, ScheduleFormDto model)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int scheduleId, ScheduleFormDto model)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
 
-        var schedule = await db.Schedules.FindAsync(scheduleId);
-        if (schedule is null)
-            return Result.Fail<ScheduleFormDto>(new NotFoundError());
+        var existing = await db.Schedules.FindAsync(scheduleId);
+        if (existing is null)
+            return Result.Fail(new NotFoundError());
 
-        schedule.Cron = model.Cron.TrimToNull();
-        schedule.Name = model.Name.TrimToNull();
+        existing.Cron = model.Cron.TrimToNull();
+        existing.Name = model.Name.TrimToNull();
 
-        var entry = db.Schedules.Update(schedule);
         await db.SaveChangesAsync();
 
-        return Result.Ok(entry.Entity.ToFromDto());
+        return Result.Ok(new IdOnlyDto(existing.Id));
     }
 }

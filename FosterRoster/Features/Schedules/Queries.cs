@@ -27,17 +27,4 @@ public static class Queries
             Id = e.Id,
             Name = e.Name
         });
-
-    /// <summary>
-    ///     Map supplied entity to edit model
-    /// </summary>
-    /// <param name="entity">Entity to transform</param>
-    /// <returns>Edit model for the supplied entity</returns>
-    public static ScheduleFormDto ToFromDto(this Schedule entity)
-        => new()
-        {
-            Cron = entity.Cron,
-            Id = entity.Id,
-            Name = entity.Name
-        };
 }

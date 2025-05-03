@@ -13,7 +13,7 @@ public sealed class ChoreRepository(
     /// </summary>
     /// <param name="model">Chore data to add.</param>
     /// <returns>A Result with Chore on Success, otherwise Result with Errors.</returns>
-    public async Task<Result<ChoreFormDto>> AddAsync(ChoreFormDto model)
+    public async Task<Result<IdOnlyDto>> AddAsync(ChoreFormDto model)
     {
         await using var db = await factory.CreateDbContextAsync();
         var entry = await db.Chores.AddAsync(new()
@@ -27,7 +27,7 @@ public sealed class ChoreRepository(
         });
 
         await db.SaveChangesAsync();
-        return Result.Ok(entry.Entity.ToFormDto());
+        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
     }
 
     /// <summary>
@@ -149,7 +149,6 @@ public sealed class ChoreRepository(
         }
 
         await db.SaveChangesAsync();
-
         return Result.Ok();
     }
 
@@ -159,7 +158,7 @@ public sealed class ChoreRepository(
     /// <param name="choreId">ID of chore to update.</param>
     /// <param name="model">Updated data to assign to Chore</param>
     /// <returns>Result with updated Chore if found, or Errors on failure.</returns>
-    public async Task<Result<ChoreFormDto>> UpdateAsync(int choreId, ChoreFormDto model)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int choreId, ChoreFormDto model)
     {
         await using var db = await factory.CreateDbContextAsync();
         var existing = await db.Chores.FindAsync(choreId);
@@ -173,6 +172,6 @@ public sealed class ChoreRepository(
         existing.Repeats = model.Repeats;
 
         await db.SaveChangesAsync();
-        return Result.Ok(existing.ToFormDto());
+        return Result.Ok(new IdOnlyDto(existing.Id));
     }
 }

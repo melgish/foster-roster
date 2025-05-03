@@ -1,7 +1,5 @@
 ﻿namespace FosterRoster.Features.Schedules;
 
-using Data;
-
 public sealed class Schedule : IIdBearer
 {
     /// <summary>

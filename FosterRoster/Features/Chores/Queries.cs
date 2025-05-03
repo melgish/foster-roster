@@ -1,6 +1,5 @@
 ﻿namespace FosterRoster.Features.Chores;
 
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using Shared.Models;
 
 public static class Queries
@@ -62,21 +61,4 @@ public static class Queries
     /// <returns>Updated query that returns list items</returns>
     public static IQueryable<ListItemDto<int>> SelectToListItemDto(this IQueryable<Chore> query)
         => query.Select(e => new ListItemDto<int>(e.Id, e.Name));
-
-    /// <summary>
-    ///     Map a single entity to edit form model.
-    /// </summary>
-    /// <param name="chore">Entity to amp</param>
-    /// <returns>New ChoreFormDto instance</returns>
-    public static ChoreFormDto ToFormDto(this Chore chore)
-        => new()
-        {
-            Cron = chore.Cron,
-            Description = chore.Description,
-            DueDate = chore.DueDate,
-            FelineId = chore.FelineId.GetValueOrDefault(),
-            Id = chore.Id,
-            Name = chore.Name,
-            Repeats = chore.Repeats
-        };
 }

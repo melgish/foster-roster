@@ -66,7 +66,6 @@ builder
     .PersistKeysToDbContext<FosterRosterDbContext>();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
 builder.Services.AddSingleton<TimeProvider, TexasTimeProvider>();
 builder.Services.AddValidatorsFromAssemblyContaining<FelineFormDto>();
 
@@ -95,7 +94,7 @@ var app = builder.Build();
 // Apply database migrations when requested by configuration.
 if (builder.Configuration.GetValue("AutoMigrate", false))
 {
-    using var scope = app.Services.CreateScope();
+    await using var scope = app.Services.CreateAsyncScope();
     var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<FosterRosterDbContext>>();
     await using var context = await factory.CreateDbContextAsync();
     string[] migrations = [.. await context.Database.GetPendingMigrationsAsync()];

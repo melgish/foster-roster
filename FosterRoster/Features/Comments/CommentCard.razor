@@ -33,9 +33,9 @@ else
     private MarkupString? _html;
     private CommentFormDto? _model;
 
-    [EditorRequired] [Parameter] public Comment Comment { get; set; } = null!;
+    [EditorRequired] [Parameter] public CommentFormDto Comment { get; set; } = null!;
 
-    [Parameter] public EventCallback<Comment> OnDelete { get; set; }
+    [Parameter] public EventCallback<IIdBearer> OnDelete { get; set; }
 
     [Parameter] public EventCallback<CommentFormDto> OnSave { get; set; }
 
@@ -49,7 +49,15 @@ else
 
     private Task EditAsync()
     {
-        _model = Comment.ToFormDto();
+        _model = new()
+        {
+            Id = Comment.Id,
+            FelineId = Comment.FelineId,
+            Text = Comment.Text,
+            TimeStamp = Comment.TimeStamp,
+            Modified = Comment.Modified
+        };
+
         return Task.CompletedTask;
     }
 

@@ -8,28 +8,36 @@
             <h4 class="rz-px-2 rz-py-0 rz-ma-0">Foster Roster</h4>
         </div>
     </li>
-    <RadzenMenuItem Path="/" Text="Dashboard" Match="NavLinkMatch.All"/>
+    <AuthorizeView>
+        <NotAuthorized>
+            <RadzenMenuItem Path="/" Text="Dashboard" Match="NavLinkMatch.All"/>
+        </NotAuthorized>
+    </AuthorizeView>
     <AuthorizeView>
         <Authorized>
+            <RadzenMenuItem Path="/" Text="Dashboard" Match="NavLinkMatch.All"/>
             <RadzenMenuItem Path="/weights" Text="Weights"/>
         </Authorized>
     </AuthorizeView>
-    <AuthorizeView Roles="Admin,User">
+    <AuthorizeView Roles="User">
         <Authorized>
-            <RadzenMenuItem Path="/intake" Text="Intake"/>
-            <RadzenMenuItem Text="Admin">
-                <RadzenMenuItem Path="/felines" Text="Felines"/>
-                <AuthorizeView Roles="Admin" Context="admin">
-                    <RadzenMenuItem Path="/fosterers" Text="Fosterers"/>
-                    <RadzenMenuItem Path="/schedules" Text="Schedules"/>
-                    <RadzenMenuItem Path="/sources" Text="Sources"/>
-                    <RadzenMenuItem Path="/tasks" Text="Tasks"/>
-                    <RadzenMenuItem Path="/users" Text="Users"/>
-                </AuthorizeView>
-            </RadzenMenuItem>
+            <RadzenMenuItem Path="/felines" Text="Felines"/>
         </Authorized>
     </AuthorizeView>
+    <AuthorizeView Roles="Admin">
+        <RadzenMenuItem Path="/felines" Text="Felines"/>
+        <RadzenMenuItem Text="Admin">
+            <RadzenMenuItem Path="/fosterers" Text="Fosterers"/>
+            <RadzenMenuItem Path="/schedules" Text="Schedules"/>
+            <RadzenMenuItem Path="/sources" Text="Sources"/>
+            <RadzenMenuItem Path="/tasks" Text="Tasks"/>
+            <RadzenMenuItem Path="/users" Text="Users"/>
+        </RadzenMenuItem>
+    </AuthorizeView>
     <AuthorizeView>
+        <NotAuthorized>
+            <RadzenMenuItem Path="/account/login" Text="Login" Match="NavLinkMatch.All" Style="margin-left:auto"/>
+        </NotAuthorized>
         <Authorized>
             <RadzenProfileMenu Style="margin-left: auto;padding-left: 0">
                 <Template>@context.User.Identity?.Name</Template>
@@ -43,9 +51,6 @@
                 </ChildContent>
             </RadzenProfileMenu>
         </Authorized>
-        <NotAuthorized>
-            <RadzenMenuItem Path="/account/login" Text="Login" Match="NavLinkMatch.All" Style="margin-left:auto"/>
-        </NotAuthorized>
     </AuthorizeView>
     <RadzenMenuItem>
         <Template>

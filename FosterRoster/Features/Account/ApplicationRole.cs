@@ -4,5 +4,5 @@ using Microsoft.AspNetCore.Identity;
 
 public sealed class ApplicationRole : IdentityRole<int>, IIdBearer
 {
-    public ICollection<ApplicationUserRole> UserRoles { get; set; } = [];
+    public ICollection<ApplicationUserRole> UserRoles { get; init; } = [];
 }

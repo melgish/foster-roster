@@ -1,7 +1,5 @@
 ﻿namespace FosterRoster.Features.Sources;
 
-using Radzen.Blazor.Markdown;
-
 public static class Queries
 {
     /// <summary>
@@ -35,16 +33,4 @@ public static class Queries
     /// <returns></returns>
     public static IQueryable<ListItemDto<int>> SelectToListItemDto(this IQueryable<Source> query)
         => query.Select(e => new ListItemDto<int>(e.Id, e.Name));
-
-    /// <summary>
-    ///     Map supplied source entity to edit model
-    /// </summary>
-    /// <param name="entity">Entity to transform</param>
-    /// <returns>Edit model for the supplied entity</returns>
-    public static SourceFormDto ToFormDto(this Source entity)
-        => new()
-        {
-            Id = entity.Id,
-            Name = entity.Name
-        };
 }

@@ -1,6 +1,6 @@
 namespace FosterRoster.Features.Fosterers;
 
-public sealed class FostererFormDto
+public sealed class FostererFormDto : IIdBearer
 {
     /// <summary>
     ///     Mailing label style address of the Fosterer

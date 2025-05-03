@@ -11,7 +11,7 @@ public sealed class SourceRepository(
     /// </summary>
     /// <param name="dto">Source to add</param>
     /// <returns>A Result with Updated Dto if successful, or Errors on failure.</returns>
-    public async Task<Result<SourceFormDto>> AddAsync(SourceFormDto dto)
+    public async Task<Result<IdOnlyDto>> AddAsync(SourceFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         var entry = db.Sources.Add(new()
@@ -19,7 +19,7 @@ public sealed class SourceRepository(
             Name = dto.Name.TrimToNull()
         });
         await db.SaveChangesAsync();
-        return Result.Ok(entry.Entity.ToFormDto());
+        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ public sealed class SourceRepository(
     /// <param name="sourceId">ID of source to update.</param>
     /// <param name="dto">Data to assign to Source</param>
     /// <returns>Result with updated Source if found, or Errors on failure.</returns>
-    public async Task<Result<SourceFormDto>> UpdateAsync(int sourceId, SourceFormDto dto)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int sourceId, SourceFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
 
@@ -79,6 +79,6 @@ public sealed class SourceRepository(
         source.Name = dto.Name.TrimToNull();
 
         await db.SaveChangesAsync();
-        return Result.Ok(source.ToFormDto());
+        return Result.Ok(new IdOnlyDto(source.Id));
     }
 }

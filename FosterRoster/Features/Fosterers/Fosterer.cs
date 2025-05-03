@@ -1,7 +1,5 @@
 namespace FosterRoster.Features.Fosterers;
 
-using Data;
-
 public sealed class Fosterer : IIdBearer
 {
     /// <summary>

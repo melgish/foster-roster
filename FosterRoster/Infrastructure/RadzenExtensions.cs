@@ -64,13 +64,13 @@ public static class RadzenExtensions
         int entityId,
         string name)
         where TComponent : ComponentBase, IConfirmDelete
-        => entityId != 0 && await Convert.ToBoolean(
+        => entityId != 0 && Convert.ToBoolean(
             await dialogService.OpenAsync<TComponent>(
                 "Confirm Delete",
                 new() { ["Name"] = name })
         );
 
-    private static string? FirstReason<TReason>(this List<TReason> reasons) where TReason : IReason
+    private static string FirstReason<TReason>(this List<TReason> reasons) where TReason : IReason
         => reasons.FirstOrDefault()?.Message ?? string.Empty;
 
     /// <summary>

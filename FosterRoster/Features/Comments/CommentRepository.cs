@@ -10,7 +10,7 @@ public sealed class CommentRepository(
     /// </summary>
     /// <param name="comment">Comment instance to add.</param>
     /// <returns>A Result with Comment on Success, otherwise Result with Errors.</returns>
-    public async Task<Result<Comment>> AddAsync(CommentFormDto comment)
+    public async Task<Result<IdOnlyDto>> AddAsync(CommentFormDto comment)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync();
         var entry = await context.Comments.AddAsync(new()
@@ -21,7 +21,18 @@ public sealed class CommentRepository(
             TimeStamp = timeProvider.GetUtcNow().UtcDateTime
         });
         await context.SaveChangesAsync();
-        return Result.Ok(entry.Entity);
+        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
+    }
+
+    public async Task<Result<Comment>> GetByKeyAsync(int commentId)
+    {
+        await using var context = await dbContextFactory.CreateDbContextAsync();
+        var comment = await context.Comments
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == commentId);
+        return comment is null
+            ? Result.Fail(new NotFoundError())
+            : Result.Ok(comment);
     }
 
     /// <summary>
@@ -49,7 +60,7 @@ public sealed class CommentRepository(
     /// <param name="commentId">ID of the comment to update.</param>
     /// <param name="dto">New data for the comment.</param>
     /// <returns>A Result instance indicating success or failure.</returns>
-    public async Task<Result<Comment>> UpdateAsync(int commentId, CommentFormDto dto)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int commentId, CommentFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         var existing = await db.Comments.FindAsync(commentId);
@@ -58,12 +69,12 @@ public sealed class CommentRepository(
 
         // Only update if comment text has actually been changed.
         if (existing.Text.Equals(dto.Text))
-            return Result.Ok(existing);
+            return Result.Ok(new IdOnlyDto(existing.Id));
 
         existing.Text = dto.Text;
         existing.Modified = timeProvider.GetUtcNow().UtcDateTime;
         await db.SaveChangesAsync();
 
-        return Result.Ok(existing);
+        return Result.Ok(new IdOnlyDto(existing.Id));
     }
 }

@@ -9,7 +9,7 @@ public sealed class FostererRepository(
     /// </summary>
     /// <param name="model">Fosterer data to add.</param>
     /// <returns>Result with Fosterer after add, or Errors on failure.</returns>
-    public async Task<Result<FostererFormDto>> AddAsync(FostererFormDto model)
+    public async Task<Result<IdOnlyDto>> AddAsync(FostererFormDto model)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         var entry = db.Fosterers.Add(new()
@@ -21,7 +21,7 @@ public sealed class FostererRepository(
             Name = model.Name
         });
         await db.SaveChangesAsync();
-        return Result.Ok(entry.Entity.ToFormDto());
+        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
     }
 
     /// <summary>
@@ -71,7 +71,7 @@ public sealed class FostererRepository(
     /// <param name="fostererId">ID of Fosterer to update</param>
     /// <param name="model">Data to assign to Fosterer</param>
     /// <returns>Result with updated Fosterer if found, or Errors on failure.</returns>
-    public async Task<Result<FostererFormDto>> UpdateAsync(int fostererId, FostererFormDto model)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int fostererId, FostererFormDto model)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         var existing = await db.Fosterers.FindAsync(fostererId);
@@ -84,6 +84,6 @@ public sealed class FostererRepository(
         existing.Name = model.Name.TrimToNull();
         await db.SaveChangesAsync();
 
-        return Result.Ok(existing.ToFormDto());
+        return Result.Ok(new IdOnlyDto(existing.Id));
     }
 }

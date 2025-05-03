@@ -1,3 +1,6 @@
 ﻿namespace FosterRoster.Shared.Models;
 
-public sealed record ListItemDto<TValue>(TValue Id, string Name);
+public sealed record ListItemDto<TValue>(
+    [UsedImplicitly] TValue Id,
+    [UsedImplicitly] string Name
+);

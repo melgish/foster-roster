@@ -8,4 +8,4 @@ public interface IIdBearer
     int Id { get; }
 }
 
-
+public sealed record IdOnlyDto(int Id) : IIdBearer;

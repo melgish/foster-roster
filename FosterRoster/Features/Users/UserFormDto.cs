@@ -1,8 +1,6 @@
 ﻿namespace FosterRoster.Features.Users;
 
-using Account;
-
-public class UserFormDto()
+public class UserFormDto : IIdBearer
 {
     /// <summary>
     ///     Password for new users or to change password for existing users.
@@ -12,7 +10,7 @@ public class UserFormDto()
     /// <summary>
     ///     Unique ID for the user
     /// </summary>
-    public int Id { get; set; }
+    public int Id { get; init; }
 
     /// <summary>
     ///     Unique name for the user. Must be an email address.
@@ -27,7 +25,7 @@ public class UserFormDto()
     /// <summary>
     ///     True if user has been locked out.
     /// </summary>
-    public DateTimeOffset? LockoutEnd { get; set; }
+    public DateTimeOffset? LockoutEnd { [UsedImplicitly] get; set; }
 
     /// <summary>
     ///     Password for new users or to change password for existing users.

@@ -23,7 +23,7 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory)
     /// </summary>
     /// <param name="dto">Request information</param>
     /// <returns></returns>
-    public async Task<Result<UserFormDto>> AddAsync(UserFormDto dto)
+    public async Task<Result<IdOnlyDto>> AddAsync(UserFormDto dto)
     {
         var userName = dto.UserName.TrimToNull();
         var email = dto.Email.TrimToNull();
@@ -42,7 +42,7 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory)
         if (rs.IsSuccess && !string.IsNullOrWhiteSpace(dto.Role))
             rs = Map(await scoped.Instance.AddToRoleAsync(user, dto.Role));
 
-        return rs.ToResult(dto);
+        return rs.ToResult(new IdOnlyDto(dto.Id));
     }
 
     /// <summary>
@@ -96,7 +96,7 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory)
     /// <param name="userId"></param>
     /// <param name="dto"></param>
     /// <returns></returns>
-    public async Task<Result<UserFormDto>> UpdateAsync(int userId, UserFormDto dto)
+    public async Task<Result<IdOnlyDto>> UpdateAsync(int userId, UserFormDto dto)
     {
         await using var scoped = scopeFactory.CreateScopedAsync<UserManager<ApplicationUser>>();
 
@@ -123,17 +123,7 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory)
             ({ } role, { } roles) => await Map(await scoped.Instance.RemoveFromRolesAsync(user, roles))
                 .Bind(async Task<Result> () => Map(await scoped.Instance.AddToRoleAsync(user, role)))
         };
-        if (rs.IsFailed)
-            return rs;
 
-        return Result.Ok(new UserFormDto
-        {
-            Email = user.Email ?? string.Empty,
-            Id = user.Id,
-            LockoutEnd = user.LockoutEnd,
-            PhoneNumber = user.PhoneNumber ?? string.Empty,
-            Role = (await scoped.Instance.GetRolesAsync(user)).FirstOrDefault() ?? string.Empty,
-            UserName = user.UserName!
-        });
+        return rs.IsFailed ? rs : Result.Ok(new IdOnlyDto(user.Id));
     }
 }
