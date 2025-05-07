@@ -7,15 +7,44 @@ using Dynamic = System.Linq.Dynamic.Core.DynamicExtensions;
 
 public static class RadzenExtensions
 {
+    /// <summary>
+    ///     Applies Radzen Grid filtering to a queryable.
+    /// </summary>
+    /// <param name="queryable"></param>
+    /// <param name="args"></param>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <returns></returns>
     private static IQueryable<TEntity> Where<TEntity>(this IQueryable<TEntity> queryable, LoadDataArgs args)
         => string.IsNullOrWhiteSpace(args.Filter) ? queryable : Dynamic.Where(queryable, args.Filter);
 
+    /// <summary>
+    ///     Applies Radzen Grid paging to a queryable.
+    /// </summary>
+    /// <param name="queryable"></param>
+    /// <param name="args"></param>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <returns></returns>
     private static IQueryable<TEntity> Skip<TEntity>(this IQueryable<TEntity> queryable, LoadDataArgs args)
         => args.Skip.HasValue ? queryable.Skip(args.Skip.Value) : queryable;
 
+    /// <summary>
+    ///     Applies Radzen Grid paging to a queryable.
+    /// </summary>
+    /// <param name="queryable"></param>
+    /// <param name="args"></param>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <returns></returns>
     private static IQueryable<TEntity> Take<TEntity>(this IQueryable<TEntity> queryable, LoadDataArgs args)
         => args.Top.HasValue ? queryable.Take(args.Top.Value) : queryable;
 
+    /// <summary>
+    ///     Applies Radzen Grid sorting to a queryable.
+    /// </summary>
+    /// <param name="queryable"></param>
+    /// <param name="args"></param>
+    /// <param name="defaultOrderBy"></param>
+    /// <typeparam name="TEntity"></typeparam>
+    /// <returns></returns>
     private static IQueryable<TEntity> OrderBy<TEntity>(this IQueryable<TEntity> queryable, LoadDataArgs args,
         string? defaultOrderBy = null)
         => (string.IsNullOrWhiteSpace(args.OrderBy) ? defaultOrderBy : args.OrderBy)
@@ -24,7 +53,7 @@ public static class RadzenExtensions
                 : queryable;
 
     /// <summary>
-    /// Return value of ToGridResultsAsync
+    ///     Return value of ToGridResultsAsync
     /// </summary>
     /// <param name="Items"></param>
     /// <param name="Count"></param>
@@ -50,7 +79,7 @@ public static class RadzenExtensions
         var data = await queryable.OrderBy(args, defaultOrderBy).Skip(args).Take(args).ToListAsync();
         return new(data, count);
     }
-
+    
     /// <summary>
     ///     Open custom delete dialog and wait for true/false response
     /// </summary>
