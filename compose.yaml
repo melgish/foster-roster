@@ -4,24 +4,31 @@ volumes:
 services:
   db:
     environment:
-        # localhost development settings. change these in the real world.
+        # Development settings. change these in the real world.
         POSTGRES_DB: mydb
         POSTGRES_USER: myuser
         POSTGRES_PASSWORD: mypassword
     image: postgres:17
-    ports:
-        # exposed for development. Lock down in the real world.
-        - "5432:5432"
     shm_size: 128mb
     volumes:
       - data:/var/lib/postgresql/data
 
   web:
+    depends_on:
+        -   db
     environment:
-      # localhost development settings. change these in the real world.
+      # Development settings. Change to match above in the real world.
       ConnectionStrings__Default: "Server=db;Port=5432;UserId=myuser;Password=mypassword;Database=mydb;"
+
+      # If set, database will auto upgrade on startup.
+      # This is not recommended for production use.
       AutoMigrate: "true"
+
+      # If set AND there are 0 users in the database, this will create an admin
+      # user with these credentials. Password should then be changed
+      # immediately.
+      FirstUserEmail: "admin@localhost"
+      FirstUserPassword: "Password#1"
     image: foster-roster:next
     ports:
         - "8080:8080"
-      

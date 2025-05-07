@@ -2,5 +2,6 @@
 
 public class TexasTimeProvider : TimeProvider
 {
-    public override TimeZoneInfo LocalTimeZone { get; } = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+    public override TimeZoneInfo LocalTimeZone { get; } = TimeZoneInfo
+        .FindSystemTimeZoneById("Central Standard Time");
 }

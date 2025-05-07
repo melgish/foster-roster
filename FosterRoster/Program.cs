@@ -15,6 +15,7 @@ using FosterRoster.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Radzen;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 using System.Text.Json.Serialization;
@@ -32,7 +33,10 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddDbContextFactory<FosterRosterDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
+    options
+        .UseNpgsql(builder.Configuration.GetConnectionString("Default"))
+        // Without this the application cannot start from an empty database.
+        .ConfigureWarnings(a => a.Ignore(RelationalEventId.PendingModelChangesWarning))
 );
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -91,16 +95,6 @@ builder.Services.AddResponseCaching();
 
 var app = builder.Build();
 
-// Apply database migrations when requested by configuration.
-if (builder.Configuration.GetValue("AutoMigrate", false))
-{
-    await using var scope = app.Services.CreateAsyncScope();
-    var factory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<FosterRosterDbContext>>();
-    await using var context = await factory.CreateDbContextAsync();
-    string[] migrations = [.. await context.Database.GetPendingMigrationsAsync()];
-    if (migrations.Length > 0) await context.Database.MigrateAsync();
-}
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -126,5 +120,11 @@ app.MapControllers();
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();
+
+// Apply database migrations when requested by configuration.
+// Choice to be made here. Wait or abort if not ready.
+// For now, assume everything will be ok by the time the first request
+// is made.
+_ = await app.CheckDatabaseReadyAsync();
 
 await app.RunAsync();
