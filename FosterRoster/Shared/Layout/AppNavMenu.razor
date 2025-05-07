@@ -16,6 +16,15 @@
     <AuthorizeView>
         <Authorized>
             <RadzenMenuItem Path="/" Text="Dashboard" Match="NavLinkMatch.All"/>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView Roles="Admin,User">
+        <Authorized>
+            <RadzenMenuItem Path="/planner" Text="Planner"/>
+        </Authorized>
+    </AuthorizeView>
+    <AuthorizeView>
+        <Authorized>
             <RadzenMenuItem Path="/weights" Text="Weights"/>
         </Authorized>
     </AuthorizeView>

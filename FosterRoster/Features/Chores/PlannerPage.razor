@@ -1,0 +1,104 @@
+﻿@page "/planner"
+@attribute [Authorize(Roles="Admin,User")]
+@rendermode @(new InteractiveServerRenderMode(false))
+@inject NotificationService NotificationService
+@inject ChoreRepository ChoreRepository
+@inject TimeProvider TimeProvider
+
+<PageTitle>Planner</PageTitle>
+<RadzenStack>
+    <AppGridPanel>
+       <RadzenDataGrid
+        @ref="_grid"
+        TItem="ChoreGridDto"
+        AllowFiltering="true"
+        AllowPaging="true"
+        AllowSorting="true"
+        GridLines="DataGridGridLines.Both"
+        Count="_count"
+        Data="_data"
+        Density="Density.Compact"
+        FilterMode="FilterMode.Simple"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+        IsLoading="_isLoading"
+        LoadData="LoadDataAsync"
+        PageNumbersCount="1"
+        PagerHorizontalAlign="HorizontalAlign.Center"
+        PagerPosition="PagerPosition.Top"
+        PageSize="20"
+        PageSizeOptions="@( [10, 20, 50, 100])"
+        PagingSummaryFormat="Showing {0} to {1} of {2}"
+        ShowPagingSummary="true">
+        <Columns>
+            <RadzenDataGridColumn Width="6ch">
+                <Template Context="data">
+                    <AppGridButton
+                        ButtonStyle="ButtonStyle.Secondary"
+                        Click="@(() => LogChoreCompletedAsync(data))"
+                        Text="Log"/>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn
+                MinWidth="12ch"
+                Property="@nameof(ChoreGridDto.DueDate)"
+                FilterOperator="FilterOperator.LessThanOrEquals"
+                FilterValue="TimeProvider.GetUtcNow().AddDays(2).Date"
+                SortOrder="SortOrder.Ascending"
+                Title="Due Date">
+                <Template Context="row">
+                    <AppLocalDateTime Value="row.DueDate"/>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn
+                MinWidth="12ch"
+                Property="@nameof(ChoreGridDto.FelineName)"
+                Title="Feline"/>
+            <RadzenDataGridColumn
+                MinWidth="12ch"
+                Property="@nameof(ChoreGridDto.Name)"
+                Title="@nameof(ChoreGridDto.Name)"/>
+        </Columns>
+    </RadzenDataGrid>
+    </AppGridPanel>
+</RadzenStack>
+
+@code {
+    private int _count;
+    private IEnumerable<ChoreGridDto>? _data;
+    private RadzenDataGrid<ChoreGridDto>? _grid;
+    private bool _isLoading;
+    
+    /// <summary>
+    ///     Loads paged data for the grid.
+    /// </summary>
+    /// <param name="args">Radzen grid arguments.</param>
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        _isLoading = true;
+        try
+        {
+            await using var query = await ChoreRepository.CreateQueryAsync();
+            (_data, _count) = await query
+                // .DueBefore(TimeProvider.GetUtcNow().AddDays(2))
+                .SelectToGridDto()
+                .ToGridResultsAsync(args, "DueDate asc");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.NotifyFailedToLoad(ex);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+    
+    private async Task LogChoreCompletedAsync(ChoreGridDto row)
+    {
+        var rs = await ChoreRepository.LogChoreCompletedAsync(row.Id);
+        if (NotificationService.NotifyResult(rs, "Task", "log", "logged"))
+        {
+            await _grid!.Reload();
+        }
+    }
+}

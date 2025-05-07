@@ -22,6 +22,18 @@ public static class Queries
         => query.Where(e => !e.FelineId.HasValue);
 
     /// <summary>
+    ///     Returns assigned chores that are due before the specified date.
+    /// </summary>
+    /// <param name="query">query instance to select from</param>
+    /// <param name="dueDate">Due date to query after</param>
+    /// <returns></returns>
+    public static IQueryable<Chore> DueBefore(this IQueryable<Chore> query, DateTimeOffset dueDate)
+        => query
+            .Where(e => e.FelineId.HasValue)
+            .Where(e => !e.DueDate.HasValue || e.DueDate <= dueDate);
+    
+    
+    /// <summary>
     ///     Map chore entity to edit form model.
     /// </summary>
     /// <param name="query">query instance to select from</param>
