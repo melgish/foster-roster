@@ -25,8 +25,16 @@ else
                 </AppFormColumn>
                 <AppFormColumn>
                     <RadzenStack Gap="1rem">
-                        <AppDateOnly @bind-Value="_model.IntakeDate" Disabled="IsDisabled" Text="Intake Date"/>
-                        <AppTextBox @bind-Value="@_model.Name" Disabled="IsDisabled" Text="Name"/>
+                        <AppDateOnly @bind-Value="_model.IntakeDate" Disabled="IsDisabled" Text="Intake Date">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppDateOnly>
+                        <AppTextBox @bind-Value="@_model.Name" Disabled="IsDisabled" Text="Name">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
                         <AppRadioButtonList @bind-Value="@_model.Gender" Disabled="IsDisabled" Text="Gender">
                             <RadzenRadioButtonListItem Text="Female" Value="Gender.Female"/>
                             <RadzenRadioButtonListItem Text="Male" Value="Gender.Male"/>

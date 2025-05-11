@@ -18,18 +18,34 @@
                     <AppFormHeader Text="Enter Weight"/>
                     <AppFormRow>
                         <AppFormColumn>
-                            <FelineSelect @bind-Value="@_model.FelineId"/>
+                            <FelineSelect @bind-Value="@_model.FelineId">
+                                <Helper>
+                                    <AppRequired/>
+                                </Helper>
+                            </FelineSelect>
                         </AppFormColumn>
                         <AppFormColumn>
-                            <AppDateTime @bind-Value="_model.DateTime" Text="Date"/>
+                            <AppDateTime @bind-Value="_model.DateTime" Text="Date">
+                                <Helper>
+                                    <AppRequired/>
+                                </Helper>
+                            </AppDateTime>
                         </AppFormColumn>
                     </AppFormRow>
                     <AppFormRow>
                         <AppFormColumn>
-                            <AppNumeric @bind-Value="_model.Value" Min="0.0m" Step="0.1" Text="Weight" TValue="float"/>
+                            <AppNumeric @bind-Value="_model.Value" Min="0.0m" Step="0.1" Text="Weight" TValue="float">
+                                <Helper>
+                                    <AppRequired/>
+                                </Helper>
+                            </AppNumeric>
                         </AppFormColumn>
                         <AppFormColumn>
-                            <WeightUnitSelect @bind-Value="@_model.Units"/>
+                            <WeightUnitSelect @bind-Value="@_model.Units">
+                                <Helper>
+                                    <AppRequired/>
+                                </Helper>
+                            </WeightUnitSelect>
                         </AppFormColumn>
                     </AppFormRow>
                     <AppFormFooter>

@@ -4,6 +4,7 @@
     <RadzenFormField
         AllowFloatingLabel="false"
         Component="@Name"
+        Helper="Helper"
         Text="@Text"
         Variant="Variant.Text">
         <RadzenDropDown TValue="int"
@@ -55,6 +56,8 @@
     [Parameter] public EventCallback<int> ValueChanged { get; set; }
 
     [Parameter] public Expression<Func<int>> ValueExpression { get; set; } = null!;
+    
+    [Parameter] public RenderFragment? Helper { get; set; }
 
     public override async Task SetParametersAsync(ParameterView parameters)
     {
