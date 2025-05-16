@@ -17,14 +17,22 @@
                 <AppFormHeader Text="@_name"/>
                 <AppFormRow>
                     <AppFormColumn>
-                        <AppTextBox @bind-Value="@_model.Name" Disabled="_isSaving" Text="Name"/>
+                        <AppTextBox @bind-Value="@_model.Name" Disabled="_isSaving" Text="Name">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
                     </AppFormColumn>
                     <AppFormColumn>
                         <AppTextBox
                             @bind-Value="@_model.Cron"
                             @oninput="@(e => _model.Cron = e.Value?.ToString() ?? string.Empty)"
                             Disabled="_isSaving"
-                            Text="Cron Expression"/>
+                            Text="Cron Expression">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>

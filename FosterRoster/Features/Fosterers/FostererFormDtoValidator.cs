@@ -12,7 +12,8 @@ public sealed class FostererFormDtoValidator : AbstractValidator<FostererFormDto
             .IsInEnum();
 
         RuleFor(model => model.Email)
-            .NotEmpty().When(e => e.ContactMethod is ContactMethod.Email)
+            .NotEmpty()
+            .When(e => e.ContactMethod is ContactMethod.Email)
             .EmailAddress()
             .MaximumLength(64);
 

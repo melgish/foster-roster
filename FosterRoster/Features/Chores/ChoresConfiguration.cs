@@ -13,10 +13,6 @@ internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
             .HasKey(e => e.Id)
             .HasName("PK_Chores");
 
-        builder.Property(e => e.Cron)
-            .HasMaxLength(128)
-            .IsRequired(false);
-
         builder.Property(e => e.Description)
             .HasMaxLength(256)
             .IsRequired(false);
@@ -45,11 +41,6 @@ internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
             .Property(e => e.Name)
             .HasMaxLength(64)
             .IsRequired();
-
-        builder
-            .Property(e => e.Repeats)
-            .IsRequired()
-            .HasDefaultValue(1);
 
         // Apply query filter to exclude tasks for inactive felines
         // but include template tasks (where FelineId is null)

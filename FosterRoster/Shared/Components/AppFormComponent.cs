@@ -25,4 +25,6 @@ public class AppFormComponent<TValue> : ComponentBase
     [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
 
     [Parameter] public Expression<Func<TValue>> ValueExpression { get; set; } = null!;
+    
+    [Parameter] public RenderFragment? Helper { get; set; }
 }

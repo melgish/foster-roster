@@ -6,6 +6,7 @@
 @using FosterRoster.Features.Felines
 
 @inject ChoreRepository ChoreRepository;
+@inject FelineRepository FelineRepository;
 @inject DialogService DialogService
 @inject NavigationManager NavigationManager;
 @inject NotificationService NotificationService;
@@ -19,14 +20,32 @@
                 <AppFormHeader Text="@_name"/>
                 <AppFormRow>
                     <AppFormColumn>
-                        <AppTextBox @bind-Value="@_model.Name" Text="Task Name"/>
+                        <AppTextBox @bind-Value="@_model.Name" Text="Task Name">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <FelineSelect
-                            @bind-Value="_model.FelineId"
-                            Disabled="_isSaving"
-                            Placeholder="Create Template"
-                            Text="Feline Name (leave blank to create template)"/>
+                        @if (_model.Id != 0)
+                        {
+                            <FelineSelect
+                                @bind-Value="_model.FelineId"
+                                Placeholder="Choose"
+                                Text="Assiged to Feline">
+                                <Helper>
+                                    <AppRequired/>
+                                </Helper>
+                            </FelineSelect>
+                        }
+                        else
+                        {
+                            <MultiFelineSelect
+                                @bind-Value="_model.FelineIds"
+                                Disabled="_isSaving"
+                                Placeholder="Choose"
+                                Text="Assigned to Feline(s)" />
+                        }
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormRow>
@@ -42,27 +61,8 @@
                                      Disabled="_isSaving"
                                      Text="Due Date"/>
                     </AppFormColumn>
-                    <AppFormColumn>
-                        <AppNumeric @bind-Value="_model.Repeats"
-                                    Disabled="_isSaving"
-                                    Text="Repeats"/>
-                    </AppFormColumn>
-                </AppFormRow>
-                <AppFormRow>
-                    <AppFormColumn>
-                        <AppTextBox @bind-Value="_model.Cron"
-                                    @oninput="@(e => _model.Cron = e.Value?.ToString() ?? string.Empty)"
-                                    Disabled="_isSaving"
-                                    Placeholder="* * * * *"
-                                    title="Cron Expression to calculate the next due date"
-                                    Text="Cron Expression"/>
-                    </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>
-                    <div style="margin-right: auto">
-                        <small style="@("color: var(--rz-input-placeholder-color)")">Description:</small>
-                        <CronDescription Cron="@_model.Cron"/>
-                    </div>
                     <AppBusyCircle IsBusy="_isSaving"/>
                     @if (_model.Id != 0)
                     {
@@ -97,7 +97,7 @@
             ShowPagingSummary="true">
             <HeaderTemplate>
                 <AppGridHeader Text="Tasks">
-                    <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
+                    <AppGridButton Click="@(AddAsync)" Text="Add"/>
                 </AppGridHeader>
             </HeaderTemplate>
             <Columns>
@@ -124,18 +124,6 @@
                         <AppLocalDateTime Value="row.DueDate"/>
                     </Template>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn
-                    Filterable="false"
-                    HeaderCssClass="app-text-right"
-                    Property="@nameof(ChoreGridDto.Repeats)"
-                    Title="@nameof(ChoreGridDto.Repeats)"
-                    TextAlign="TextAlign.Right"
-                    Width="8ch"/>
-                <RadzenDataGridColumn
-                    Filterable="false"
-                    Property="@nameof(ChoreGridDto.Cron)"
-                    Title="@nameof(ChoreGridDto.Cron)"
-                    Width="15ch"/>
             </Columns>
         </RadzenDataGrid>
     </AppGridPanel>
@@ -158,6 +146,12 @@
     /// </summary>
     [Parameter]
     public int ChoreId { get; set; }
+
+    private async Task AddAsync()
+    {
+        _model = new();
+        await EditAsync(0);
+    }
 
     /// <summary>
     ///     Delete the chore currently being edited.
@@ -239,7 +233,13 @@
     {
         // Reset the model to be edited.
         var rs = ChoreId == 0
-            ? Result.Ok<ChoreFormDto>(new())
+            ? Result.Ok<ChoreFormDto>(new()
+            {
+                Description = _model.Description,
+                FelineId = _model.FelineId,
+                FelineIds = [.. _model.FelineIds],
+                Name = _model.Name
+            })
             : await ChoreRepository.GetByKeyAsync(ChoreId);
         if (NavigationManager.VerifyFound(rs))
         {
@@ -248,12 +248,45 @@
         }
     }
 
+    private async Task<bool> ConfirmMultiCreateAsync()
+    {
+        if (_model.Id != 0 || _model.FelineIds.Count <= 1)
+        {
+            return true;
+        }
+        
+        // Convert Id's to names.
+        await using var query = await FelineRepository.CreateQueryAsync();
+        var names = await query
+                .Where(e => _model.FelineIds.Contains(e.Id))
+                .Select(e => e.Name)
+                .Order()
+                .ToListAsync()
+            switch
+            {
+                { Count: > 2 } n => string.Join(", ", n[..^1]) + ", and " + n[^1], 
+                { } n => string.Join(" and ", n),
+                _ => string.Empty
+            };
+
+        return (bool)(await DialogService.OpenAsync<ConfirmMultiTaskCreate>("Confirm Create", new()
+        {
+            ["Count"] = _model.FelineIds.Count,
+            ["Names"] = names,
+        }));
+    }
+
     /// <summary>
     ///     Save the source to the database.
     /// </summary>
     /// <param name="editContext">Form context</param>
     private async Task SaveAsync(EditContext editContext)
     {
+        if (!await ConfirmMultiCreateAsync())
+        {
+            return;
+        }
+        
         var rs = _model.Id == 0
             ? await ChoreRepository.AddAsync(_model)
             : await ChoreRepository.UpdateAsync(_model.Id, _model);
@@ -263,5 +296,4 @@
             await EditAsync(_model.Id);
         }
     }
-
 }

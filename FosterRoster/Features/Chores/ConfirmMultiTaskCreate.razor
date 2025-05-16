@@ -1,0 +1,25 @@
+﻿@inject DialogService DialogService
+
+<RadzenStack>
+    <RadzenRow>
+        <RadzenColumn>
+            <RadzenText Typo="Typo.body1">
+                <p>If you click Yes, you will create @Count individual tasks for @Names.</p>
+                <p><em>If you make a mistake here, you will need to delete them one at a time.</em></p>
+            </RadzenText>
+        </RadzenColumn>
+    </RadzenRow>
+    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End">
+        <RadzenButton ButtonStyle="ButtonStyle.Base" Click="@Cancel" Variant="Variant.Text">Cancel</RadzenButton>
+        <RadzenButton ButtonStyle="ButtonStyle.Danger" Click="@Confirm" Variant="Variant.Text">Yes</RadzenButton>
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    [Parameter] public int Count { get; set; } = 0;
+    [Parameter] public string Names { get; set; } = string.Empty;
+
+    void Cancel() => DialogService.Close(false);
+
+    void Confirm() => DialogService.Close(true);
+}

@@ -17,7 +17,11 @@
                 <AppFormHeader Text="@_name"/>
                 <AppFormRow>
                     <AppFormColumn>
-                        <AppTextBox @bind-Value="@_model.Name" Disabled="_isSaving" Text="Name"/>
+                        <AppTextBox @bind-Value="@_model.Name" Disabled="_isSaving" Text="Name">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>

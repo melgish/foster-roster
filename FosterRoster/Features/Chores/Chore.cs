@@ -5,12 +5,6 @@ using Felines;
 public sealed class Chore : IIdBearer
 {
     /// <summary>
-    ///     Cron expression that defines how the next occurrence of
-    ///     a repeating task should be calculated.
-    /// </summary>
-    public string? Cron { get; set; }
-
-    /// <summary>
     ///     Description of the task. Description will be added
     ///     to journal entry when task is completed.
     /// </summary>
@@ -27,7 +21,7 @@ public sealed class Chore : IIdBearer
     ///     considered a template chore that can be cloned for
     ///     any feline.
     /// </summary>
-    public int? FelineId { get; init; }
+    public int? FelineId { get; set; }
 
     /// <summary>
     ///     Feline associated with the chore. If null, the chore is
@@ -45,9 +39,4 @@ public sealed class Chore : IIdBearer
     ///     Name of chore to display to the user.
     /// </summary>
     public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    ///     How many times a chore repeats. Default is 1.
-    /// </summary>
-    public int Repeats { get; set; } = 1;
 }

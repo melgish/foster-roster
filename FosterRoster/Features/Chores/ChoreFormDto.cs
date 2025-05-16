@@ -21,11 +21,6 @@ public sealed class ChoreFormDto
     public int FelineId { get; set; }
 
     /// <summary>
-    ///     How often the task should be performed. Default is "Once".
-    /// </summary>
-    public string? Cron { get; set; }
-
-    /// <summary>
     ///     Unique identifier for the task.
     /// </summary>
     public int Id { get; init; }
@@ -36,7 +31,8 @@ public sealed class ChoreFormDto
     public string Name { get; set; } = string.Empty;
 
     /// <summary>
-    ///     How many times a task repeats. Default is 1.
+    ///     When creating a new task, this is the list of
+    ///     felines that it will be assigned to
     /// </summary>
-    public int Repeats { get; set; } = 1;
+    public List<int> FelineIds { get; set; } = [];
 }
