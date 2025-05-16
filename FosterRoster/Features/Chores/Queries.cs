@@ -22,18 +22,6 @@ public static class Queries
         => query.Where(e => !e.FelineId.HasValue);
 
     /// <summary>
-    ///     Returns assigned chores that are due before the specified date.
-    /// </summary>
-    /// <param name="query">query instance to select from</param>
-    /// <param name="dueDate">Due date to query after</param>
-    /// <returns></returns>
-    public static IQueryable<Chore> DueBefore(this IQueryable<Chore> query, DateTimeOffset dueDate)
-        => query
-            .Where(e => e.FelineId.HasValue)
-            .Where(e => !e.DueDate.HasValue || e.DueDate <= dueDate);
-    
-    
-    /// <summary>
     ///     Map chore entity to edit form model.
     /// </summary>
     /// <param name="query">query instance to select from</param>
@@ -41,13 +29,11 @@ public static class Queries
     public static IQueryable<ChoreFormDto> SelectToFormDto(this IQueryable<Chore> query)
         => query.Select(chore => new ChoreFormDto
         {
-            Cron = chore.Cron,
             Description = chore.Description,
             DueDate = chore.DueDate,
             FelineId = chore.FelineId.GetValueOrDefault(),
             Id = chore.Id,
             Name = chore.Name,
-            Repeats = chore.Repeats
         });
 
     /// <summary>
@@ -58,12 +44,10 @@ public static class Queries
     public static IQueryable<ChoreGridDto> SelectToGridDto(this IQueryable<Chore> query)
         => query.Select(e => new ChoreGridDto
         {
-            Cron = e.Cron,
             DueDate = e.DueDate,
             FelineName = e.Feline == null ? "Template" : e.Feline.Name,
             Id = e.Id,
             Name = e.Name,
-            Repeats = e.Repeats
         });
 
     /// <summary>

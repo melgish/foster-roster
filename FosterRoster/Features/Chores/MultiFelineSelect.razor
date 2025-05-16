@@ -1,0 +1,53 @@
+﻿@inject Felines.FelineRepository FelineRepository
+@inherits AppFormComponent<List<int>>
+
+<RadzenStack Gap="0rem">
+    <RadzenFormField
+        AllowFloatingLabel="false"
+        Component="@Name"
+        Helper="Helper"
+        Text="@Text"
+        Variant="Variant.Text">
+        <RadzenDropDown TValue="List<int>"
+                        @attributes="Attributes"
+                        AllowFiltering="true"
+                        AllowClear="AllowClear"
+                        Data="_data"
+                        Disabled="Disabled"
+                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                        FilterOperator="StringFilterOperator.StartsWith"
+                        FilterPlaceholder="Search..."
+                        Name="@Name"
+                        Multiple="true"
+                        Placeholder="@Placeholder"
+                        TextProperty="@nameof(ListItemDto<int>.Name)"
+                        Value="@Value"
+                        ValueChanged="ValueChanged"
+                        ValueExpression="ValueExpression"
+                        ValueProperty="@nameof(ListItemDto<int>.Id)"/>
+    </RadzenFormField>
+    <ValidationMessage For="@ValueExpression"/>
+</RadzenStack>
+
+@code {
+    private List<ListItemDto<int>>? _data;
+    
+    [Parameter] public bool AllowClear { get; set; } = true;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        parameters.SetParameterProperties(this);
+
+        if (_data is null)
+        {
+            // Get all felines, active or inactive from db.
+            await using var query = await FelineRepository.CreateQueryAsync();
+            _data = await query
+                .AsNoTracking()
+                .OrderBy(e => e.Name)
+                .Select(e => new ListItemDto<int>(e.Id, e.Name))
+                .ToListAsync();
+        }
+        await base.SetParametersAsync(ParameterView.Empty);
+    }
+}

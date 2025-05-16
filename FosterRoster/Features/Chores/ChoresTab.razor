@@ -1,23 +1,6 @@
 ﻿@inject ChoreRepository ChoreRepository
 @inject NotificationService NotificationService
 
-<AppFormPanel>
-    <EditForm FormName="cloneTemplate" Model="_model" OnValidSubmit="CloneTemplateAsync">
-        <FluentValidationValidator/>
-        <RadzenStack
-            AlignItems="AlignItems.Center"
-            Gap="1rem"
-            Orientation="Orientation.Horizontal">
-            <TemplateSelect
-                @bind-Value="_model.ChoreId"
-                Placeholder="Select task to assign"
-                Text="Add From Template"/>
-            <AppFormButton
-                ButtonType="ButtonType.Submit"
-                Text="Add"/>
-        </RadzenStack>
-    </EditForm>
-</AppFormPanel>
 <AppGridPanel>
     <RadzenDataGrid
         @ref="_grid"
@@ -61,18 +44,6 @@
                     <AppLocalDateTime Value="row.DueDate"/>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn
-                Filterable="false"
-                Property="@nameof(ChoreGridDto.Cron)"
-                Title="@nameof(ChoreGridDto.Cron)"
-                Width="10ch"/>
-            <RadzenDataGridColumn
-                Filterable="false"
-                HeaderCssClass="app-text-right"
-                Property="@nameof(ChoreGridDto.Repeats)"
-                Title="@nameof(ChoreGridDto.Repeats)"
-                TextAlign="TextAlign.Right"
-                Width="8ch"/>
         </Columns>
     </RadzenDataGrid>
 </AppGridPanel>
@@ -84,33 +55,10 @@
     private IEnumerable<ChoreGridDto>? _data;
     private RadzenDataGrid<ChoreGridDto>? _grid;
     private bool _isLoading;
-    private CloneTemplateRequest _model = new();
 
     [EditorRequired] [Parameter] public int FelineId { get; set; }
 
     [Parameter] public EventCallback<int> OnChoreLogged { get; set; }
-
-    /// <summary>
-    ///     Set the model when the parameters are set.
-    /// </summary>
-    protected override void OnParametersSet()
-    {
-        base.OnParametersSet();
-        _model = new() { FelineId = FelineId };
-    }
-
-    /// <summary>
-    ///     Clone a template task and assign to the current feline.
-    /// </summary>
-    public async Task CloneTemplateAsync()
-    {
-        var rs = await ChoreRepository.CloneTemplateAsync(_model);
-        if (NotificationService.NotifyResult(rs, "Task", "create", "created"))
-        {
-            _model = new() { FelineId = FelineId };
-            await _grid!.Reload();
-        }
-    }
 
     /// <summary>
     ///     Loads paged data for the grid.
@@ -137,6 +85,10 @@
         }
     }
 
+    /// <summary>
+    ///     Marks individual chores as completed.
+    /// </summary>
+    /// <param name="row"></param>
     private async Task LogChoreCompletedAsync(ChoreGridDto row)
     {
         var rs = await ChoreRepository.LogChoreCompletedAsync(row.Id);
@@ -146,5 +98,4 @@
             await _grid!.Reload();
         }
     }
-
 }

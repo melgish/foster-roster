@@ -4,8 +4,7 @@ using Data;
 using NCrontab;
 
 public sealed class ChoreRepository(
-    IDbContextFactory<FosterRosterDbContext> factory,
-    TimeProvider timeProvider
+    IDbContextFactory<FosterRosterDbContext> factory
 )
 {
     /// <summary>
@@ -16,61 +15,16 @@ public sealed class ChoreRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(ChoreFormDto model)
     {
         await using var db = await factory.CreateDbContextAsync();
-        var entry = await db.Chores.AddAsync(new()
-        {
-            Cron = model.Cron.TrimToNull(),
-            Description = model.Description.TrimToNull(),
-            DueDate = model.DueDate?.UtcDateTime,
-            FelineId = model.FelineId.ZeroToNull(),
-            Name = model.Name.TrimToNull(),
-            Repeats = model.Repeats
-        });
-
+        await db.Chores.AddRangeAsync(model.FelineIds
+            .Select(felineId => new Chore
+            {
+                Description = model.Description.TrimToNull(),
+                DueDate = model.DueDate?.UtcDateTime,
+                FelineId = felineId.ZeroToNull(),
+                Name = model.Name.TrimToNull()
+            }));
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
-    }
-
-    /// <summary>
-    ///     Determine the next due date of a task.
-    /// </summary>
-    /// <param name="dueDate"></param>
-    /// <param name="cron"></param>
-    /// <returns></returns>
-    private DateTimeOffset? GetNextDueDate(DateTimeOffset? dueDate, string? cron)
-    {
-        if (dueDate is null || string.IsNullOrWhiteSpace(cron)) return dueDate;
-        var schedule = CrontabSchedule.Parse(cron);
-        var now = timeProvider.GetLocalNow().LocalDateTime;
-        var nextDue = schedule.GetNextOccurrence(now);
-        return nextDue;
-    }
-
-    /// <summary>
-    /// Clone the specified template chore for the specified feline.
-    /// </summary>
-    /// <param name="request"></param>
-    /// <returns>Result of clone containing ID of new record.</returns>
-    public async Task<Result<int>> CloneTemplateAsync(CloneTemplateRequest request)
-    {
-        await using var context = await factory.CreateDbContextAsync();
-        var template = await context
-            .Chores
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == request.ChoreId && !c.FelineId.HasValue);
-        if (template is null) return Result.Fail(new NotFoundError());
-
-        var entry = context.Chores.Add(new()
-        {
-            Description = template.Description,
-            DueDate = GetNextDueDate(template.DueDate, template.Cron)?.UtcDateTime,
-            FelineId = request.FelineId,
-            Name = template.Name,
-            Cron = template.Cron,
-            Repeats = template.Repeats
-        });
-        await context.SaveChangesAsync();
-
-        return Result.Ok(entry.Entity.Id);
+        return Result.Ok(new IdOnlyDto(0));
     }
 
     /// <summary>
@@ -127,7 +81,6 @@ public sealed class ChoreRepository(
         var chore = await db.Chores.FindAsync(choreId);
         if (chore is null) return Result.Fail(new NotFoundError());
         if (chore.FelineId is null) return Result.Fail("Task is not assigned to a feline.");
-        if (chore.Repeats == 0) return Result.Fail("Task has already been completed.");
 
         // Create a journal entry for the chore.
         db.Comments.Add(new()
@@ -137,17 +90,7 @@ public sealed class ChoreRepository(
             TimeStamp = DateTimeOffset.UtcNow
         });
 
-        if (chore.Repeats == 1)
-        {
-            db.Chores.Remove(chore);
-        }
-        else
-        {
-            chore.Repeats -= 1;
-            chore.DueDate = GetNextDueDate(chore.DueDate, chore.Cron)?.UtcDateTime;
-            db.Chores.Update(chore);
-        }
-
+        db.Chores.Remove(chore);
         await db.SaveChangesAsync();
         return Result.Ok();
     }
@@ -164,12 +107,10 @@ public sealed class ChoreRepository(
         var existing = await db.Chores.FindAsync(choreId);
         if (existing is null) return Result.Fail(new NotFoundError());
 
-        existing.Cron = model.Cron;
         existing.Description = model.Description;
         existing.DueDate = model.DueDate?.UtcDateTime;
         existing.Name = model.Name;
-        // existing.FelineId = model.FelineId;
-        existing.Repeats = model.Repeats;
+        existing.FelineId = model.FelineId;
 
         await db.SaveChangesAsync();
         return Result.Ok(new IdOnlyDto(existing.Id));
