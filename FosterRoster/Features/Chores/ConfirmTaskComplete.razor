@@ -1,0 +1,29 @@
+﻿<RadzenStack>
+        <EditForm Model="Model" OnValidSubmit="Confirm">
+            <FluentValidationValidator/>
+            <RadzenStack>
+                <AppFormRow>
+                    <AppFormColumn SizeSM="12">
+                        <AppDateTime @bind-Value="Model.LogDate" Text="Date / Time Completed">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppDateTime>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn SizeSM="12">
+                        <AppTextArea @bind-Value="@Model.LogText" Text="Journal Entry" Rows="3">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextArea>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormFooter>
+                    <RadzenButton ButtonStyle="ButtonStyle.Base" Click="@Cancel" Variant="Variant.Text">Cancel</RadzenButton>
+                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Variant="Variant.Text">Complete</RadzenButton>
+                </AppFormFooter>
+            </RadzenStack>
+        </EditForm>
+</RadzenStack>

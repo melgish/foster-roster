@@ -44,6 +44,7 @@ public static class Queries
     public static IQueryable<ChoreGridDto> SelectToGridDto(this IQueryable<Chore> query)
         => query.Select(e => new ChoreGridDto
         {
+            Description = e.Description ?? string.Empty,
             DueDate = e.DueDate,
             FelineName = e.Feline == null ? "Template" : e.Feline.Name,
             Id = e.Id,

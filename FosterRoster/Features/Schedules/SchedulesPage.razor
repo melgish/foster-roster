@@ -36,10 +36,6 @@
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>
-                    <div style="margin-right: auto">
-                        <small style="@("color: var(--rz-input-placeholder-color)")">Description:</small>
-                        <CronDescription Cron="@_model.Cron"/>
-                    </div>
                     <AppBusyCircle IsBusy="_isSaving"/>
                     @if (_model.Id != 0)
                     {
