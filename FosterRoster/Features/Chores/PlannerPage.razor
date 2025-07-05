@@ -94,20 +94,13 @@
         }
     }
     
-    private async Task LogChoreCompletedAsync(ChoreGridDto row)
+    /// <summary>
+    ///     Log an existing task as completed.
+    /// </summary>
+    /// <param name="choreGridDto">Grid row to complete.</param>
+    private async Task LogChoreCompletedAsync(ChoreGridDto choreGridDto)
     {
-        var logEntry = await DialogService.ConfirmTaskCompleteAsync(new()
-        {
-            LogDate = TimeProvider.GetLocalNow(),
-            LogText = row.Description
-        });
-        if (logEntry is null)
-        {
-            return;
-        }
-        
-        var rs = await ChoreRepository.LogChoreCompletedAsync(row.Id, logEntry);
-        if (NotificationService.NotifyResult(rs, "Task", "log", "logged"))
+        if (await ConfirmTaskComplete.ConfirmAndCompleteAsync(choreGridDto, ChoreRepository, DialogService, NotificationService, TimeProvider))
         {
             await _grid!.Reload();
         }

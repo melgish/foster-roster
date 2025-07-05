@@ -6,10 +6,11 @@
 @using FosterRoster.Features.Felines
 
 @inject ChoreRepository ChoreRepository;
-@inject FelineRepository FelineRepository;
 @inject DialogService DialogService
+@inject FelineRepository FelineRepository;
 @inject NavigationManager NavigationManager;
 @inject NotificationService NotificationService;
+@inject TimeProvider TimeProvider;
 
 <PageTitle>Tasks</PageTitle>
 <RadzenStack>
@@ -32,7 +33,7 @@
                             <FelineSelect
                                 @bind-Value="_model.FelineId"
                                 Placeholder="Choose"
-                                Text="Assiged to Feline">
+                                Text="Assigned to Feline">
                                 <Helper>
                                     <AppRequired/>
                                 </Helper>
@@ -44,7 +45,7 @@
                                 @bind-Value="_model.FelineIds"
                                 Disabled="_isSaving"
                                 Placeholder="Choose"
-                                Text="Assigned to Feline(s)" />
+                                Text="Assigned to Feline(s)"/>
                         }
                     </AppFormColumn>
                 </AppFormRow>
@@ -105,6 +106,8 @@
                     <Template Context="data">
                         <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
                                        Text="Edit"/>
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => LogChoreCompletedAsync(data))"
+                                       Text="Log"/>
                     </Template>
                 </RadzenDataGridColumn>
                 <RadzenDataGridColumn
@@ -151,6 +154,34 @@
     {
         _model = new();
         await EditAsync(0);
+    }
+
+    private async Task<bool> ConfirmMultiCreateAsync()
+    {
+        if (_model.Id != 0 || _model.FelineIds.Count <= 1)
+        {
+            return true;
+        }
+
+        // Convert ID's to names.
+        await using var query = await FelineRepository.CreateQueryAsync();
+        var names = await query
+                .Where(e => _model.FelineIds.Contains(e.Id))
+                .Select(e => e.Name)
+                .Order()
+                .ToListAsync()
+            switch
+            {
+                { Count: > 2 } n => string.Join(", ", n[..^1]) + ", and " + n[^1],
+                { } n => string.Join(" and ", n),
+                _ => string.Empty
+            };
+
+        return (bool)await DialogService.OpenAsync<ConfirmMultiTaskCreate>("Confirm Create", new()
+        {
+            ["Count"] = _model.FelineIds.Count,
+            ["Names"] = names
+        });
     }
 
     /// <summary>
@@ -217,6 +248,19 @@
     }
 
     /// <summary>
+    ///     Log an existing task as completed.
+    /// </summary>
+    /// <param name="choreGridDto">Grid row to complete.</param>
+    private async Task LogChoreCompletedAsync(ChoreGridDto choreGridDto)
+    {
+        if (await ConfirmTaskComplete.ConfirmAndCompleteAsync(choreGridDto, ChoreRepository, DialogService, NotificationService, TimeProvider))
+        {
+            await _grid!.Reload();
+            await EditAsync(0);
+        }
+    }
+
+    /// <summary>
     ///     Invoked when the component is initialized.
     /// </summary>
     protected override async Task OnParametersSetAsync()
@@ -248,34 +292,6 @@
         }
     }
 
-    private async Task<bool> ConfirmMultiCreateAsync()
-    {
-        if (_model.Id != 0 || _model.FelineIds.Count <= 1)
-        {
-            return true;
-        }
-        
-        // Convert Id's to names.
-        await using var query = await FelineRepository.CreateQueryAsync();
-        var names = await query
-                .Where(e => _model.FelineIds.Contains(e.Id))
-                .Select(e => e.Name)
-                .Order()
-                .ToListAsync()
-            switch
-            {
-                { Count: > 2 } n => string.Join(", ", n[..^1]) + ", and " + n[^1], 
-                { } n => string.Join(" and ", n),
-                _ => string.Empty
-            };
-
-        return (bool)(await DialogService.OpenAsync<ConfirmMultiTaskCreate>("Confirm Create", new()
-        {
-            ["Count"] = _model.FelineIds.Count,
-            ["Names"] = names,
-        }));
-    }
-
     /// <summary>
     ///     Save the source to the database.
     /// </summary>
@@ -286,7 +302,7 @@
         {
             return;
         }
-        
+
         var rs = _model.Id == 0
             ? await ChoreRepository.AddAsync(_model)
             : await ChoreRepository.UpdateAsync(_model.Id, _model);
@@ -296,4 +312,5 @@
             await EditAsync(_model.Id);
         }
     }
+
 }

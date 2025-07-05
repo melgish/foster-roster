@@ -90,21 +90,10 @@
     /// <summary>
     ///     Marks individual chores as completed.
     /// </summary>
-    /// <param name="row"></param>
-    private async Task LogChoreCompletedAsync(ChoreGridDto row)
+    /// <param name="choreGridDto">Grid row to log completed.</param>
+    private async Task LogChoreCompletedAsync(ChoreGridDto choreGridDto)
     {
-        var logEntry = await DialogService.ConfirmTaskCompleteAsync(new()
-        {
-            LogDate = TimeProvider.GetLocalNow(),
-            LogText = row.Description
-        });
-        if (logEntry is null)
-        {
-            return;
-        }
-
-        var rs = await ChoreRepository.LogChoreCompletedAsync(row.Id, logEntry);
-        if (NotificationService.NotifyResult(rs, "Task", "log", "logged"))
+        if (await ConfirmTaskComplete.ConfirmAndCompleteAsync(choreGridDto, ChoreRepository, DialogService, NotificationService, TimeProvider))
         {
             await OnChoreLogged.InvokeAsync();
             await _grid!.Reload();

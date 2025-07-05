@@ -3,11 +3,11 @@
 [UsedImplicitly]
 public sealed class ChoreCompletionFormDtoValidator : AbstractValidator<ChoreCompletionFormDto>
 {
-    public ChoreCompletionFormDtoValidator()
+    public ChoreCompletionFormDtoValidator(TimeProvider timeProvider)
     {
         RuleFor(e => e.LogDate)
             .NotNull()
-            .LessThanOrEqualTo(DateTime.UtcNow)
+            .LessThanOrEqualTo(v => timeProvider.GetUtcNow())
             .WithMessage("Date must not be in the future.");
         
         RuleFor(e => e.LogText)
