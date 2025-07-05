@@ -6,4 +6,5 @@ public sealed class ChoreGridDto
     public string? FelineName { get; init; } = string.Empty;
     public required int Id { get; init; }
     public required string Name { get; init; }
+    public required string Description { get; init; }
 }
