@@ -14,7 +14,6 @@
 
     <ItemGroup>
         <PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />
-        <PackageReference Include="CronExpressionDescriptor" Version="2.41.0" />
         <PackageReference Include="FluentResults" Version="3.16.0" />
         <PackageReference Include="FluentValidation" Version="11.11.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
@@ -28,7 +27,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.4" />
-        <PackageReference Include="NCrontab" Version="3.3.3" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
         <PackageReference Include="Radzen.Blazor" Version="6.6.4" />
         <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />

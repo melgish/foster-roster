@@ -1,7 +1,6 @@
 ﻿namespace FosterRoster.Features.Chores;
 
 using Data;
-using NCrontab;
 
 public sealed class ChoreRepository(
     IDbContextFactory<FosterRosterDbContext> factory
@@ -68,32 +67,6 @@ public sealed class ChoreRepository(
             .SelectToFormDto()
             .FirstOrDefaultAsync();
         return dto is null ? Result.Fail(new NotFoundError()) : Result.Ok(dto);
-    }
-
-    /// <summary>
-    ///     Creates journal entry that chore has been completed.
-    /// </summary>
-    /// <param name="choreId">ID of chore to complete.</param>
-    /// <param name="logDate">Date and time the chore was completed.</param>
-    /// <returns>Result of operation.</returns>
-    public async Task<Result> LogChoreCompletedAsync(int choreId, DateTimeOffset logDate)
-    {
-        await using var db = await factory.CreateDbContextAsync();
-        var chore = await db.Chores.FindAsync(choreId);
-        if (chore is null) return Result.Fail(new NotFoundError());
-        if (chore.FelineId is null) return Result.Fail("Task is not assigned to a feline.");
-
-        // Create a journal entry for the chore.
-        db.Comments.Add(new()
-        {
-            FelineId = chore.FelineId.GetValueOrDefault(),
-            Text = string.IsNullOrWhiteSpace(chore.Description) ? chore.Name : chore.Description,
-            TimeStamp = logDate.UtcDateTime
-        });
-
-        db.Chores.Remove(chore);
-        await db.SaveChangesAsync();
-        return Result.Ok();
     }
 
     public async Task<Result> LogChoreCompletedAsync(int choreId, ChoreCompletionFormDto dto)
