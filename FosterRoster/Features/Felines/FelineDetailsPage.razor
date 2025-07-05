@@ -4,6 +4,7 @@
 
 @using FosterRoster.Features.Comments
 @using FosterRoster.Features.Chores
+@using FosterRoster.Features.Weights
 
 @inject CommentRepository CommentRepository
 @inject DialogService DialogService
@@ -51,6 +52,9 @@ else
                             </RadzenTabsItem>
                             <RadzenTabsItem Icon="task_alt" Text="Tasks">
                                 <ChoresTab FelineId="@FelineId" OnChoreLogged="RefreshAsync"/>
+                            </RadzenTabsItem>
+                            <RadzenTabsItem Icon="scale" Text="Weights">
+                                <WeightsTab FelineId="@FelineId" />
                             </RadzenTabsItem>
                         </Tabs>
                     </RadzenTabs>
