@@ -4,6 +4,7 @@
 @inject NotificationService NotificationService
 @inject ChoreRepository ChoreRepository
 @inject TimeProvider TimeProvider
+@inject DialogService DialogService
 
 <PageTitle>Planner</PageTitle>
 <RadzenStack>
@@ -95,7 +96,17 @@
     
     private async Task LogChoreCompletedAsync(ChoreGridDto row)
     {
-        var rs = await ChoreRepository.LogChoreCompletedAsync(row.Id);
+        var logEntry = await DialogService.ConfirmTaskCompleteAsync(new()
+        {
+            LogDate = TimeProvider.GetLocalNow(),
+            LogText = row.Description
+        });
+        if (logEntry is null)
+        {
+            return;
+        }
+        
+        var rs = await ChoreRepository.LogChoreCompletedAsync(row.Id, logEntry);
         if (NotificationService.NotifyResult(rs, "Task", "log", "logged"))
         {
             await _grid!.Reload();

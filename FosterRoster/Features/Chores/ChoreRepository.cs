@@ -73,9 +73,10 @@ public sealed class ChoreRepository(
     /// <summary>
     ///     Creates journal entry that chore has been completed.
     /// </summary>
-    /// <param name="choreId"></param>
-    /// <returns>Result of operation</returns>
-    public async Task<Result> LogChoreCompletedAsync(int choreId)
+    /// <param name="choreId">ID of chore to complete.</param>
+    /// <param name="logDate">Date and time the chore was completed.</param>
+    /// <returns>Result of operation.</returns>
+    public async Task<Result> LogChoreCompletedAsync(int choreId, DateTimeOffset logDate)
     {
         await using var db = await factory.CreateDbContextAsync();
         var chore = await db.Chores.FindAsync(choreId);
@@ -87,9 +88,28 @@ public sealed class ChoreRepository(
         {
             FelineId = chore.FelineId.GetValueOrDefault(),
             Text = string.IsNullOrWhiteSpace(chore.Description) ? chore.Name : chore.Description,
-            TimeStamp = DateTimeOffset.UtcNow
+            TimeStamp = logDate.UtcDateTime
         });
 
+        db.Chores.Remove(chore);
+        await db.SaveChangesAsync();
+        return Result.Ok();
+    }
+
+    public async Task<Result> LogChoreCompletedAsync(int choreId, ChoreCompletionFormDto dto)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var chore = await db.Chores.FindAsync(choreId);
+        if (chore is null) return Result.Fail(new NotFoundError());
+        if (chore.FelineId is null) return Result.Fail("Task is not assigned to a feline.");
+
+        db.Comments.Add(new()
+        {
+            FelineId = chore.FelineId.GetValueOrDefault(),
+            Text = string.IsNullOrEmpty(dto.LogText) ? chore.Name : dto.LogText,
+            TimeStamp = dto.LogDate!.Value.UtcDateTime,
+        });
+        
         db.Chores.Remove(chore);
         await db.SaveChangesAsync();
         return Result.Ok();
