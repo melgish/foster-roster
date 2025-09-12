@@ -148,6 +148,7 @@ public sealed class FelineRepository(
         existing.Color = model.Color;
         existing.FostererId = model.FostererId;
         existing.Gender = model.Gender;
+        existing.IntakeDate = model.IntakeDate ?? existing.IntakeDate;
         existing.IntakeAgeInWeeks = model.IntakeAgeInWeeks;
 
         existing.Name = model.Name;

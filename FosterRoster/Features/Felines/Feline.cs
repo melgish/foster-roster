@@ -21,7 +21,7 @@ public sealed class Feline : IIdBearer
     public int Id { get; init; }
     public DateTimeOffset? InactivatedAtUtc { get; init; }
     public int? IntakeAgeInWeeks { get; set; }
-    public DateOnly IntakeDate { get; init; }
+    public DateOnly IntakeDate { get; set; }
     public bool IsInactive { get; init; }
     public string Name { get; set; } = string.Empty;
     public DateOnly? RegistrationDate { get; set; }
