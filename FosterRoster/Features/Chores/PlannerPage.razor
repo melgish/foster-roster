@@ -5,6 +5,7 @@
 @inject ChoreRepository ChoreRepository
 @inject TimeProvider TimeProvider
 @inject DialogService DialogService
+@inject ILogger<PlannerPage> Logger
 
 <PageTitle>Planner</PageTitle>
 <RadzenStack>
@@ -43,7 +44,9 @@
                 MinWidth="12ch"
                 Property="@nameof(ChoreGridDto.DueDate)"
                 FilterOperator="FilterOperator.LessThanOrEquals"
-                FilterValue="TimeProvider.GetUtcNow().AddDays(2).Date"
+                FilterOperators="@([FilterOperator.LessThanOrEquals, FilterOperator.GreaterThanOrEquals, FilterOperator.IsNull, FilterOperator.IsNotNull])"
+                FilterValue="TimeProvider.GetLocalNow().AddDays(2)"
+                FormatString="MM/dd h:mm tt"
                 SortOrder="SortOrder.Ascending"
                 Title="Due Date">
                 <Template Context="row">
@@ -80,12 +83,12 @@
         {
             await using var query = await ChoreRepository.CreateQueryAsync();
             (_data, _count) = await query
-                // .DueBefore(TimeProvider.GetUtcNow().AddDays(2))
                 .SelectToGridDto()
                 .ToGridResultsAsync(args, "DueDate asc");
         }
         catch (Exception ex)
         {
+            Logger.LogError(ex, "Failed to load chores for planner page.");
             NotificationService.NotifyFailedToLoad(ex);
         }
         finally
