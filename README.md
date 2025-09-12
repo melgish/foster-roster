@@ -31,7 +31,7 @@ dotnet list package --outdated
 
 ### backup database in dev container
 ```sh
-docker compose exec -u 0 db pg_dump -h localhost -p 5432 -U myuser -F c -b -v -f /roster.dump mydb
+docker compose exec -u 0 db pg_dump -h localhost -p 5432 -U roster -F c -b -v -f /roster.dump mydb
 docker compose cp db:/roster.dump ./
 docker compose exec -u 0 db rm /roster.dump
 ```
@@ -39,6 +39,6 @@ docker compose exec -u 0 db rm /roster.dump
 ### restore database in dev container
 ```sh
 docker compose cp ./roster.dump db:/roster.dump
-docker compose exec -u 0 db pg_restore -h localhost -p 5432 -U myuser -d mydb -v /roster.dump
+docker compose exec -u 0 db pg_restore -h localhost -p 5432 -U roster -d roster -v /roster.dump
 docker compose exec -u 0 db rm /roster.dump
 ```
