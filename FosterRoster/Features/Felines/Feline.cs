@@ -24,9 +24,10 @@ public sealed class Feline : IIdBearer
     public DateOnly IntakeDate { get; set; }
     public bool IsInactive { get; init; }
     public string Name { get; set; } = string.Empty;
-    public DateOnly? RegistrationDate { get; set; }
+    public DateOnly? RegistrationDate { get; init; }
     public Source? Source { get; init; }
     public int? SourceId { get; set; }
+    public DateOnly? SterilizationDate { get; set; }
     public Thumbnail? Thumbnail { get; set; }
     public Weaned Weaned { get; set; }
     public ICollection<Weight> Weights { get; init; } = [];
