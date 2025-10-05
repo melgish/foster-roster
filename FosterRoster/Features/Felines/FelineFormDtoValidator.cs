@@ -30,10 +30,10 @@ public sealed class FelineFormDtoValidator : AbstractValidator<FelineFormDto>
             .NotEmpty()
             .MaximumLength(64);
 
-        RuleFor(feline => feline.RegistrationDate)
+        RuleFor(feline => feline.SterilizationDate)
             .LessThanOrEqualTo(p => GetDateOnlyNow())
-            .WithMessage("Registration date must be in the past.");
-
+            .WithMessage("Spay / Neuter date must be in the past.");
+        
         RuleFor(feline => feline.Weaned).IsInEnum();
     }
 

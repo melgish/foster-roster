@@ -65,9 +65,9 @@ else
                     <CategorySelect @bind-Value="_model.Category" Disabled="IsDisabled"/>
                 </AppFormColumn>
                 <AppFormColumn>
-                    <AppDateOnly @bind-Value="_model.RegistrationDate"
+                    <AppDateOnly @bind-Value="_model.SterilizationDate"
                                  Disabled="IsDisabled"
-                                 Text="Registration Date"/>
+                                 Text="Spay / Neuter Date"/>
                 </AppFormColumn>
             </AppFormRow>
             <AppFormRow>
@@ -227,7 +227,7 @@ else
             InactivatedAtUtc = Feline.InactivatedAtUtc,
             IntakeDate = Feline.IntakeDate,
             Name = Feline.Name,
-            RegistrationDate = Feline.RegistrationDate,
+            SterilizationDate = Feline.SterilizationDate,
             SourceId = Feline.SourceId,
             Thumbnail = Feline.Thumbnail,
             Weaned = Feline.Weaned

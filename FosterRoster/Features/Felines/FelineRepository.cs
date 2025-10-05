@@ -46,8 +46,8 @@ public sealed class FelineRepository(
             IntakeAgeInWeeks = model.IntakeAgeInWeeks,
             IntakeDate = model.IntakeDate.GetValueOrDefault(),
             Name = model.Name,
-            RegistrationDate = model.RegistrationDate,
             SourceId = model.SourceId,
+            SterilizationDate = model.SterilizationDate,
             Weaned = model.Weaned,
 
             Thumbnail = model.Thumbnail
@@ -152,8 +152,8 @@ public sealed class FelineRepository(
         existing.IntakeAgeInWeeks = model.IntakeAgeInWeeks;
 
         existing.Name = model.Name;
-        existing.RegistrationDate = model.RegistrationDate;
         existing.SourceId = model.SourceId;
+        existing.SterilizationDate = model.SterilizationDate;
         if (existing.Thumbnail is not null && model.Thumbnail is null)
         {
             db.Remove(existing.Thumbnail);

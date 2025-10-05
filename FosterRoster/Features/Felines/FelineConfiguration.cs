@@ -83,6 +83,11 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .OnDelete(DeleteBehavior.SetNull);
 
         builder
+            .Property(e => e.SterilizationDate)
+            .HasColumnType("date")
+            .IsRequired(false);
+
+        builder
             .HasOne(e => e.Thumbnail)
             .WithOne()
             .HasForeignKey<Thumbnail>(e => e.FelineId)

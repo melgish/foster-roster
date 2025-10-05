@@ -43,8 +43,8 @@ public static class Queries
             InactivatedAtUtc = entity.InactivatedAtUtc,
             IntakeDate = entity.IntakeDate,
             Name = entity.Name,
-            RegistrationDate = entity.RegistrationDate,
             SourceId = entity.SourceId ?? 0,
+            SterilizationDate = entity.SterilizationDate,
             Thumbnail = entity.Thumbnail == null
                 ? null
                 : new()

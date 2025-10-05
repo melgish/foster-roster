@@ -11,12 +11,12 @@ dotnet watch --project FosterRoster
 
 ### create database migration
 ```sh
-dotnet ef migrations add {Migration Name} --project FosterRoster.Data
+dotnet ef migrations add {Migration Name} --project FosterRoster
 ```
 
 ### update dev database
 ```sh
-dotnet ef database update --project FosterRoster.Data
+dotnet ef database update --project FosterRoster
 ```
 
 ### publish to docker

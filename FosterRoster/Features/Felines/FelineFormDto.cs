@@ -18,7 +18,7 @@ public sealed class FelineFormDto : IIdBearer
     public DateTimeOffset? InactivatedAtUtc { get; init; }
     public DateOnly? IntakeDate { get; set; }
     public string Name { get; set; } = string.Empty;
-    public DateOnly? RegistrationDate { get; set; }
+    public DateOnly? SterilizationDate { get; set; }
     public int SourceId { get; set; }
     public Thumbnail? Thumbnail { get; set; }
     public Weaned Weaned { get; set; }
