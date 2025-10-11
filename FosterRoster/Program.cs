@@ -2,15 +2,6 @@
 
 using FosterRoster.Data;
 using FosterRoster.Features.Account;
-using FosterRoster.Features.Chores;
-using FosterRoster.Features.Comments;
-using FosterRoster.Features.Felines;
-using FosterRoster.Features.Fosterers;
-using FosterRoster.Features.Schedules;
-using FosterRoster.Features.Sources;
-using FosterRoster.Features.Thumbnails;
-using FosterRoster.Features.Users;
-using FosterRoster.Features.Vaccinations;
 using FosterRoster.Features.Weights;
 using FosterRoster.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -73,17 +64,7 @@ builder
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 builder.Services.AddSingleton<TimeProvider, TexasTimeProvider>();
 builder.Services.AddValidatorsFromAssemblyContaining<IAppAssemblyMarker>();
-
-builder.Services.AddScoped<ChoreRepository>();
-builder.Services.AddScoped<CommentRepository>();
-builder.Services.AddScoped<FelineRepository>();
-builder.Services.AddScoped<FostererRepository>();
-builder.Services.AddScoped<ScheduleRepository>();
-builder.Services.AddScoped<SourceRepository>();
-builder.Services.AddScoped<ThumbnailRepository>();
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<VaccinationRepository>();
-builder.Services.AddScoped<WeightRepository>();
+builder.Services.AddRepositoriesFromAssemblyContaining<IAppAssemblyMarker>();
 
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenCookieThemeService(options =>

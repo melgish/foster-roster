@@ -4,7 +4,7 @@ using Data;
 
 public sealed class SourceRepository(
     IDbContextFactory<FosterRosterDbContext> dbContextFactory
-)
+): IRepository
 {
     /// <summary>
     ///     Adds a new Source to the database.

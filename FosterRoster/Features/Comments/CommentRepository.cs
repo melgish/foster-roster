@@ -3,7 +3,7 @@ namespace FosterRoster.Features.Comments;
 public sealed class CommentRepository(
     IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory,
     TimeProvider timeProvider
-)
+): IRepository
 {
     /// <summary>
     ///     Adds a new comment to the database.

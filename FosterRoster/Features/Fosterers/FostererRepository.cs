@@ -2,7 +2,7 @@ namespace FosterRoster.Features.Fosterers;
 
 public sealed class FostererRepository(
     IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
-)
+): IRepository
 {
     /// <summary>
     ///     Adds a new fosterer to the database.

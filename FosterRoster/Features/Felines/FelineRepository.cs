@@ -2,7 +2,7 @@ namespace FosterRoster.Features.Felines;
 
 public sealed class FelineRepository(
     IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
-)
+): IRepository
 {
     /// <summary>
     ///     Restores identified feline to active status.

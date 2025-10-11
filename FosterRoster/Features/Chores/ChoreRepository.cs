@@ -4,7 +4,7 @@ using Data;
 
 public sealed class ChoreRepository(
     IDbContextFactory<FosterRosterDbContext> factory
-)
+): IRepository
 {
     /// <summary>
     ///     Adds a new chore to the database.
@@ -82,7 +82,7 @@ public sealed class ChoreRepository(
             Text = string.IsNullOrEmpty(dto.LogText) ? chore.Name : dto.LogText,
             TimeStamp = dto.LogDate!.Value.UtcDateTime,
         });
-        
+
         db.Chores.Remove(chore);
         await db.SaveChangesAsync();
         return Result.Ok();

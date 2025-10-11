@@ -3,7 +3,7 @@
 using Account;
 using Microsoft.AspNetCore.Identity;
 
-public sealed class UserRepository(IServiceScopeFactory scopeFactory)
+public sealed class UserRepository(IServiceScopeFactory scopeFactory): IRepository
 {
     /// <summary>
     ///     Maps an IdentityResult to a FluentResults Result.

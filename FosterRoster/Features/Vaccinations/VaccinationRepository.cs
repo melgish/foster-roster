@@ -3,7 +3,7 @@ namespace FosterRoster.Features.Vaccinations;
 using Data;
 public class VaccinationRepository(
     IDbContextFactory<FosterRosterDbContext> dbContextFactory
-)
+) : IRepository
 {
     public async Task<Result<IdOnlyDto>> AddAsync(VaccinationFormDto dto)
     {

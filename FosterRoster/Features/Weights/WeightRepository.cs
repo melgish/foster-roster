@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 public sealed class WeightRepository(
     IDbContextFactory<Data.FosterRosterDbContext> contextFactory
-)
+) : IRepository
 {
     private static readonly Expression<Func<Weight, Weight>> WeightProjection =
         w => new()
