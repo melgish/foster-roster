@@ -63,7 +63,7 @@ public sealed class FelineFormDtoValidator : AbstractValidator<FelineFormDto>
         RuleFor(feline => feline.SterilizationDate)
             .LessThanOrEqualTo(p => timeProvider.GetDateOnlyNow())
             .WithMessage("Spay / Neuter date must be in the past.");
-        
+
         RuleFor(feline => feline.Weaned).IsInEnum();
     }
 }

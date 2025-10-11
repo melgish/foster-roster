@@ -3,7 +3,7 @@ namespace FosterRoster.Features.Comments;
 public sealed class CommentRepository(
     IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory,
     TimeProvider timeProvider
-)
+) : IRepository
 {
     /// <summary>
     ///     Adds a new comment to the database.
@@ -47,11 +47,11 @@ public sealed class CommentRepository(
                 .Comments
                 .Where(e => e.Id == commentId)
                 .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NotFoundError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
 
     /// <summary>

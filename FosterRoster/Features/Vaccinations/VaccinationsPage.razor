@@ -3,6 +3,7 @@
 
 @rendermode @(new InteractiveServerRenderMode(false))
 
+@using FosterRoster.Features.Chores
 @using FosterRoster.Features.Felines
 @inject DialogService DialogService
 @inject TimeProvider TimeProvider;
@@ -21,14 +22,31 @@
                 <AppFormHeader Text="@_name"/>
                 <AppFormRow>
                     <AppFormColumn>
-                        <FelineSelect
-                            @bind-Value="_model.FelineId"
-                            Placeholder="Choose"
-                            Text="Assigned to Feline">
-                            <Helper>
-                                <AppRequired/>
-                            </Helper>
-                        </FelineSelect>
+                        @if (_model.Id != 0)
+                        {
+                            <FelineSelect
+                                @bind-Value="_model.FelineId"
+                                Disabled="_isSaving"
+                                Placeholder="Choose"
+                                Text="Feline">
+                                <Helper>
+                                    <AppRequired/>
+                                </Helper>
+                            </FelineSelect>
+                        }
+                        else
+                        {
+                            <MultiFelineSelect
+                                @bind-Value="_model.FelineIds"
+                                Disabled="_isSaving"
+                                Placeholder="Choose"
+                                Text="Feline(s)"
+                            >
+                                <Helper>
+                                    <AppRequired/>
+                                </Helper>
+                            </MultiFelineSelect>
+                        }
                     </AppFormColumn>
                     <AppFormColumn>
                         <AppDateOnly @bind-Value="_model.VaccinationDate" Text="Vaccination Date">
@@ -78,6 +96,7 @@
                             </Helper>
                         </AppTextBox>
                     </AppFormColumn>
+                    
                 </AppFormRow>
                 <AppFormRow>
                     <AppFormColumn SizeSM="12">
@@ -133,6 +152,7 @@
             <RadzenDataGridColumn
                 Filterable="false"
                 Property="@nameof(VaccinationGridDto.VaccinationDate)"
+                SortOrder="SortOrder.Descending"
                 Title="Vaccination Date"
                 Width="18ch"/>
             <RadzenDataGridColumn Property="@nameof(VaccinationGridDto.VaccineName)" Title="Vaccine"/>
@@ -257,16 +277,23 @@
     /// <param name="editContext">Form context</param>
     private async Task SaveAsync(EditContext editContext)
     {
-        var rs = _model.Id == 0
-            ? await VaccinationRepository.AddAsync(_model)
-            : await VaccinationRepository.UpdateAsync(_model.Id, _model);
-        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
+        _isSaving = true;
+        try
         {
-            await _grid!.Reload();
-            // If editing an existing vaccination, continue editing.
-            // If creating a new vaccination, start a new one.
-            await EditAsync(_model.Id);
+            var rs = _model.Id == 0
+                ? await VaccinationRepository.AddAsync(_model)
+                : await VaccinationRepository.UpdateAsync(_model.Id, _model);
+            if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
+            {
+                await _grid!.Reload();
+                // If editing an existing vaccination, continue editing.
+                // If creating a new vaccination, start a new one.
+                await EditAsync(_model.Id);
+            }
+        }
+        finally
+        {
+            _isSaving = false;
         }
     }
-
 }

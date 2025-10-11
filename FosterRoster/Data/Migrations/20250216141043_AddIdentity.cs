@@ -1,6 +1,6 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using System;
 
 #nullable disable
 
@@ -195,10 +195,10 @@ namespace FosterRoster.Data.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
-            
+
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
-                columns: [ "Id", "Name", "NormalizedName", "ConcurrencyStamp" ],
+                columns: ["Id", "Name", "NormalizedName", "ConcurrencyStamp"],
                 values: new object[,]
                 {
                     { 1, "Admin", "ADMIN", "00000000-0000-0000-0000-000000000000" },

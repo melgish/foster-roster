@@ -3,34 +3,35 @@ namespace FosterRoster.Features.Vaccinations;
 using Data;
 public class VaccinationRepository(
     IDbContextFactory<FosterRosterDbContext> dbContextFactory
-)
+) : IRepository
 {
     public async Task<Result<IdOnlyDto>> AddAsync(VaccinationFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
-        var entry = db.Vaccinations.Add(new Vaccination()
-        {
-            AdministeredBy = dto.AdministeredBy.Trim(),
-            Comments = dto.Comments?.TrimToNull(),
-            ExpirationDate = dto.ExpirationDate!.Value,
-            FelineId = dto.FelineId,
-            ManufacturerName = dto.ManufacturerName.Trim(),
-            SerialNumber = dto.SerialNumber.Trim(),
-            VaccinationDate = dto.VaccinationDate!.Value,
-            VaccineName = dto.VaccineName.Trim()
-        });
+        db.Vaccinations.AddRange(
+            dto.FelineIds.Select(felineId => new Vaccination()
+            {
+                AdministeredBy = dto.AdministeredBy.Trim(),
+                Comments = dto.Comments?.TrimToNull(),
+                ExpirationDate = dto.ExpirationDate!.Value,
+                FelineId = felineId,
+                ManufacturerName = dto.ManufacturerName.Trim(),
+                SerialNumber = dto.SerialNumber.Trim(),
+                VaccinationDate = dto.VaccinationDate!.Value,
+                VaccineName = dto.VaccineName.Trim()
+            }));
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
+        return Result.Ok(new IdOnlyDto(0));
     }
-    
+
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Vaccination table.
     /// </summary>
     /// <returns></returns>
     public Task<Query<Vaccination>> CreateQueryAsync()
         => dbContextFactory.CreateQueryAsync(db => db.Vaccinations.AsNoTracking());
-    
-    
+
+
     /// <summary>
     ///     Deletes an existing Vaccination from the database by its ID.
     /// </summary>
@@ -43,14 +44,14 @@ public class VaccinationRepository(
                 .Vaccinations
                 .Where(e => e.Id == vaccinationId)
                 .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NotFoundError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
-    
-    
+
+
     /// <summary>
     ///     Gets an existing Vaccinations from the database by its ID.
     /// </summary>
@@ -79,7 +80,7 @@ public class VaccinationRepository(
         var existing = await db.Vaccinations.FindAsync(vaccinationId);
         if (existing is null)
             return Result.Fail(new NotFoundError());
-        
+
         existing.AdministeredBy = model.AdministeredBy.Trim();
         existing.Comments = model.Comments?.TrimToNull();
         existing.ExpirationDate = model.ExpirationDate!.Value;
@@ -88,7 +89,7 @@ public class VaccinationRepository(
         existing.SerialNumber = model.SerialNumber.Trim();
         existing.VaccinationDate = model.VaccinationDate!.Value;
         existing.VaccineName = model.VaccineName.Trim();
-        
+
         await db.SaveChangesAsync();
 
         return Result.Ok(new IdOnlyDto(existing.Id));

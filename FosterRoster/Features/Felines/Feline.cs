@@ -141,7 +141,7 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .HasConstraintName("FK_Vaccinations_Felines")
             .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         builder
             .Property(e => e.Weaned)
             .HasConversion<string>()

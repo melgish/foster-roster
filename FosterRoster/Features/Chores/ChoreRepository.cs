@@ -4,7 +4,7 @@ using Data;
 
 public sealed class ChoreRepository(
     IDbContextFactory<FosterRosterDbContext> factory
-)
+) : IRepository
 {
     /// <summary>
     ///     Adds a new chore to the database.
@@ -14,7 +14,7 @@ public sealed class ChoreRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(ChoreFormDto model)
     {
         await using var db = await factory.CreateDbContextAsync();
-        await db.Chores.AddRangeAsync(model.FelineIds
+        db.Chores.AddRange(model.FelineIds
             .Select(felineId => new Chore
             {
                 Description = model.Description.TrimToNull(),
@@ -82,7 +82,7 @@ public sealed class ChoreRepository(
             Text = string.IsNullOrEmpty(dto.LogText) ? chore.Name : dto.LogText,
             TimeStamp = dto.LogDate!.Value.UtcDateTime,
         });
-        
+
         db.Chores.Remove(chore);
         await db.SaveChangesAsync();
         return Result.Ok();

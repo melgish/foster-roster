@@ -2,7 +2,7 @@ namespace FosterRoster.Features.Fosterers;
 
 public sealed class FostererRepository(
     IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
-)
+) : IRepository
 {
     /// <summary>
     ///     Adds a new fosterer to the database.
@@ -43,11 +43,11 @@ public sealed class FostererRepository(
                 .Fosterers
                 .Where(e => e.Id == fostererId)
                 .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NotFoundError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
 
     /// <summary>

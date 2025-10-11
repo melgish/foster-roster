@@ -79,7 +79,7 @@ public static class RadzenExtensions
         var data = await queryable.OrderBy(args, defaultOrderBy).Skip(args).Take(args).ToListAsync();
         return new(data, count);
     }
-    
+
     /// <summary>
     ///     Open custom delete dialog and wait for true/false response
     /// </summary>

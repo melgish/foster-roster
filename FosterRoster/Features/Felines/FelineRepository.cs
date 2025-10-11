@@ -2,7 +2,7 @@ namespace FosterRoster.Features.Felines;
 
 public sealed class FelineRepository(
     IDbContextFactory<Data.FosterRosterDbContext> dbContextFactory
-)
+) : IRepository
 {
     /// <summary>
     ///     Restores identified feline to active status.
@@ -20,11 +20,11 @@ public sealed class FelineRepository(
                     .SetProperty(f => f.IsInactive, false)
                     .SetProperty(f => f.InactivatedAtUtc, default(DateTimeOffset?))
                 ) switch
-            {
-                0 => Result.Fail(new NoChangesError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NoChangesError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
 
     /// <summary>
@@ -80,11 +80,11 @@ public sealed class FelineRepository(
                     .SetProperty(p => p.InactivatedAtUtc, dateTimeUtc.ToUniversalTime())
                     .SetProperty(p => p.IsInactive, true)
                 ) switch
-            {
-                0 => Result.Fail(new NoChangesError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NoChangesError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
 
     /// <summary>
@@ -98,11 +98,11 @@ public sealed class FelineRepository(
         return await db.Felines
                 .Where(e => e.Id == felineId)
                 .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NotFoundError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
 
     /// <summary>
@@ -121,10 +121,10 @@ public sealed class FelineRepository(
                 .Include(f => f.Thumbnail)
                 .SelectToFormDto()
                 .SingleOrDefaultAsync(f => f.Id == felineId) switch
-            {
-                null => Result.Fail(new NotFoundError()),
-                { } feline => Result.Ok(feline)
-            };
+        {
+            null => Result.Fail(new NotFoundError()),
+            { } feline => Result.Ok(feline)
+        };
     }
 
     /// <summary>

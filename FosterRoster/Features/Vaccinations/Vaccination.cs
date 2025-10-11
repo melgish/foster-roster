@@ -18,7 +18,7 @@ public sealed class Vaccination : IIdBearer
     ///     Additional comments about the vaccination.
     /// </summary>
     public string? Comments { get; set; }
-    
+
     /// <summary>
     ///     Date the vaccination expires.
     /// </summary>
@@ -28,7 +28,7 @@ public sealed class Vaccination : IIdBearer
     ///     Feline that received the vaccination.
     /// </summary>
     public Feline Feline { get; init; } = null!;
-    
+
     /// <summary>
     ///     Feline that received the vaccination.
     /// </summary>
@@ -38,17 +38,17 @@ public sealed class Vaccination : IIdBearer
     ///     Unique identifier for the vaccination.
     /// </summary>
     public int Id { get; init; }
-   
+
     /// <summary>
     ///     Name of the vaccine manufacturer.
     /// </summary>
     public string ManufacturerName { get; set; } = string.Empty;
-    
+
     /// <summary>
     ///     Serial number of the vaccine.
     /// </summary>
     public string SerialNumber { get; set; } = string.Empty;
-    
+
     /// <summary>
     ///     Date the vaccination was administered.
     /// </summary>
@@ -76,7 +76,7 @@ internal sealed class VaccinationConfiguration : IEntityTypeConfiguration<Vaccin
         builder.Property(e => e.AdministeredBy)
             .HasMaxLength(64)
             .IsRequired();
-        
+
         builder
             .Property(e => e.Comments)
             .HasMaxLength(256)
@@ -91,16 +91,16 @@ internal sealed class VaccinationConfiguration : IEntityTypeConfiguration<Vaccin
         builder
             .Property(e => e.FelineId)
             .IsRequired();
-        
+
         builder
             .Property(e => e.Id)
             .UseIdentityAlwaysColumn();
-        
+
         builder
             .Property(e => e.ManufacturerName)
             .HasMaxLength(64)
             .IsRequired();
-            
+
         builder
             .Property(e => e.SerialNumber)
             .HasMaxLength(64)
@@ -110,7 +110,7 @@ internal sealed class VaccinationConfiguration : IEntityTypeConfiguration<Vaccin
             .Property(e => e.VaccinationDate)
             .HasColumnType("date")
             .IsRequired();
-        
+
         builder
             .Property(e => e.VaccineName)
             .HasMaxLength(64)

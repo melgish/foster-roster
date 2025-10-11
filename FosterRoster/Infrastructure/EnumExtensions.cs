@@ -17,10 +17,10 @@ public static class EnumExtensions
                 .GetMember(stringValue)
                 .SelectMany(e => e.GetCustomAttributes(false).OfType<DisplayAttribute>())
                 .FirstOrDefault() switch
-            {
-                { Description: { } description } => description,
-                { Name: { } name } => name,
-                _ => stringValue
-            };
+        {
+            { Description: { } description } => description,
+            { Name: { } name } => name,
+            _ => stringValue
+        };
     }
 }

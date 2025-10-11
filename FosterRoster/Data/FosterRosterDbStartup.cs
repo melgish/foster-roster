@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 public static class FosterRosterDbStartup
 {
-    private class SetupConfig 
+    private class SetupConfig
     {
         public bool AutoMigrate { get; [UsedImplicitly] init; }
         public string? FirstUserEmail { get; [UsedImplicitly] init; }
@@ -19,7 +19,7 @@ public static class FosterRosterDbStartup
         app.Services.GetRequiredService<IConfiguration>().Bind(config);
         return config;
     }
-    
+
     private static async Task<bool> MigrateDatabaseAsync(IHost app, SetupConfig cfg)
     {
         await using var scope = app.Services.CreateAsyncScope();
@@ -36,13 +36,13 @@ public static class FosterRosterDbStartup
             // Database is up to date.
             return true;
         }
-       
+
         if (!cfg.AutoMigrate)
         {
             // Auto-migration is not enabled.
             return false;
         }
-        
+
         await db.Database.MigrateAsync();
         return true;
     }
@@ -51,12 +51,12 @@ public static class FosterRosterDbStartup
     {
         await using var scope = app.Services.CreateAsyncScope();
         var manager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        
+
         if (await manager.Users.AnyAsync())
         {
             return true;
         }
-        
+
         if (string.IsNullOrEmpty(cfg.FirstUserEmail) || string.IsNullOrEmpty(cfg.FirstUserPassword))
         {
             // No initial user data provided.
@@ -76,11 +76,11 @@ public static class FosterRosterDbStartup
             // Failed to create the user.
             return false;
         }
-        
+
         rs = await manager.AddToRoleAsync(user, "Admin");
         return rs.Succeeded;
     }
-    
+
     /// <summary>
     /// Make sure that database is up to date and has a user
     /// </summary>

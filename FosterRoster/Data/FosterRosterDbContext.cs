@@ -1,8 +1,5 @@
 ﻿namespace FosterRoster.Data;
 
-using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
 using Features.Account;
 using Features.Chores;
 using Features.Comments;
@@ -13,7 +10,10 @@ using Features.Sources;
 using Features.Thumbnails;
 using Features.Vaccinations;
 using Features.Weights;
+using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 
 public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> options)
     : IdentityDbContext<

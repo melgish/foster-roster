@@ -6,7 +6,7 @@ public sealed class ChoreCompletionFormDto
     /// Date and time when the chore was completed.
     /// </summary>
     public DateTimeOffset? LogDate { get; set; }
-    
+
     /// <summary>
     /// Journal entry for the completed chore.
     /// </summary>

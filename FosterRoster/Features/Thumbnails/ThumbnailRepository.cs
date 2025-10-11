@@ -2,7 +2,7 @@ namespace FosterRoster.Features.Thumbnails;
 
 public sealed class ThumbnailRepository(
     IDbContextFactory<Data.FosterRosterDbContext> contextFactory
-)
+) : IRepository
 {
     public sealed record ThumbnailData(byte[] ImageData, string ContentType);
 

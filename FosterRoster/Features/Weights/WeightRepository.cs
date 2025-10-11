@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 public sealed class WeightRepository(
     IDbContextFactory<Data.FosterRosterDbContext> contextFactory
-)
+) : IRepository
 {
     private static readonly Expression<Func<Weight, Weight>> WeightProjection =
         w => new()
@@ -59,10 +59,10 @@ public sealed class WeightRepository(
                 .Weights
                 .Where(e => e.FelineId == felineId && e.DateTime == dateTime)
                 .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NotFoundError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
 }

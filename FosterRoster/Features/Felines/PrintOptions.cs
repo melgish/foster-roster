@@ -25,7 +25,7 @@ public sealed class PrintOptions
     /// <summary>
     ///     Gets or sets the selected print sections.
     /// </summary>
-    public PrintSection[] SelectedPrintSections { get; set; } = [..PrintSections];
+    public PrintSection[] SelectedPrintSections { get; set; } = [.. PrintSections];
 
     /// <summary>
     ///     Gets or sets the units to display for each weight.
