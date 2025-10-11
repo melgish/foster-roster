@@ -53,7 +53,7 @@ public sealed class VaccinationFormDto : IIdBearer
     ///     Name of the vaccine administered.
     /// </summary>
     public string VaccineName { get; set; } = string.Empty;
-    
+
     /// <summary>
     ///     When creating a new vaccination, this is the list of
     ///     felines that it will be assigned to
@@ -98,7 +98,7 @@ public sealed class VaccinationFormDtoValidator : AbstractValidator<VaccinationF
                     .Must(e => e.Count == 0)
                     .WithMessage("Felines must not be selected.");
             });
-        
+
         RuleFor(model => model.ManufacturerName)
             .NotEmpty()
             .MaximumLength(64);

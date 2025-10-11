@@ -10,16 +10,16 @@ public class VaccinationRepository(
         await using var db = await dbContextFactory.CreateDbContextAsync();
         db.Vaccinations.AddRange(
             dto.FelineIds.Select(felineId => new Vaccination()
-        {
-            AdministeredBy = dto.AdministeredBy.Trim(),
-            Comments = dto.Comments?.TrimToNull(),
-            ExpirationDate = dto.ExpirationDate!.Value,
-            FelineId = felineId,
-            ManufacturerName = dto.ManufacturerName.Trim(),
-            SerialNumber = dto.SerialNumber.Trim(),
-            VaccinationDate = dto.VaccinationDate!.Value,
-            VaccineName = dto.VaccineName.Trim()
-        }));
+            {
+                AdministeredBy = dto.AdministeredBy.Trim(),
+                Comments = dto.Comments?.TrimToNull(),
+                ExpirationDate = dto.ExpirationDate!.Value,
+                FelineId = felineId,
+                ManufacturerName = dto.ManufacturerName.Trim(),
+                SerialNumber = dto.SerialNumber.Trim(),
+                VaccinationDate = dto.VaccinationDate!.Value,
+                VaccineName = dto.VaccineName.Trim()
+            }));
         await db.SaveChangesAsync();
         return Result.Ok(new IdOnlyDto(0));
     }
