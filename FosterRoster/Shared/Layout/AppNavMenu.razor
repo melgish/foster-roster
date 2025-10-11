@@ -28,13 +28,13 @@
             <RadzenMenuItem Path="/weights" Text="Weights"/>
         </Authorized>
     </AuthorizeView>
-    <AuthorizeView Roles="User">
+    <AuthorizeView Roles="Admin,User">
         <Authorized>
             <RadzenMenuItem Path="/felines" Text="Felines"/>
+            <RadzenMenuItem Path="/vaccinations" Text="Vaccinations"/>
         </Authorized>
     </AuthorizeView>
     <AuthorizeView Roles="Admin">
-        <RadzenMenuItem Path="/felines" Text="Felines"/>
         <RadzenMenuItem Text="Admin">
             <RadzenMenuItem Path="/fosterers" Text="Fosterers"/>
             <RadzenMenuItem Path="/sources" Text="Sources"/>

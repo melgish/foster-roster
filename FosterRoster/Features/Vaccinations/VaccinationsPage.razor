@@ -1,0 +1,272 @@
+@page "/vaccinations"
+@page "/vaccinations/{VaccinationId:int}"
+
+@rendermode @(new InteractiveServerRenderMode(false))
+
+@using FosterRoster.Features.Felines
+@inject DialogService DialogService
+@inject TimeProvider TimeProvider;
+@inject NavigationManager NavigationManager;
+@inject NotificationService NotificationService;
+@inject VaccinationRepository  VaccinationRepository;
+
+
+
+<PageTitle>Vaccinations</PageTitle>
+<RadzenStack>
+    <AppFormPanel>
+        <EditForm FormName="editVaccination" Model="_model" OnValidSubmit="SaveAsync">
+            <FluentValidationValidator/>
+            <RadzenStack Gap="0.5rem">
+                <AppFormHeader Text="@_name"/>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <FelineSelect
+                            @bind-Value="_model.FelineId"
+                            Placeholder="Choose"
+                            Text="Assigned to Feline">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </FelineSelect>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppDateOnly @bind-Value="_model.VaccinationDate" Text="Vaccination Date">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppDateOnly>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="@_model.VaccineName" Text="Vaccine">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="@_model.ManufacturerName" Text="Manufacturer">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="@_model.SerialNumber" Text="Serial Number">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppDateOnly @bind-Value="_model.ExpirationDate" Text="Expiration Date">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppDateOnly>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="@_model.AdministeredBy" Text="Administered By">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn SizeSM="12">
+                        <AppTextArea @bind-Value="@_model.Comments" Rows="2" Text="Comments" />
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormFooter>
+                    <AppBusyCircle IsBusy="_isSaving"/>
+                    @if (_model.Id != 0)
+                    {
+                        <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving"/>
+                    }
+                    <AppFormSaveButton Disabled="_isSaving"/>
+                    <AppFormResetButton Click="ResetAsync" Disabled="_isSaving"/>
+                </AppFormFooter>
+            </RadzenStack>
+        </EditForm>
+    </AppFormPanel>
+    <AppGridPanel>
+        <RadzenDataGrid
+            @ref="_grid"
+            TItem="VaccinationGridDto"
+            AllowFiltering="true"
+            AllowPaging="true"
+            AllowSorting="true"
+            Count="_count"
+            Data="_data"
+            Density="Grid.Density"
+            FilterMode="FilterMode.Simple"
+            FilterCaseSensitivity="Grid.FilterCaseSensitivity"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="Grid.PageNumbersCount"
+            PagerHorizontalAlign="Grid.PagerHorizontalAlign"
+            PagerPosition="Grid.PagerPosition"
+            PageSize="Grid.PageSize"
+            PageSizeOptions="Grid.PageSizeOptions"
+            PagingSummaryFormat="@Grid.PagingSummaryFormat"
+            ShowPagingSummary="true">
+        <HeaderTemplate>
+            <AppGridHeader Text="Vaccinations">
+                <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
+            </AppGridHeader>
+        </HeaderTemplate>        
+        <Columns>
+            <RadzenDataGridColumn Width="6ch">
+                <Template Context="data">
+                    <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                   Text="Edit"/>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(VaccinationGridDto.FelineName)" Title="Feline" Width="20ch" />
+            <RadzenDataGridColumn
+                Filterable="false"
+                Property="@nameof(VaccinationGridDto.VaccinationDate)"
+                Title="Vaccination Date"
+                Width="18ch"/>
+            <RadzenDataGridColumn Property="@nameof(VaccinationGridDto.VaccineName)" Title="Vaccine"/>
+            <RadzenDataGridColumn
+                Filterable="false"
+                Property="@nameof(VaccinationGridDto.ExpirationDate)"
+                Title="Expires"
+                Width="18ch"/>
+        </Columns>
+        </RadzenDataGrid>
+    </AppGridPanel>
+</RadzenStack>
+
+@code {
+    private const string PageRoute = "/vaccinations";
+    private const string EntityName = "Vaccination";
+
+    private int _count;
+    private IEnumerable<VaccinationGridDto>? _data;
+    private RadzenDataGrid<VaccinationGridDto>? _grid;
+    private bool _isLoading;
+    private bool _isSaving;
+    private VaccinationFormDto _model = new();
+    
+    private string _name = $"Create New {EntityName}";
+
+    [Parameter]
+    public int VaccinationId { get; set; }
+
+    /// <summary>
+    ///     Delete the source currently being edited.
+    /// </summary>
+    private async Task DeleteAsync()
+    {
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteVaccination>(_model.Id, _name))
+            return;
+
+        _isSaving = true;
+        try
+        {
+            var rs = await VaccinationRepository.DeleteByKeyAsync(_model.Id);
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
+            {
+                await _grid!.Reload();
+                await EditAsync(0);
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+    
+    /// <summary>
+    ///     Edit the specified entity.
+    /// </summary>
+    /// <param name="entityId">ID of the entity to edit or 0 to create a new one.</param>
+    private async Task EditAsync(int entityId)
+    {
+        if (entityId == VaccinationId)
+        {
+            await ResetAsync();
+            return;
+        }
+
+        NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
+    }
+    
+    /// <summary>
+    ///     Loads paged data for the grid.
+    /// </summary>
+    /// <param name="args">Radzen grid arguments</param>
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        _isLoading = true;
+        try
+        {
+            await using var query = await VaccinationRepository.CreateQueryAsync();
+            (_data, _count) = await query
+                .SelectToGridDto()
+                .ToGridResultsAsync(args, "FelineName asc, VaccinationDate desc");
+        }
+        catch (Exception ex)
+        {
+            NotificationService.NotifyFailedToLoad(ex);
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    /// <summary>
+    ///     Invoked when the component is initialized.
+    /// </summary>
+    protected override async Task OnParametersSetAsync()
+    {
+        // Initialize the model to be edited.
+        await ResetAsync();
+        await base.OnParametersSetAsync();
+    }
+
+    /// <summary>
+    ///     Invoked when form reset is requested.
+    /// </summary>
+    private async Task ResetAsync()
+    {
+        // Reset the model to be edited.
+        var rs = VaccinationId != 0
+            ? await VaccinationRepository.GetByKeyAsync(VaccinationId)
+            : Result.Ok<VaccinationFormDto>(new());
+        if (NavigationManager.VerifyFound(rs))
+        {
+            _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.VaccineName;
+            _model = rs.Value;
+        }
+    }
+
+    /// <summary>
+    ///     Save the vaccination to the database.
+    /// </summary>
+    /// <param name="editContext">Form context</param>
+    private async Task SaveAsync(EditContext editContext)
+    {
+        var rs = _model.Id == 0
+            ? await VaccinationRepository.AddAsync(_model)
+            : await VaccinationRepository.UpdateAsync(_model.Id, _model);
+        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
+        {
+            await _grid!.Reload();
+            // If editing an existing vaccination, continue editing.
+            // If creating a new vaccination, start a new one.
+            await EditAsync(_model.Id);
+        }
+    }
+
+}

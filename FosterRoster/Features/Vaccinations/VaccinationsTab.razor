@@ -1,0 +1,71 @@
+@inject VaccinationRepository VaccinationRepository
+
+<AppGridPanel>
+    <RadzenDataGrid
+            @ref="_grid"
+            TItem="VaccinationGridDto"
+            AllowFiltering="false"
+            AllowPaging="false"
+            AllowSorting="false"
+            Count="_count"
+            Data="_data"
+            Density="Density.Compact"
+            FilterMode="FilterMode.Simple"
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+            IsLoading="_isLoading"
+            LoadData="LoadDataAsync"
+            PageNumbersCount="1"
+            PagerHorizontalAlign="HorizontalAlign.Center"
+            PagerPosition="PagerPosition.Top"
+            PageSize="20"
+            PageSizeOptions="@( [10, 20, 50, 100])"
+            PagingSummaryFormat="Showing {0} to {1} of {2}"
+            ShowPagingSummary="true">
+            <Columns>
+                <RadzenDataGridColumn
+                    Property="@nameof(VaccinationGridDto.VaccinationDate)"
+                    Title="Vaccine Date"
+                    Width="13ch">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="@nameof(VaccinationGridDto.VaccineName)" Title="Vaccine">
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn
+                    Property="@nameof(VaccinationGridDto.ExpirationDate)" Title="Exp Date"
+                    Width="13ch">
+                </RadzenDataGridColumn>
+            </Columns>
+        </RadzenDataGrid>    
+</AppGridPanel>
+
+@code {
+    private int _count;
+    private IEnumerable<VaccinationGridDto>? _data;
+    private RadzenDataGrid<VaccinationGridDto>? _grid;
+    private bool _isLoading;
+    
+    [EditorRequired] [Parameter] public int FelineId { get; set; }
+    
+    /// <summary>
+    ///     Fetch data for the grid.
+    /// </summary>
+    /// <param name="args"></param>
+    private async Task LoadDataAsync(LoadDataArgs args)
+    {
+        if (_grid is null) return;
+        _isLoading = true;
+        try
+        {
+            await using var query = await VaccinationRepository.CreateQueryAsync();
+            (_data, _count) = await query
+                .ForFeline(FelineId)
+                .SelectToGridDto()
+                .ToGridResultsAsync(args, "VaccinationDate desc");
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+}
