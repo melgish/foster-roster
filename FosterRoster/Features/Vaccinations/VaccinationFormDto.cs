@@ -85,7 +85,7 @@ public sealed class VaccinationFormDtoValidator : AbstractValidator<VaccinationF
                     .WithMessage("Feline must not be selected");
 
                 RuleFor(e => e.FelineIds)
-                    .Must(e => e.Count > 0)
+                    .Must(e => e?.Count > 0)
                     .WithMessage("At least one feline must be selected.");
             })
             .Otherwise(() =>
@@ -95,7 +95,7 @@ public sealed class VaccinationFormDtoValidator : AbstractValidator<VaccinationF
                     .WithMessage("Feline must be selected");
 
                 RuleFor(e => e.FelineIds)
-                    .Must(e => e.Count == 0)
+                    .Must(e => e is null || e.Count == 0)
                     .WithMessage("Felines must not be selected.");
             });
 
