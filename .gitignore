@@ -486,4 +486,4 @@ $RECYCLE.BIN/
 *.dump
 *.override.yaml
 *.[Dd]evelopment.json
-
+*.sh
