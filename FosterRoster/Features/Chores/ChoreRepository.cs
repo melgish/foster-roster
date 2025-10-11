@@ -14,7 +14,7 @@ public sealed class ChoreRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(ChoreFormDto model)
     {
         await using var db = await factory.CreateDbContextAsync();
-        await db.Chores.AddRangeAsync(model.FelineIds
+        db.Chores.AddRange(model.FelineIds
             .Select(felineId => new Chore
             {
                 Description = model.Description.TrimToNull(),

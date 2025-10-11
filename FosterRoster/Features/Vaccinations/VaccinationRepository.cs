@@ -8,19 +8,20 @@ public class VaccinationRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(VaccinationFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
-        var entry = db.Vaccinations.Add(new Vaccination()
+        db.Vaccinations.AddRange(
+            dto.FelineIds.Select(felineId => new Vaccination()
         {
             AdministeredBy = dto.AdministeredBy.Trim(),
             Comments = dto.Comments?.TrimToNull(),
             ExpirationDate = dto.ExpirationDate!.Value,
-            FelineId = dto.FelineId,
+            FelineId = felineId,
             ManufacturerName = dto.ManufacturerName.Trim(),
             SerialNumber = dto.SerialNumber.Trim(),
             VaccinationDate = dto.VaccinationDate!.Value,
             VaccineName = dto.VaccineName.Trim()
-        });
+        }));
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
+        return Result.Ok(new IdOnlyDto(0));
     }
 
     /// <summary>

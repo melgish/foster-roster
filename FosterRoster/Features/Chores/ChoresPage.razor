@@ -32,6 +32,7 @@
                         {
                             <FelineSelect
                                 @bind-Value="_model.FelineId"
+                                Disabled="_isSaving"
                                 Placeholder="Choose"
                                 Text="Assigned to Feline">
                                 <Helper>
@@ -303,13 +304,21 @@
             return;
         }
 
-        var rs = _model.Id == 0
-            ? await ChoreRepository.AddAsync(_model)
-            : await ChoreRepository.UpdateAsync(_model.Id, _model);
-        if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
+        _isSaving = true;
+        try
         {
-            await _grid!.Reload();
-            await EditAsync(_model.Id);
+            var rs = _model.Id == 0
+                ? await ChoreRepository.AddAsync(_model)
+                : await ChoreRepository.UpdateAsync(_model.Id, _model);
+            if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
+            {
+                await _grid!.Reload();
+                await EditAsync(_model.Id);
+            }
+        }
+        finally
+        {
+            _isSaving = false;
         }
     }
 

@@ -53,6 +53,12 @@ public sealed class VaccinationFormDto : IIdBearer
     ///     Name of the vaccine administered.
     /// </summary>
     public string VaccineName { get; set; } = string.Empty;
+    
+    /// <summary>
+    ///     When creating a new vaccination, this is the list of
+    ///     felines that it will be assigned to
+    /// </summary>
+    public List<int> FelineIds { get; set; } = [];
 }
 
 [UsedImplicitly]
@@ -72,10 +78,27 @@ public sealed class VaccinationFormDtoValidator : AbstractValidator<VaccinationF
             .GreaterThan(model => model.VaccinationDate)
             .WithMessage("Expiration date must be after the vaccination date.");
 
-        RuleFor(model => model.FelineId)
-            .GreaterThan(0)
-            .WithMessage("Please select a feline.");
+        When(e => e.Id == 0, () =>
+            {
+                RuleFor(e => e.FelineId)
+                    .Equal(0)
+                    .WithMessage("Feline must not be selected");
 
+                RuleFor(e => e.FelineIds)
+                    .Must(e => e.Count > 0)
+                    .WithMessage("At least one feline must be selected.");
+            })
+            .Otherwise(() =>
+            {
+                RuleFor(e => e.FelineId)
+                    .GreaterThan(0)
+                    .WithMessage("Feline must be selected");
+
+                RuleFor(e => e.FelineIds)
+                    .Must(e => e.Count == 0)
+                    .WithMessage("Felines must not be selected.");
+            });
+        
         RuleFor(model => model.ManufacturerName)
             .NotEmpty()
             .MaximumLength(64);
