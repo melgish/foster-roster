@@ -17,7 +17,7 @@ public static class Queries
             VaccinationDate = e.VaccinationDate,
             VaccineName = e.VaccineName,
         });
-    
+
     public static IQueryable<VaccinationGridDto> SelectToGridDto(this IQueryable<Vaccination> query)
         => query.Select(e => new VaccinationGridDto()
         {
@@ -27,7 +27,7 @@ public static class Queries
             VaccinationDate = e.VaccinationDate,
             VaccineName = e.VaccineName,
         });
-    
+
     public static IQueryable<Vaccination> ForFeline(this IQueryable<Vaccination> query, int felineId)
         => query.Where(e => e.FelineId == felineId);
 }

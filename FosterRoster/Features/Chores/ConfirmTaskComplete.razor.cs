@@ -43,7 +43,7 @@ public sealed partial class ConfirmTaskComplete(DialogService dialogService)
         {
             return false;
         }
-        
+
         var rs = await choreRepository.LogChoreCompletedAsync(choreGridDto.Id, logEntry);
         return notificationService.NotifyResult(rs, "Task", "log", "logged");
     }

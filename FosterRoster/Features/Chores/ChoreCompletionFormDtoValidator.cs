@@ -9,7 +9,7 @@ public sealed class ChoreCompletionFormDtoValidator : AbstractValidator<ChoreCom
             .NotNull()
             .LessThanOrEqualTo(v => timeProvider.GetUtcNow())
             .WithMessage("Date must not be in the future.");
-        
+
         RuleFor(e => e.LogText)
             .NotEmpty()
             .WithMessage("Journal entry must not be empty.");

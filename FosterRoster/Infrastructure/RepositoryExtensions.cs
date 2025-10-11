@@ -12,7 +12,7 @@ public static class RepositoryExtensions
             .GetTypes()
             .Where(t => !t.IsAbstract)
             .Where(t => t.GetInterfaces().Any(i => i == typeof(IRepository)));
-            
+
         foreach (var type in types)
         {
             services.AddScoped(type);

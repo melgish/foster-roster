@@ -4,7 +4,7 @@ using Data;
 
 public sealed class ChoreRepository(
     IDbContextFactory<FosterRosterDbContext> factory
-): IRepository
+) : IRepository
 {
     /// <summary>
     ///     Adds a new chore to the database.

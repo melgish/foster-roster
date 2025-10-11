@@ -4,7 +4,7 @@ using Data;
 
 public sealed class SourceRepository(
     IDbContextFactory<FosterRosterDbContext> dbContextFactory
-): IRepository
+) : IRepository
 {
     /// <summary>
     ///     Adds a new Source to the database.
@@ -41,11 +41,11 @@ public sealed class SourceRepository(
                 .Sources
                 .Where(e => e.Id == sourceId)
                 .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NotFoundError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
 
     /// <summary>

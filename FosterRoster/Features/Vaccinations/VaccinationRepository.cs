@@ -22,15 +22,15 @@ public class VaccinationRepository(
         await db.SaveChangesAsync();
         return Result.Ok(new IdOnlyDto(entry.Entity.Id));
     }
-    
+
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Vaccination table.
     /// </summary>
     /// <returns></returns>
     public Task<Query<Vaccination>> CreateQueryAsync()
         => dbContextFactory.CreateQueryAsync(db => db.Vaccinations.AsNoTracking());
-    
-    
+
+
     /// <summary>
     ///     Deletes an existing Vaccination from the database by its ID.
     /// </summary>
@@ -43,14 +43,14 @@ public class VaccinationRepository(
                 .Vaccinations
                 .Where(e => e.Id == vaccinationId)
                 .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NotFoundError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
-    
-    
+
+
     /// <summary>
     ///     Gets an existing Vaccinations from the database by its ID.
     /// </summary>
@@ -79,7 +79,7 @@ public class VaccinationRepository(
         var existing = await db.Vaccinations.FindAsync(vaccinationId);
         if (existing is null)
             return Result.Fail(new NotFoundError());
-        
+
         existing.AdministeredBy = model.AdministeredBy.Trim();
         existing.Comments = model.Comments?.TrimToNull();
         existing.ExpirationDate = model.ExpirationDate!.Value;
@@ -88,7 +88,7 @@ public class VaccinationRepository(
         existing.SerialNumber = model.SerialNumber.Trim();
         existing.VaccinationDate = model.VaccinationDate!.Value;
         existing.VaccineName = model.VaccineName.Trim();
-        
+
         await db.SaveChangesAsync();
 
         return Result.Ok(new IdOnlyDto(existing.Id));
