@@ -1,6 +1,7 @@
 ﻿@page "/felines/{FelineId:int}/print"
 @using Features.Comments
 @using Features.Thumbnails
+@using Features.Vaccinations
 @using Features.Weights
 @layout Shared.Layout.PrintLayout
 @attribute [ExcludeFromInteractiveRouting]
@@ -129,6 +130,32 @@
             </tbody>
         </table>
     }
+    
+    @if (ShowVaccinations.GetValueOrDefault((true) && _vaccinations.Count > 0))
+    {
+        <table class="vaccinations">
+            <caption>Vaccinations</caption>
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Vaccine</th>
+                <th>Serial Number</th>
+                <th>Expiration Date</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var vaccination in _vaccinations)
+            {
+                <tr>
+                    <td>@vaccination.VaccinationDate</td>
+                    <td>@vaccination.VaccineName</td>
+                    <td>@vaccination.SerialNumber</td>
+                    <td>@vaccination.ExpirationDate</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    }
 }
 
 @code {
@@ -137,6 +164,7 @@
     private string? _fosterer;
     private Thumbnail? _thumbnail;
     private List<Comment> _comments = [];
+    private List<Vaccination> _vaccinations = [];
     private List<Weight> _weights = [];
     private DateTimeOffset _localNow;
     private WeightUnit _units = WeightUnit.lbs;
@@ -171,6 +199,9 @@
     /// </summary>
     [SupplyParameterFromQuery(Name = "vitals")]
     private bool? ShowVitals { get; set; }
+    
+    [SupplyParameterFromQuery(Name = "vaccinations")]
+    private bool? ShowVaccinations { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -223,6 +254,14 @@
             .AsNoTracking()
             .Where(c => c.FelineId == FelineId)
             .OrderByDescending(c => c.TimeStamp)
+            .ToListAsync();
+        
+        _vaccinations = await DbContext
+            .Vaccinations
+            .AsNoTracking()
+            .Where(v => v.FelineId == FelineId)
+            .OrderByDescending(v => v.VaccinationDate)
+            .ThenBy(v => v.VaccineName)
             .ToListAsync();
     }
 

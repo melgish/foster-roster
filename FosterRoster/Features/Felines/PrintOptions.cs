@@ -7,6 +7,7 @@ public enum PrintSection
     Vitals,
     Image,
     Journal,
+    Vaccinations,
     Weights
 }
 
@@ -17,6 +18,7 @@ public sealed class PrintOptions
         PrintSection.Vitals,
         PrintSection.Image,
         PrintSection.Journal,
+        PrintSection.Vaccinations,
         PrintSection.Weights
     ];
 

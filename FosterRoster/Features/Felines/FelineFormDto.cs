@@ -3,6 +3,9 @@ namespace FosterRoster.Features.Felines;
 using Comments;
 using Thumbnails;
 
+/// <summary>
+///     Form data for creating or updating a <see cref="Feline" />.
+/// </summary>
 public sealed class FelineFormDto : IIdBearer
 {
     public string? AnimalId { get; set; }
@@ -22,4 +25,45 @@ public sealed class FelineFormDto : IIdBearer
     public int SourceId { get; set; }
     public Thumbnail? Thumbnail { get; set; }
     public Weaned Weaned { get; set; }
+}
+
+/// <summary>
+///     Validation rules for <see cref="FelineFormDto" />.
+/// </summary>
+[UsedImplicitly]
+public sealed class FelineFormDtoValidator : AbstractValidator<FelineFormDto>
+{
+    public FelineFormDtoValidator(TimeProvider timeProvider)
+    {
+        RuleFor(feline => feline.AnimalId)
+            .MaximumLength(24);
+
+        RuleFor(feline => feline.Breed)
+            .MaximumLength(48);
+
+        RuleFor(feline => feline.Category).IsInEnum();
+
+        RuleFor(feline => feline.Color)
+            .MaximumLength(96);
+
+        RuleFor(feline => feline.Gender).IsInEnum();
+
+        RuleFor(feline => feline.IntakeAgeInWeeks)
+            .GreaterThanOrEqualTo(0);
+
+        RuleFor(feline => feline.IntakeDate)
+            .NotNull()
+            .LessThanOrEqualTo(p => timeProvider.GetDateOnlyNow())
+            .WithMessage("Intake date must be in the past.");
+
+        RuleFor(feline => feline.Name)
+            .NotEmpty()
+            .MaximumLength(64);
+
+        RuleFor(feline => feline.SterilizationDate)
+            .LessThanOrEqualTo(p => timeProvider.GetDateOnlyNow())
+            .WithMessage("Spay / Neuter date must be in the past.");
+        
+        RuleFor(feline => feline.Weaned).IsInEnum();
+    }
 }

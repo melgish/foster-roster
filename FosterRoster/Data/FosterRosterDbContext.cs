@@ -11,6 +11,7 @@ using Features.Fosterers;
 using Features.Schedules;
 using Features.Sources;
 using Features.Thumbnails;
+using Features.Vaccinations;
 using Features.Weights;
 using Microsoft.AspNetCore.Identity;
 
@@ -33,6 +34,7 @@ public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> optio
     public DbSet<Schedule> Schedules { get; set; } = null!;
     public DbSet<Chore> Chores { get; set; } = null!;
     public DbSet<Thumbnail> Thumbnails { get; set; } = null!;
+    public DbSet<Vaccination> Vaccinations { get; set; } = null!;
     public DbSet<Weight> Weights { get; set; } = null!;
 
     // IDataProtectionKeyContext

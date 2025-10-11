@@ -10,6 +10,7 @@ using FosterRoster.Features.Schedules;
 using FosterRoster.Features.Sources;
 using FosterRoster.Features.Thumbnails;
 using FosterRoster.Features.Users;
+using FosterRoster.Features.Vaccinations;
 using FosterRoster.Features.Weights;
 using FosterRoster.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -81,6 +82,7 @@ builder.Services.AddScoped<ScheduleRepository>();
 builder.Services.AddScoped<SourceRepository>();
 builder.Services.AddScoped<ThumbnailRepository>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<VaccinationRepository>();
 builder.Services.AddScoped<WeightRepository>();
 
 builder.Services.AddRadzenComponents();

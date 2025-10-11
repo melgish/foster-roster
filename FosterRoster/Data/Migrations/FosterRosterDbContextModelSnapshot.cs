@@ -391,6 +391,55 @@ namespace FosterRoster.Data.Migrations
                     b.ToTable("Thumbnails", (string)null);
                 });
 
+            modelBuilder.Entity("FosterRoster.Features.Vaccinations.Vaccination", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdministeredBy")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("Comments")
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateOnly>("ExpirationDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("FelineId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ManufacturerName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<DateOnly>("VaccinationDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("VaccineName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.HasKey("Id")
+                        .HasName("PK_Vaccinations");
+
+                    b.HasIndex("FelineId");
+
+                    b.ToTable("Vaccinations", (string)null);
+                });
+
             modelBuilder.Entity("FosterRoster.Features.Weights.Weight", b =>
                 {
                     b.Property<int>("FelineId")
@@ -589,6 +638,18 @@ namespace FosterRoster.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("FosterRoster.Features.Vaccinations.Vaccination", b =>
+                {
+                    b.HasOne("FosterRoster.Features.Felines.Feline", "Feline")
+                        .WithMany("Vaccinations")
+                        .HasForeignKey("FelineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Vaccinations_Felines");
+
+                    b.Navigation("Feline");
+                });
+
             modelBuilder.Entity("FosterRoster.Features.Weights.Weight", b =>
                 {
                     b.HasOne("FosterRoster.Features.Felines.Feline", "Feline")
@@ -654,6 +715,8 @@ namespace FosterRoster.Data.Migrations
                     b.Navigation("Comments");
 
                     b.Navigation("Thumbnail");
+
+                    b.Navigation("Vaccinations");
 
                     b.Navigation("Weights");
                 });

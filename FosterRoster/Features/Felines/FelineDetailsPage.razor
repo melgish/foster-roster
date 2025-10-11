@@ -4,6 +4,7 @@
 
 @using FosterRoster.Features.Comments
 @using FosterRoster.Features.Chores
+@using FosterRoster.Features.Vaccinations
 @using FosterRoster.Features.Weights
 
 @inject CommentRepository CommentRepository
@@ -56,6 +57,9 @@ else
                             <RadzenTabsItem Icon="scale" Text="Weights">
                                 <WeightsTab FelineId="@FelineId" />
                             </RadzenTabsItem>
+                            <RadzenTabsItem Icon="syringe" Text="Vaccinations">
+                                <VaccinationsTab FelineId="@FelineId" />
+                            </RadzenTabsItem>
                         </Tabs>
                     </RadzenTabs>
                 </div>
@@ -93,16 +97,16 @@ else
     ///     Delete the supplied comment from the current feline.
     /// </summary>
     /// <param name="comment">Comment to delete</param>
-    private async Task DeleteCommentAsync(IIdBearer comment)
+    private async Task DeleteCommentAsync(IIdBearer? comment)
     {
-        if (_feline is null || !await DialogService.ConfirmDeleteAsync<ConfirmDeleteComment>(_comment.Id, string.Empty))
+        if (_feline is null || comment is null) return;
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteComment>(comment.Id, string.Empty))
             return;
 
         var rs = await CommentRepository.DeleteByKeyAsync(comment.Id);
         if (NotificationService.NotifyResult(rs, "Comment", "delete", "deleted"))
         {
             _feline.Comments = [.. _feline.Comments.Where(c => c.Id != comment.Id)];
-            _comment = new() { FelineId = FelineId };
         }
     }
 
