@@ -3,7 +3,12 @@ name: Publish Release Image
 on:
     release:
         types: [published]
-
+    wokflow_dispatch:
+        inputs:
+            version:
+                description: 'Version to publish'
+                required: true
+                default: '0.1.0'
 jobs:
     push:
         name: Push Docker image to Docker Hub
