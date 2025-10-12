@@ -41,5 +41,5 @@ jobs:
                   --arch x64
                   /t:PublishContainer
                   -p ContainerRegistry=docker.io
-                  -p ContainerRepositoryName=melgish/foster-roster
+                  -p ContainerRepository=melgish/foster-roster
                   -p ContainerImageTags='"${{ steps.meta.outputs.tags }}"'
