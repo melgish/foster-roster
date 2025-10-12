@@ -6,8 +6,8 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPublishable>true</IsPublishable>
         <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-        <ContainerRepository>foster-roster</ContainerRepository>
-        <ContainerImageTag>next</ContainerImageTag>
+        <ContainerRepository>melgish/foster-roster</ContainerRepository>
+        <ContainerImageTag>latest</ContainerImageTag>
         <RuntimeFrameworkVersion>9.0.1</RuntimeFrameworkVersion>
         <Version>1.5.2</Version>
     </PropertyGroup>
