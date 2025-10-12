@@ -6,8 +6,6 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPublishable>true</IsPublishable>
         <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-        <ContainerRepository>melgish/foster-roster</ContainerRepository>
-        <ContainerImageTag>latest</ContainerImageTag>
         <RuntimeFrameworkVersion>9.0.1</RuntimeFrameworkVersion>
         <Version>1.5.2</Version>
     </PropertyGroup>
@@ -32,10 +30,10 @@
         <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
     </ItemGroup>
 
-    <!-- 
+    <!--
     Remove Registration and External Logins from the project.
     Note to restore, be sure to remove conditional EXTERNAL_LOGINS
-    in IdentityComponentsEndpointRouteBuilderExtensions.cs  
+    in IdentityComponentsEndpointRouteBuilderExtensions.cs
     -->
     <ItemGroup>
         <Content Remove="Features/Account/Pages/Register.razor" />
