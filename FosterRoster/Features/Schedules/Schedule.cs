@@ -21,7 +21,7 @@ public sealed class Schedule : IIdBearer
     public string Name { get; init; } = string.Empty;
 }
 
-public sealed class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
+internal sealed class ScheduleConfiguration : IEntityTypeConfiguration<Schedule>
 {
     public void Configure(EntityTypeBuilder<Schedule> builder)
     {
