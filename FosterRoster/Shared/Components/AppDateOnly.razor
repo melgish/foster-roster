@@ -7,7 +7,8 @@
         Component="@Name"
         Text="@Text"
         Variant="Variant.Text">
-        <RadzenDatePicker Disabled="Disabled"
+        <RadzenDatePicker AllowClear="@AllowClear"
+                          Disabled="Disabled"
                           Name="@Name"
                           Placeholder="mm/dd/yyyy"
                           Value="@Value"
@@ -17,3 +18,11 @@
     </RadzenFormField>
     <ValidationMessage For="ValueExpression"/>
 </RadzenStack>
+
+@code {
+    /// <summary>
+    ///     Gets or sets value indication if value can be cleared.
+    /// </summary>
+    [Parameter]
+    public bool AllowClear { get; set; }
+}

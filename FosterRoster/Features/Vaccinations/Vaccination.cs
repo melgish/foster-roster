@@ -22,7 +22,7 @@ public sealed class Vaccination : IIdBearer
     /// <summary>
     ///     Date the vaccination expires.
     /// </summary>
-    public DateOnly ExpirationDate { get; set; }
+    public DateOnly? ExpirationDate { get; set; }
 
     /// <summary>
     ///     Feline that received the vaccination.
@@ -47,7 +47,7 @@ public sealed class Vaccination : IIdBearer
     /// <summary>
     ///     Serial number of the vaccine.
     /// </summary>
-    public string SerialNumber { get; set; } = string.Empty;
+    public string? SerialNumber { get; set; } = string.Empty;
 
     /// <summary>
     ///     Date the vaccination was administered.
@@ -85,7 +85,7 @@ internal sealed class VaccinationConfiguration : IEntityTypeConfiguration<Vaccin
         builder
             .Property(e => e.ExpirationDate)
             .HasColumnType("date")
-            .IsRequired();
+            .IsRequired(false);
 
         // See <see cref="FelineConfiguration" /> for the relationship
         builder
@@ -104,7 +104,7 @@ internal sealed class VaccinationConfiguration : IEntityTypeConfiguration<Vaccin
         builder
             .Property(e => e.SerialNumber)
             .HasMaxLength(64)
-            .IsRequired();
+            .IsRequired(false);
 
         builder
             .Property(e => e.VaccinationDate)

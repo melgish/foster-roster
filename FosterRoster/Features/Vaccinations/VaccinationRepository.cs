@@ -13,10 +13,10 @@ public class VaccinationRepository(
             {
                 AdministeredBy = dto.AdministeredBy.Trim(),
                 Comments = dto.Comments?.TrimToNull(),
-                ExpirationDate = dto.ExpirationDate!.Value,
+                ExpirationDate = dto.ExpirationDate,
                 FelineId = felineId,
                 ManufacturerName = dto.ManufacturerName.Trim(),
-                SerialNumber = dto.SerialNumber.Trim(),
+                SerialNumber = dto.SerialNumber.TrimToNull(),
                 VaccinationDate = dto.VaccinationDate!.Value,
                 VaccineName = dto.VaccineName.Trim()
             }));
@@ -83,10 +83,10 @@ public class VaccinationRepository(
 
         existing.AdministeredBy = model.AdministeredBy.Trim();
         existing.Comments = model.Comments?.TrimToNull();
-        existing.ExpirationDate = model.ExpirationDate!.Value;
+        existing.ExpirationDate = model.ExpirationDate;
         existing.FelineId = model.FelineId;
         existing.ManufacturerName = model.ManufacturerName.Trim();
-        existing.SerialNumber = model.SerialNumber.Trim();
+        existing.SerialNumber = model.SerialNumber?.TrimToNull();
         existing.VaccinationDate = model.VaccinationDate!.Value;
         existing.VaccineName = model.VaccineName.Trim();
 

@@ -42,7 +42,7 @@ public sealed class VaccinationFormDto : IIdBearer
     /// <summary>
     ///     Serial number of the vaccine.
     /// </summary>
-    public string SerialNumber { get; set; } = string.Empty;
+    public string? SerialNumber { get; set; }
 
     /// <summary>
     ///     Date the vaccination was administered.
@@ -74,7 +74,6 @@ public sealed class VaccinationFormDtoValidator : AbstractValidator<VaccinationF
             .MaximumLength(256);
 
         RuleFor(model => model.ExpirationDate)
-            .NotNull()
             .GreaterThan(model => model.VaccinationDate)
             .WithMessage("Expiration date must be after the vaccination date.");
 
@@ -104,7 +103,6 @@ public sealed class VaccinationFormDtoValidator : AbstractValidator<VaccinationF
             .MaximumLength(64);
 
         RuleFor(model => model.SerialNumber)
-            .NotEmpty()
             .MaximumLength(64);
 
         RuleFor(model => model.VaccineName)
