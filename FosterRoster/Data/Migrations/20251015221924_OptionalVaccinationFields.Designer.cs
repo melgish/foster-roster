@@ -3,6 +3,7 @@ using System;
 using FosterRoster.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace FosterRoster.Data.Migrations
 {
     [DbContext(typeof(FosterRosterDbContext))]
-    partial class FosterRosterDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251015221924_OptionalVaccinationFields")]
+    partial class OptionalVaccinationFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -352,6 +355,34 @@ namespace FosterRoster.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("Microchips", (string)null);
+                });
+
+            modelBuilder.Entity("FosterRoster.Features.Schedules.Schedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Cron")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(48)
+                        .HasColumnType("character varying(48)");
+
+                    b.HasKey("Id")
+                        .HasName("PK_Schedules");
+
+                    b.HasIndex("Cron")
+                        .IsUnique()
+                        .HasDatabaseName("IX_Schedules_Cron");
+
+                    b.ToTable("Schedules", (string)null);
                 });
 
             modelBuilder.Entity("FosterRoster.Features.Sources.Source", b =>

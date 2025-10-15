@@ -2,7 +2,7 @@ namespace FosterRoster.Features.Vaccinations;
 
 public sealed class VaccinationGridDto
 {
-    public DateOnly ExpirationDate { get; init; }
+    public DateOnly? ExpirationDate { get; init; }
 
     public string FelineName { get; init; } = string.Empty;
 

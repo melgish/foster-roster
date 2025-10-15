@@ -1,3 +1,5 @@
+using FosterRoster.Features.Microchips;
+
 namespace FosterRoster.Features.Felines;
 
 using Chores;
@@ -29,6 +31,7 @@ public sealed class Feline : IIdBearer
     public int? IntakeAgeInWeeks { get; set; }
     public DateOnly IntakeDate { get; set; }
     public bool IsInactive { get; init; }
+    public Microchip? Microchip { get; set; }
     public string Name { get; set; } = string.Empty;
     public DateOnly? RegistrationDate { get; init; }
     public Source? Source { get; init; }
@@ -104,6 +107,13 @@ internal sealed class FelineConfiguration : IEntityTypeConfiguration<Feline>
             .Property(e => e.IntakeDate)
             .HasColumnType("date")
             .IsRequired();
+
+        builder
+            .HasOne(e => e.Microchip)
+            .WithOne(e => e.Feline)
+            .HasForeignKey<Microchip>(e => e.FelineId)
+            .HasConstraintName("FK_Microchips_Felines_FelineId")
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .Property(e => e.Name)

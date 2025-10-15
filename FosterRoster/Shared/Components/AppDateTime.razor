@@ -7,7 +7,8 @@
         Helper="Helper"
         Text="@Text"
         Variant="Variant.Text">
-        <RadzenDatePicker DateFormat="g"
+        <RadzenDatePicker AllowClear="AllowClear" 
+                          DateFormat="g"
                           Disabled="Disabled"
                           HourFormat="12"
                           Kind="DateTimeKind.Local"
@@ -20,3 +21,11 @@
     </RadzenFormField>
     <ValidationMessage For="ValueExpression"/>
 </RadzenStack>
+
+@code {
+    /// <summary>
+    ///     Gets or sets value indication if value can be cleared.
+    /// </summary>
+    [Parameter]
+    public bool AllowClear { get; set; }
+}

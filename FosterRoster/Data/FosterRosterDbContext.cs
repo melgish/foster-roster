@@ -1,11 +1,13 @@
-﻿namespace FosterRoster.Data;
+﻿using FosterRoster.Features.Microchips;
+
+namespace FosterRoster.Data;
 
 using Features.Account;
 using Features.Chores;
 using Features.Comments;
 using Features.Felines;
 using Features.Fosterers;
-using Features.Schedules;
+using Features.Microchips;
 using Features.Sources;
 using Features.Thumbnails;
 using Features.Vaccinations;
@@ -27,12 +29,12 @@ public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> optio
         IdentityUserToken<int>
     >(options), IDataProtectionKeyContext
 {
+    public DbSet<Chore> Chores { get; set; } = null!;
     public DbSet<Comment> Comments { get; set; } = null!;
     public DbSet<Feline> Felines { get; set; } = null!;
     public DbSet<Fosterer> Fosterers { get; set; } = null!;
+    public DbSet<Microchip> Microchips { get; set; } = null!;
     public DbSet<Source> Sources { get; set; } = null!;
-    public DbSet<Schedule> Schedules { get; set; } = null!;
-    public DbSet<Chore> Chores { get; set; } = null!;
     public DbSet<Thumbnail> Thumbnails { get; set; } = null!;
     public DbSet<Vaccination> Vaccinations { get; set; } = null!;
     public DbSet<Weight> Weights { get; set; } = null!;

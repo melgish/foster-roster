@@ -74,18 +74,10 @@
                 </AppFormRow>
                 <AppFormRow>
                     <AppFormColumn>
-                        <AppTextBox @bind-Value="@_model.SerialNumber" Text="Serial Number">
-                            <Helper>
-                                <AppRequired/>
-                            </Helper>
-                        </AppTextBox>
+                        <AppTextBox @bind-Value="@_model.SerialNumber" Text="Serial Number"/>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <AppDateOnly @bind-Value="_model.ExpirationDate" Text="Expiration Date">
-                            <Helper>
-                                <AppRequired/>
-                            </Helper>
-                        </AppDateOnly>
+                        <AppDateOnly @bind-Value="_model.ExpirationDate" AllowClear="true" Text="Expiration Date" />
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormRow>
