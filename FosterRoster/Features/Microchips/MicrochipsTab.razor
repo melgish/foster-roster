@@ -1,0 +1,135 @@
+@inject DialogService DialogService
+@inject MicrochipsRepository MicrochipsRepository
+@inject NotificationService NotificationService
+
+@if (_model is null)
+{
+    <AppLoading/>
+}
+else
+{
+    <AppFormPanel>
+        <EditForm FormName="editMicrochip"
+                  Model="_model"
+                  OnValidSubmit="SaveAsync">
+            <FluentValidationValidator/>
+            <RadzenStack Gap="0.5rem">
+                <AppFormHeader Text="Microchip">
+                    <RadzenStack AlignItems="AlignItems.Center"
+                                 Gap="0.5rem"
+                                 JustifyContent="JustifyContent.End"
+                                 Orientation="Orientation.Horizontal"
+                                 >
+                        <AppBusyCircle IsBusy="_isSaving"/>
+                        @if (!_model.IsNew())
+                        {
+                            <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving" />
+                        }
+                        <AppFormSaveButton Disabled="_isSaving"/>
+                        <AppFormResetButton Click="ResetAsync" Disabled="_isSaving" />
+                    </RadzenStack>
+                </AppFormHeader>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="@_model.Brand" Text="Brand">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
+                    </AppFormColumn>
+                    <AppFormColumn>
+                        <AppTextBox @bind-Value="@_model.Code" Text="Code">
+                            <Helper>
+                                <AppRequired/>
+                            </Helper>
+                        </AppTextBox>
+                    </AppFormColumn>
+                </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn SizeSM="12">
+                        <AppTextArea @bind-Value="@_model.Comment" Rows="1" Text="Comment"/>
+                    </AppFormColumn>
+                </AppFormRow>
+                
+            </RadzenStack>
+        </EditForm>
+    </AppFormPanel>
+}
+
+@code {
+    private const string EntityName = "Microchip";
+    private bool _isSaving;
+    private MicrochipFormDto? _model;
+    
+    [EditorRequired] [Parameter] public int FelineId { get; set; }
+    
+    [EditorRequired] [Parameter] public string Name { get; set; }
+
+    /// <summary>
+    ///     Delete the microchip info from the current feline.
+    /// </summary>
+    private async Task DeleteAsync()
+    {
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteMicrochip>(_model.Id, Name))
+            return;
+
+        _isSaving = true;
+        try
+        {
+            var rs = await MicrochipsRepository.DeleteByKeyAsync(_model!.Id);
+            if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
+            {
+                await ResetAsync();
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await ResetAsync();
+        await base.OnParametersSetAsync();
+    }
+    
+    private async Task ResetAsync()
+    {
+        var rs = await MicrochipsRepository
+            .GetByFelineIdAsync(FelineId);
+        _model = rs.IsSuccess ? rs.Value : new MicrochipFormDto() { FelineId = FelineId };
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>
+    ///     Write current microchip info to the database.
+    /// </summary>
+    private async Task SaveAsync()
+    {
+        if (_model is null) return;
+        _isSaving = true;
+        try
+        {
+            var rs = _model.IsNew()
+                ? await MicrochipsRepository.AddAsync(_model!)
+                : await MicrochipsRepository.UpdateAsync(_model!.Id, _model);
+            if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
+            {
+                _model = new MicrochipFormDto
+                {
+                    Brand = _model.Brand,
+                    Code = _model.Code,
+                    Comment = _model.Comment,
+                    FelineId = _model.FelineId,
+                    Id = rs.Value.Id
+                };
+            }
+        }
+        finally
+        {
+            _isSaving = false;
+        }
+    }
+}

@@ -24,6 +24,7 @@ public class VaccinationRepository(
         return Result.Ok(new IdOnlyDto(0));
     }
 
+
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Vaccination table.
     /// </summary>
@@ -67,8 +68,9 @@ public class VaccinationRepository(
         return model is null ? Result.Fail(new NotFoundError()) : Result.Ok(model);
     }
 
+
     /// <summary>
-    ///     Updates an existing Vaccinationsin the database.
+    ///     Updates an existing Vaccinations in the database.
     /// </summary>
     /// <param name="vaccinationId">ID of vaccination to update.</param>
     /// <param name="model">Data to assign to Vaccinations</param>
@@ -94,5 +96,4 @@ public class VaccinationRepository(
 
         return Result.Ok(new IdOnlyDto(existing.Id));
     }
-
 }
