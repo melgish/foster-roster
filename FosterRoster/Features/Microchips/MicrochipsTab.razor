@@ -70,13 +70,13 @@ else
     /// </summary>
     private async Task DeleteAsync()
     {
-        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteMicrochip>(_model.Id, Name))
+        if (!await DialogService.ConfirmDeleteAsync<ConfirmDeleteMicrochip>(_model!.Id, Name))
             return;
 
         _isSaving = true;
         try
         {
-            var rs = await MicrochipsRepository.DeleteByKeyAsync(_model!.Id);
+            var rs = await MicrochipsRepository.DeleteByKeyAsync(_model.Id);
             if (NotificationService.NotifyResult(rs, EntityName, "delete", "deleted"))
             {
                 await ResetAsync();
