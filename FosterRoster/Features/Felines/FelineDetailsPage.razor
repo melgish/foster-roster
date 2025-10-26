@@ -4,6 +4,7 @@
 
 @using FosterRoster.Features.Comments
 @using FosterRoster.Features.Chores
+@using FosterRoster.Features.Microchips
 @using FosterRoster.Features.Vaccinations
 @using FosterRoster.Features.Weights
 
@@ -59,6 +60,9 @@ else
                             </RadzenTabsItem>
                             <RadzenTabsItem Icon="syringe" Text="Vaccinations">
                                 <VaccinationsTab FelineId="@FelineId" />
+                            </RadzenTabsItem>
+                            <RadzenTabsItem Icon="memory_alt" Text="Microchip">
+                                <MicrochipsTab FelineId="@FelineId" Name="@Name" />
                             </RadzenTabsItem>
                         </Tabs>
                     </RadzenTabs>

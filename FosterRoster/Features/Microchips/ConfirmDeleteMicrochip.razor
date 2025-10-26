@@ -1,0 +1,9 @@
+@implements IConfirmDelete
+
+<AppConfirmModal>
+    <p>If you click Yes, you will delete microchip data from "@Name".</p>
+</AppConfirmModal>
+
+@code {
+    [Parameter] public string Name { get; set; } = string.Empty;
+}

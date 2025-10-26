@@ -9,3 +9,8 @@ public interface IIdBearer
 }
 
 public sealed record IdOnlyDto(int Id) : IIdBearer;
+
+public static class IdBearer
+{
+    public static bool IsNew(this IIdBearer bearer) => bearer.Id == 0;
+}
