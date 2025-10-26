@@ -1,8 +1,10 @@
 ﻿@page "/felines/{FelineId:int}/print"
 @using Features.Comments
+@using Features.Microchips
 @using Features.Thumbnails
 @using Features.Vaccinations
 @using Features.Weights
+
 @layout Shared.Layout.PrintLayout
 @attribute [ExcludeFromInteractiveRouting]
 @inject Data.FosterRosterDbContext DbContext
@@ -72,6 +74,17 @@
                     <th>Spay / Neuter Date</th>
                     <td>@_feline.SterilizationDate</td>
                 </tr>
+                @if (_microchip is not null)
+                {
+                    <tr>
+                        <th>Microchip Brand</th>
+                        <td>@_microchip.Brand</td>
+                    </tr>
+                    <tr>
+                        <th>Microchip Number</th>
+                        <td>@_microchip.Code</td>
+                    </tr>
+                }
                 </tbody>
             </table>
             @if (ShowImage.GetValueOrDefault(true) && _thumbnail is not null)
@@ -169,6 +182,7 @@
     private DateTimeOffset _localNow;
     private WeightUnit _units = WeightUnit.lbs;
     private string? _source;
+    private Microchip? _microchip;
 
     /// <summary>
     ///     When truthy, print the image.
@@ -263,6 +277,12 @@
             .OrderByDescending(v => v.VaccinationDate)
             .ThenBy(v => v.VaccineName)
             .ToListAsync();
+        
+        _microchip = await DbContext
+            .Microchips
+            .AsNoTracking()
+            .Where(m => m.FelineId == FelineId)
+            .FirstOrDefaultAsync();
     }
 
 }
