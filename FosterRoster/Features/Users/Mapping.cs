@@ -34,6 +34,7 @@ public static class Mapping
             Role = e.UserRoles.Select(r => r.Role.Name).FirstOrDefault() ?? string.Empty,
             UserName = e.UserName ?? string.Empty,
             Password = string.Empty,
-            ConfirmPassword = string.Empty
+            ConfirmPassword = string.Empty,
+            Fosterers = e.Fosterers.Select(f => f.Id).ToList()
         });
 }

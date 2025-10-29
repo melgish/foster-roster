@@ -1,4 +1,7 @@
-﻿namespace FosterRoster.Features.Users;
+﻿using FosterRoster.Data;
+using FosterRoster.Features.Fosterers;
+
+namespace FosterRoster.Features.Users;
 
 using Account;
 using Microsoft.AspNetCore.Identity;
@@ -17,7 +20,7 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
             { Succeeded: true } => Result.Ok(),
             { Errors: { } errors } => Result.Fail(string.Join(", ", errors.Select(e => e.Description)))
         };
-
+    
     /// <summary>
     /// Adds a new user to the database in the supplied role.
     /// </summary>
@@ -25,6 +28,12 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
     /// <returns></returns>
     public async Task<Result<IdOnlyDto>> AddAsync(UserFormDto dto)
     {
+        // Need both Managers and EF context to create a user with fosterers.
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<FosterRosterDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
+
         var userName = dto.UserName.TrimToNull();
         var email = dto.Email.TrimToNull();
 
@@ -33,15 +42,14 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
             UserName = userName,
             Email = email,
             EmailConfirmed = true,
-            PhoneNumber = dto.PhoneNumber.TrimToNull()
+            PhoneNumber = dto.PhoneNumber.TrimToNull(),
+            Fosterers = await dbContext.Fosterers.Where(f => dto.Fosterers.Contains(f.Id)).ToListAsync(),
+            UserRoles = await roleManager.FindByNameAsync(dto.Role) is { } role 
+                ? [new ApplicationUserRole() { Role = role }] : []
         };
 
-        await using var scoped = scopeFactory.CreateScopedAsync<UserManager<ApplicationUser>>();
-
-        var rs = Map(await scoped.Instance.CreateAsync(user, dto.Password));
-        if (rs.IsSuccess && !string.IsNullOrWhiteSpace(dto.Role))
-            rs = Map(await scoped.Instance.AddToRoleAsync(user, dto.Role));
-
+        var rs = Map(await userManager.CreateAsync(user, dto.Password));
+        
         return rs.ToResult(new IdOnlyDto(dto.Id));
     }
 
@@ -98,31 +106,43 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
     /// <returns></returns>
     public async Task<Result<IdOnlyDto>> UpdateAsync(int userId, UserFormDto dto)
     {
-        await using var scoped = scopeFactory.CreateScopedAsync<UserManager<ApplicationUser>>();
+        // Need both Managers and EF context to update a user with fosterers.
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<FosterRosterDbContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<ApplicationRole>>();
 
-        var user = await scoped.Instance.FindByIdAsync(userId.ToString());
+        var user = await userManager
+            .Users
+            .Include(u => u.Fosterers)
+            .Include(u => u.UserRoles)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
         if (user is null)
             return Result.Fail(new NotFoundError());
 
         user.Email = dto.Email.TrimToNull();
         user.PhoneNumber = dto.PhoneNumber.TrimToNull();
 
-        var rs = Map(await scoped.Instance.UpdateAsync(user));
-        if (rs.IsFailed)
-            return rs;
-
+        // Update the role if changed.
         // Identity framework allows a user to be in multiple roles, but the
         // expectation for the application is that a user will be in a single
         // role.
-        rs = (dto.Role.TrimToNull(), await scoped.Instance.GetRolesAsync(user)) switch
-        {
-            (null, []) => Result.Ok(),
-            ({ } role, [var exists]) when exists == role => Result.Ok(),
-            (null, { } roles) => Map(await scoped.Instance.RemoveFromRolesAsync(user, roles)),
-            ({ } role, []) => Map(await scoped.Instance.AddToRoleAsync(user, role)),
-            ({ } role, { } roles) => await Map(await scoped.Instance.RemoveFromRolesAsync(user, roles))
-                .Bind(async Task<Result> () => Map(await scoped.Instance.AddToRoleAsync(user, role)))
-        };
+        var role = await roleManager.FindByNameAsync(dto.Role);
+        user.UserRoles = role is not null 
+            ? [ new ApplicationUserRole { Role = role } ] 
+            : [];
+
+        // Update the fosterers.
+        user.Fosterers = await dbContext
+            .Fosterers
+            .Where(f => dto.Fosterers.Contains(f.Id))
+            .ToListAsync();
+
+        // Save using the userManager to ensure any concurrency tokens are handled.
+        var rs = Map(await userManager.UpdateAsync(user));
+        if (rs.IsFailed)
+            return rs;
 
         return rs.IsFailed ? rs : Result.Ok(new IdOnlyDto(user.Id));
     }
