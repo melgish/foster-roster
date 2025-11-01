@@ -1,38 +1,62 @@
 ﻿@page "/"
+@using System.Security.Claims
+@using FosterRoster.Data
+@using FosterRoster.Features.Users
 @attribute [AllowAnonymous]
-@inject Felines.FelineRepository FelineRepository
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
+@inject UserRepository userRepository
 
 <PageTitle>Dashboard</PageTitle>
 <div class="deck">
     @foreach (var feline in _felines)
     {
-        <FelineCard @key="feline.Id" Feline="@feline" FelineChanged="OnFelineChanged"/>
+        <FelineCard @key="feline.Id" Feline="@feline" FelineChanged="OnFelineChanged" UserFelines="_userFelines"/>
     }
 </div>
 
 @code {
     private IEnumerable<FelineCardDto> _felines = [];
+    private UserFelines _userFelines = UserFelines.None;
 
     /// <summary>
     ///     Load all active felines for the dashboard.
     /// </summary>
     private async Task LoadFelinesAsync()
     {
-        await using var query = await FelineRepository.CreateQueryAsync();
-        _felines = await query
-            .AsNoTracking()
-            .Include(f => f.Thumbnail)
+        var state = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        await using var dbContext = await DbContextFactory.CreateDbContextAsync();
+        // Load the current user's felines.
+        if (state.User.IsInRole(Roles.Admin))
+        {
+            _userFelines = UserFelines.All;
+        }
+        else if (state.User.IsInRole(Roles.User))
+        {
+            _ = int.TryParse(state.User.FindFirstValue(ClaimTypes.NameIdentifier), out int userId);
+            var uf = dbContext
+                .Users
+                .Where(u => u.Id == userId)
+                .SelectMany(f => f.Fosterers);
+                
+            _userFelines = UserFelines.Some(await dbContext
+                .Felines
+                .IgnoreQueryFilters()
+                // Cats without a fosterer can be managed by anyone?
+                .Where(f => f.Fosterer == null || uf.Contains(f.Fosterer))
+                .Select(f => f.Id)
+                .ToHashSetAsync()
+            );
+        }
+        else
+        {
+            _userFelines = UserFelines.None;
+        }
+        
+        _felines = await dbContext
+            .Felines
             .OrderBy(f => f.Name)
-            .Select(f => new FelineCardDto
-            {
-                Category = f.Category,
-                Gender = f.Gender,
-                Id = f.Id,
-                IntakeAgeInWeeks = f.IntakeAgeInWeeks,
-                IntakeDate = f.IntakeDate,
-                Name = f.Name,
-                ThumbnailVersion = f.Thumbnail == null ? null : f.Thumbnail.Version
-            })
+            .SelectToCardDto()
             .ToListAsync();
     }
 

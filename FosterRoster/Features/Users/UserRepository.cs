@@ -1,10 +1,9 @@
 ﻿using FosterRoster.Data;
-using FosterRoster.Features.Fosterers;
+using FosterRoster.Features.Account;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace FosterRoster.Features.Users;
-
-using Account;
-using Microsoft.AspNetCore.Identity;
 
 public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IRepository
 {
