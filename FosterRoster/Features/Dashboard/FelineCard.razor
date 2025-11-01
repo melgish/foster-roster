@@ -19,8 +19,11 @@ else
                          Orientation="Orientation.Horizontal">
                 <RadzenText Text="@Feline.Name" TextStyle="TextStyle.DisplayH6" TagName="TagName.Div"
                             Style="margin-bottom: 0"/>
-                <AuthorizeView Roles="Admin,User">
+                <AuthorizeView Roles="User,Admin">
+                @if (UserFelines.Has(Feline.Id))
+                {
                     <AppFileInput OnChange="@OnFilesChangedAsync" Size="ButtonSize.Small" Rounded="true"/>
+                }
                 </AuthorizeView>
             </RadzenStack>
             <RadzenLink Path=@($"/felines/{Feline!.Id}")>
@@ -54,6 +57,9 @@ else
     /// </summary>
     [Parameter]
     public EventCallback<FelineCardDto> FelineChanged { get; set; }
+    
+    [Parameter]
+    public UserFelines UserFelines { get; set; } = UserFelines.None;
 
     /// <summary>
     ///     Handles quick change of the thumbnail from the dashboard.

@@ -8,6 +8,11 @@ public class UserFormDto : IIdBearer
     public string ConfirmPassword { get; set; } = string.Empty;
 
     /// <summary>
+    ///     A list of fosterer IDs associated with the user.
+    /// </summary>
+    public List<int> Fosterers { get; set; } = [];
+
+    /// <summary>
     ///     Unique ID for the user
     /// </summary>
     public int Id { get; init; }

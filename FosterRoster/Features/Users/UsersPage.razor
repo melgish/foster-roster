@@ -52,6 +52,15 @@
                         </AppFormColumn>
                     }
                 </AppFormRow>
+                <AppFormRow>
+                    <AppFormColumn>
+                        <MultiFostererSelect @bind-Value="_model.Fosterers" Text="Fosterers">
+                            <Helper>
+                                Select Fosterers that this user is allowed to manage.
+                            </Helper>
+                        </MultiFostererSelect>
+                    </AppFormColumn>
+                </AppFormRow>
                 <AppFormFooter>
                     <AppBusyCircle IsBusy="_isSaving"/>
                     @if (_model.Id != 0)

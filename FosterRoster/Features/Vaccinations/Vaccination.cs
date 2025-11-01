@@ -115,5 +115,7 @@ internal sealed class VaccinationConfiguration : IEntityTypeConfiguration<Vaccin
             .Property(e => e.VaccineName)
             .HasMaxLength(64)
             .IsRequired();
+
+        builder.HasQueryFilter(e => !e.Feline.IsInactive);
     }
 }
