@@ -38,10 +38,10 @@
                     Filterable="false"
                     Sortable="false"
                     Property="@nameof(FelineGridDto.Id)"
-                    Width="6ch">
+                    Width="4ch">
                     <Template>
                         <RadzenLink Path="@($"/felines/{context.Id}")">
-                            <AppGridButton ButtonStyle="ButtonStyle.Secondary" Text="Edit"/>
+                            <AppGridButton ButtonStyle="ButtonStyle.Secondary" Icon="Edit" aria-label="Edit" />
                         </RadzenLink>
                     </Template>
                 </RadzenDataGridColumn>
@@ -63,7 +63,7 @@
                     FilterValue="@_isInactiveFilter"
                     Property="@nameof(FelineGridDto.IsInactive)"
                     Title="Inactive"
-                    Width="19ch">
+                    Width="18ch">
                     <FilterTemplate>
                         <AppGridInactiveFilter @bind-Value="_isInactiveFilter"/>
                     </FilterTemplate>
