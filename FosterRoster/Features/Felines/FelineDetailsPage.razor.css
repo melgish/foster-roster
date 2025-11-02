@@ -6,3 +6,21 @@
 .tabs ::deep {
     --rz-tabs-padding: 0 0 0 0;
 }
+
+.tabs ::deep > div > ul[role="tablist"] {
+    flex-wrap: wrap;
+}
+
+@media screen and (max-width: 640px) {
+    /* On small screens, hide the text of unselected tabs to save space */
+    .tabs ::deep {
+        --rz-tabs-tab-font-size: 13px;
+        --rz-tabs-tab-line-height: 22px;
+    }
+    .tabs ::deep > div > ul[role="tablist"] > li > a {
+        padding: 10px 14px;
+    }
+    .tabs ::deep > div > ul[role="tablist"] > li:not(.rz-tabview-selected) > a > span:last-child {
+        display: none;
+    }
+}
