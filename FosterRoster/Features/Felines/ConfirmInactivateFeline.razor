@@ -10,7 +10,7 @@
     private void Cancel() => DialogService.Close();
 
     protected override void OnInitialized()
-        => _model = new(TimeProvider.GetUtcNow());
+        => _model = new(TimeProvider.GetLocalNow());
 
     private void Submit() => DialogService.Close(_model.Value);
 
@@ -29,7 +29,6 @@
                 .WithMessage("Please enter an inactivation date.");
         }
     }
-
 }
 
 <EditForm FormName="inactivate"
@@ -52,6 +51,7 @@
                     @bind-Value="_model.Value"
                     DateFormat="MM/dd/yyyy h:mm tt"
                     HourFormat="12"
+                    Kind="DateTimeKind.Local"
                     ShowTime="true"/>
             </RadzenFormField>
             <ValidationMessage For="() => _model.Value"/>
