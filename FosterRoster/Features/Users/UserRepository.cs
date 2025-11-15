@@ -49,7 +49,7 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
 
         var rs = Map(await userManager.CreateAsync(user, dto.Password));
 
-        return rs.ToResult(new IdOnlyDto(dto.Id));
+        return rs.ToResult(dto.ToIdOnly());
     }
 
     /// <summary>
@@ -143,6 +143,6 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
         if (rs.IsFailed)
             return rs;
 
-        return rs.IsFailed ? rs : Result.Ok(new IdOnlyDto(user.Id));
+        return rs.IsFailed ? rs : Result.Ok(user.ToIdOnly());
     }
 }

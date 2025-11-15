@@ -22,7 +22,7 @@ public sealed class MicrochipsRepository(
             FelineId = dto.FelineId,
         });
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
+        return Result.Ok(entry.Entity.ToIdOnly());
     }
 
 
@@ -88,6 +88,6 @@ public sealed class MicrochipsRepository(
 
         await db.SaveChangesAsync();
 
-        return Result.Ok(new IdOnlyDto(existing.Id));
+        return Result.Ok(existing.ToIdOnly());
     }
 }
