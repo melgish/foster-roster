@@ -99,7 +99,7 @@ public static class RadzenExtensions
                 new() { ["Name"] = name })
         );
 
-    private static string FirstReason<TReason>(this List<TReason> reasons) where TReason : IReason
+    private static string FirstReason<TReason>(this IReadOnlyList<TReason> reasons) where TReason : IReason
         => reasons.FirstOrDefault()?.Message ?? string.Empty;
 
     /// <summary>
