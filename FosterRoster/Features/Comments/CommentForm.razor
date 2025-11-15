@@ -9,7 +9,7 @@ else
               OnValidSubmit="@(() => OnSave.InvokeAsync(Model))">
         <FluentValidationValidator/>
         <RadzenHtmlEditor @bind-Value="Model.Text">
-            @if (Model.Id != 0)
+            @if (Model.IsExisting)
             {
                 <RadzenHtmlEditorCustomTool>
                     <Template Context="tool">
@@ -34,7 +34,7 @@ else
                                   Variant="Variant.Outlined"/>
                 </Template>
             </RadzenHtmlEditorCustomTool>
-            @if (Model.Id != 0)
+            @if (Model.IsExisting)
             {
                 <RadzenHtmlEditorCustomTool>
                     <Template Context="tool">

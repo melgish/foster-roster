@@ -3,7 +3,7 @@
 /// <summary>
 ///     DTO for creating or updating a chore.
 /// </summary>
-public sealed class ChoreFormDto
+public sealed class ChoreFormDto : IIdBearer
 {
     /// <summary>
     ///     Description of the task. Description will be added
@@ -55,7 +55,7 @@ public sealed class ChoreFormDtoValidator : AbstractValidator<ChoreFormDto>
             .MaximumLength(64)
             .NotEmpty();
 
-        When(e => e.Id == 0, () =>
+        When(e => e.IsNew, () =>
             {
                 RuleFor(e => e.FelineId)
                     .Must(e => e == 0)

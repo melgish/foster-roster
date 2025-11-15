@@ -77,7 +77,7 @@ public sealed class VaccinationFormDtoValidator : AbstractValidator<VaccinationF
             .GreaterThan(model => model.VaccinationDate)
             .WithMessage("Expiration date must be after the vaccination date.");
 
-        When(e => e.Id == 0, () =>
+        When(e => e.IsNew, () =>
             {
                 RuleFor(e => e.FelineId)
                     .Equal(0)
