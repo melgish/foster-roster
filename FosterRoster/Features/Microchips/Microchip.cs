@@ -62,7 +62,7 @@ internal sealed class MicrochipConfig : IEntityTypeConfiguration<Microchip>
         builder
             .Property(e => e.Id)
             .UseIdentityAlwaysColumn();
-        
+
         builder.HasQueryFilter(e => !e.Feline.IsInactive);
     }
 }

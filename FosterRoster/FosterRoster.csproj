@@ -1,45 +1,41 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
-    <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
-        <Nullable>enable</Nullable>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <IsPublishable>true</IsPublishable>
-        <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
-        <RuntimeFrameworkVersion>9.0.1</RuntimeFrameworkVersion>
-        <Version>1.7.2</Version>
-    </PropertyGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />
-        <PackageReference Include="FluentResults" Version="3.16.0" />
-        <PackageReference Include="FluentValidation" Version="12.0.0" />
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
-        <PackageReference Include="HtmlSanitizer" Version="9.0.886" />
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
-        <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="9.0.10" />
-        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.10" />
-        <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.10">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.10" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
-        <PackageReference Include="Radzen.Blazor" Version="7.4.3" />
-        <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
-    </ItemGroup>
-
-    <!--
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPublishable>true</IsPublishable>
+    <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
+    <RuntimeFrameworkVersion>9.0.1</RuntimeFrameworkVersion>
+    <Version>1.7.2</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />
+    <PackageReference Include="FluentResults" Version="3.16.0" />
+    <PackageReference Include="FluentValidation" Version="12.0.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
+    <PackageReference Include="HtmlSanitizer" Version="9.0.886" />
+    <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="10.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Radzen.Blazor" Version="7.4.3" />
+    <PackageReference Include="SharpGrip.FluentValidation.AutoValidation.Mvc" Version="1.5.0" />
+  </ItemGroup>
+  <!--
     Remove Registration and External Logins from the project.
     Note to restore, be sure to remove conditional EXTERNAL_LOGINS
     in IdentityComponentsEndpointRouteBuilderExtensions.cs
     -->
-    <ItemGroup>
-        <Content Remove="Features/Account/Pages/Register.razor" />
-        <Content Remove="Features/Account/Pages/ExternalLogin.razor" />
-        <Content Remove="Features/Account/Pages/RegisterConfirmation.razor" />
-        <Content Remove="Features/Account/Pages/Manage/ExternalLogins.razor" />
-    </ItemGroup>
-
+  <ItemGroup>
+    <Content Remove="Features/Account/Pages/Register.razor" />
+    <Content Remove="Features/Account/Pages/ExternalLogin.razor" />
+    <Content Remove="Features/Account/Pages/RegisterConfirmation.razor" />
+    <Content Remove="Features/Account/Pages/Manage/ExternalLogins.razor" />
+  </ItemGroup>
 </Project>

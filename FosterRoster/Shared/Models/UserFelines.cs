@@ -11,7 +11,7 @@ public abstract record UserFelines
 /// <summary>
 ///     Filter when user has access to all felines.
 /// </summary>
-public sealed record UserFelinesAll : UserFelines 
+public sealed record UserFelinesAll : UserFelines
 {
     public override bool Has(int felineId) => true;
 }

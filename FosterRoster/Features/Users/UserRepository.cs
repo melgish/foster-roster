@@ -19,7 +19,7 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
             { Succeeded: true } => Result.Ok(),
             { Errors: { } errors } => Result.Fail(string.Join(", ", errors.Select(e => e.Description)))
         };
-    
+
     /// <summary>
     /// Adds a new user to the database in the supplied role.
     /// </summary>
@@ -43,12 +43,12 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
             EmailConfirmed = true,
             PhoneNumber = dto.PhoneNumber.TrimToNull(),
             Fosterers = await dbContext.Fosterers.Where(f => dto.Fosterers.Contains(f.Id)).ToListAsync(),
-            UserRoles = await roleManager.FindByNameAsync(dto.Role) is { } role 
+            UserRoles = await roleManager.FindByNameAsync(dto.Role) is { } role
                 ? [new ApplicationUserRole() { Role = role }] : []
         };
 
         var rs = Map(await userManager.CreateAsync(user, dto.Password));
-        
+
         return rs.ToResult(new IdOnlyDto(dto.Id));
     }
 
@@ -128,8 +128,8 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
         // expectation for the application is that a user will be in a single
         // role.
         var role = await roleManager.FindByNameAsync(dto.Role);
-        user.UserRoles = role is not null 
-            ? [ new ApplicationUserRole { Role = role } ] 
+        user.UserRoles = role is not null
+            ? [new ApplicationUserRole { Role = role }]
             : [];
 
         // Update the fosterers.
