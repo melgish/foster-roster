@@ -73,7 +73,6 @@ public static class RadzenExtensions
         }
     }
 
-    /// <param name="dialogService"></param>
     extension(DialogService dialogService)
     {
         /// <summary>
