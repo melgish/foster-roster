@@ -8,7 +8,7 @@ public sealed partial class ConfirmTaskComplete(DialogService dialogService)
 {
     [Parameter] public ChoreCompletionFormDto Model { get; set; } = null!;
 
-    private void Cancel() => dialogService.Close(null);
+    private void Cancel() => dialogService.Close();
     private void Confirm(EditContext context) => dialogService.Close(context.Model);
 
 

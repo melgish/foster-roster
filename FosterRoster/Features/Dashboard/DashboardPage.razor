@@ -1,11 +1,9 @@
 ﻿@page "/"
 @using System.Security.Claims
 @using FosterRoster.Data
-@using FosterRoster.Features.Users
 @attribute [AllowAnonymous]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
-@inject UserRepository userRepository
 
 <PageTitle>Dashboard</PageTitle>
 <div class="deck">
@@ -74,5 +72,4 @@
         await LoadFelinesAsync();
         await base.OnInitializedAsync();
     }
-
 }
