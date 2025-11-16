@@ -1,7 +1,6 @@
 ﻿using FosterRoster.Data;
 using FosterRoster.Features.Account;
 using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
 
 namespace FosterRoster.Features.Users;
 
