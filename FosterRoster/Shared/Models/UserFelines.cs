@@ -30,5 +30,5 @@ public sealed record UserFelinesNone : UserFelines
 /// <param name="FelineIds"></param>
 public sealed record UserFelinesSome(HashSet<int> FelineIds) : UserFelines
 {
-    public override bool Has(int felinId) => FelineIds.Contains(felinId);
+    public override bool Has(int felineId) => FelineIds.Contains(felineId);
 }
