@@ -1,7 +1,8 @@
-﻿namespace FosterRoster.Features.Account;
-
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Identity;
 using System.Diagnostics.CodeAnalysis;
+
+namespace FosterRoster.Features.Account;
 
 internal sealed class IdentityRedirectManager(NavigationManager navigationManager)
 {
@@ -41,11 +42,13 @@ internal sealed class IdentityRedirectManager(NavigationManager navigationManage
         context.Response.Cookies.Append(StatusCookieName, message, StatusCookieBuilder.Build(context));
         RedirectTo(uri);
     }
-
-#if NOT_IMPLEMENTED
+    
     public void RedirectToCurrentPage() => RedirectTo(CurrentPath);
-#endif
 
     public void RedirectToCurrentPageWithStatus(string message, HttpContext context)
         => RedirectToWithStatus(CurrentPath, message, context);
+    
+    public void RedirectToInvalidUser(UserManager<ApplicationUser> userManager, HttpContext context)
+        => RedirectToWithStatus("Account/InvalidUser", $"Error: Unable to load user with ID '{userManager.GetUserId(context.User)}'.", context);
+
 }
