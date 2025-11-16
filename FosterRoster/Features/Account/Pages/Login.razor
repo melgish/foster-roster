@@ -101,12 +101,16 @@
 
     [CascadingParameter] private HttpContext HttpContext { get; set; } = null!;
 
-    [SupplyParameterFromForm] private InputModel Input { get; [UsedImplicitly] set; } = new();
+    [SupplyParameterFromForm] private InputModel Input { get; set; } = null!;
 
     [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        // SupplyParameterFromForm can set Input to null in some cases.
+        // ReSharper disable once NullCoalescingConditionIsAlwaysNotNullAccordingToAPIContract
+        Input ??= new InputModel();
+
         if (HttpMethods.IsGet(HttpContext.Request.Method))
         {
             // Clear the existing external cookie to ensure a clean login process
