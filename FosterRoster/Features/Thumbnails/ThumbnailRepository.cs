@@ -41,7 +41,7 @@ public sealed class ThumbnailRepository(
             .SingleOrDefaultAsync(e => e.Id == felineId);
         if (feline == null) return Result.Fail(new NotFoundError());
 
-        feline.Thumbnail ??= new() { FelineId = feline.Id };
+        feline.Thumbnail ??= new Thumbnail { FelineId = feline.Id };
         feline.Thumbnail.ImageData = thumbnail.ImageData;
         feline.Thumbnail.ContentType = thumbnail.ContentType;
 

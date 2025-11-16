@@ -93,7 +93,7 @@ else
         {
             var rsc = await CommentRepository.GetByKeyAsync(rs.Value.Id);
             _feline.Comments = [rsc.ValueOrDefault.ToFormDto(), .. _feline.Comments];
-            _comment = new() { FelineId = FelineId };
+            _comment = new CommentFormDto { FelineId = FelineId };
         }
     }
 
@@ -135,7 +135,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _comment = new() { FelineId = FelineId };
+        _comment = new CommentFormDto { FelineId = FelineId };
         _feline ??= await LoadAsync();
         if (_feline is null)
         {

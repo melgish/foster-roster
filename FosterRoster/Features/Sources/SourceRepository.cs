@@ -14,7 +14,7 @@ public sealed class SourceRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(SourceFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
-        var entry = db.Sources.Add(new()
+        var entry = db.Sources.Add(new Source
         {
             Name = dto.Name.TrimToNull()
         });

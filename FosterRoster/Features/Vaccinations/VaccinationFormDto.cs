@@ -1,7 +1,5 @@
 namespace FosterRoster.Features.Vaccinations;
 
-using Felines;
-
 public sealed class VaccinationFormDto : IIdBearer
 {
     /// <summary>

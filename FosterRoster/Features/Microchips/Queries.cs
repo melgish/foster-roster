@@ -11,7 +11,7 @@ public static class Queries
                 Code = e.Code,
                 Comment = e.Comment,
                 FelineId = e.FelineId,
-                Id = e.Id,
+                Id = e.Id
             });
     }
 }

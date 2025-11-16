@@ -209,7 +209,7 @@
         // Reset the model to be edited.
         var rs = FostererId != 0
             ? await FostererRepository.GetByKeyAsync(FostererId)
-            : Result.Ok<FostererFormDto>(new());
+            : Result.Ok(new FostererFormDto());
         if (NavigationManager.VerifyFound(rs))
         {
             _name = rs.Value.IsNew ? $"Create New {EntityName}" : rs.Value.Name;

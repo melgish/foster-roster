@@ -66,7 +66,7 @@ public static class FosterRosterDbStartup
         {
             UserName = cfg.FirstUserEmail,
             Email = cfg.FirstUserEmail,
-            EmailConfirmed = true,
+            EmailConfirmed = true
         };
 
         var rs = await manager.CreateAsync(user, cfg.FirstUserPassword);

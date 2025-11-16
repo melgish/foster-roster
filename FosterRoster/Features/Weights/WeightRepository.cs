@@ -1,3 +1,5 @@
+using FosterRoster.Features.Felines;
+
 namespace FosterRoster.Features.Weights;
 
 using Infrastructure;
@@ -8,13 +10,13 @@ public sealed class WeightRepository(
 ) : IRepository
 {
     private static readonly Expression<Func<Weight, Weight>> WeightProjection =
-        w => new()
+        w => new Weight
         {
             FelineId = w.FelineId,
             DateTime = w.DateTime,
             Value = w.Value,
             Units = w.Units,
-            Feline = new()
+            Feline = new Feline
             {
                 Name = w.Feline.Name
             }
@@ -40,11 +42,7 @@ public sealed class WeightRepository(
     /// </summary>
     /// <returns></returns>
     public async Task<Query<Weight>> CreateQueryAsync()
-    {
-        var context = await contextFactory.CreateDbContextAsync();
-        var queryable = context.Weights;
-        return new(context, queryable);
-    }
+        => await contextFactory.CreateQueryAsync(db => db.Weights);
 
     /// <summary>
     ///     Delete the given weight from the database.

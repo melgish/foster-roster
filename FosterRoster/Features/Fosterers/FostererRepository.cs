@@ -12,7 +12,7 @@ public sealed class FostererRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(FostererFormDto model)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
-        var entry = db.Fosterers.Add(new()
+        var entry = db.Fosterers.Add(new Fosterer
         {
             Address = model.Address,
             ContactMethod = model.ContactMethod,

@@ -13,7 +13,7 @@ public sealed class CommentRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(CommentFormDto comment)
     {
         await using var context = await dbContextFactory.CreateDbContextAsync();
-        var entry = await context.Comments.AddAsync(new()
+        var entry = await context.Comments.AddAsync(new Comment
         {
             FelineId = comment.FelineId,
             Text = comment.Text,
@@ -68,7 +68,7 @@ public sealed class CommentRepository(
             return Result.Fail(new NotFoundError());
 
         // Only update if comment text has actually been changed.
-        if (existing.Text.Equals(dto.Text))
+        if (existing.Text.Equals(dto.Text, StringComparison.Ordinal))
             return Result.Ok(existing.ToIdOnly());
 
         existing.Text = dto.Text;

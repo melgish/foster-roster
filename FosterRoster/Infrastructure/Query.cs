@@ -58,7 +58,7 @@ public static class Query
     ) where TEntity : class
     {
         var db = await dbContextFactory.CreateDbContextAsync();
-        return new(db, setFactory(db));
+        return new Query<TEntity>(db, setFactory(db));
     }
 
     /// <summary>

@@ -31,12 +31,12 @@ public sealed partial class ConfirmTaskComplete(DialogService dialogService)
     {
         var logEntry = (ChoreCompletionFormDto?)await dialogService.OpenAsync<ConfirmTaskComplete>(
             "Confirm Task Complete",
-            new()
+            new Dictionary<string, object>
             {
-                ["Model"] = new ChoreCompletionFormDto()
+                ["Model"] = new ChoreCompletionFormDto
                 {
                     LogDate = timeProvider.GetLocalNow(),
-                    LogText = choreGridDto.Description,
+                    LogText = choreGridDto.Description
                 }
             });
         if (logEntry == null)

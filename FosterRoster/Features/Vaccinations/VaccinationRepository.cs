@@ -9,7 +9,7 @@ public class VaccinationRepository(
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         db.Vaccinations.AddRange(
-            dto.FelineIds.Select(felineId => new Vaccination()
+            dto.FelineIds.Select(felineId => new Vaccination
             {
                 AdministeredBy = dto.AdministeredBy.Trim(),
                 Comments = dto.Comments?.TrimToNull(),

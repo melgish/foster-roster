@@ -14,12 +14,12 @@ public sealed class MicrochipsRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(MicrochipFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
-        var entry = db.Microchips.Add(new Microchip()
+        var entry = db.Microchips.Add(new Microchip
         {
             Brand = dto.Brand.Trim(),
             Code = dto.Code.Trim(),
             Comment = dto.Comment.TrimToNull(),
-            FelineId = dto.FelineId,
+            FelineId = dto.FelineId
         });
         await db.SaveChangesAsync();
         return Result.Ok(entry.Entity.ToIdOnly());

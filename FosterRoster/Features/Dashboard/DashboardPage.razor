@@ -31,7 +31,7 @@
         }
         else if (state.User.IsInRole(Roles.User))
         {
-            _ = int.TryParse(state.User.FindFirstValue(ClaimTypes.NameIdentifier), out int userId);
+            _ = int.TryParse(state.User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId);
             var uf = dbContext
                 .Users
                 .Where(u => u.Id == userId)

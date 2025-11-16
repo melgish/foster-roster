@@ -208,7 +208,7 @@
     private void Reset()
     {
         // Start a new form, but keep the selected unit type
-        _model = new()
+        _model = new WeightFromDto
         {
             DateTime = TimeProvider.GetUtcNow(),
             Units = _model.Units

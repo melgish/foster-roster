@@ -2,6 +2,9 @@
 
 using Radzen;
 
+/// <summary>
+///     A set of configurable defaults for Radzen Grids used within the application.
+/// </summary>
 public static class Grid
 {
     public static readonly Density Density = Density.Compact;

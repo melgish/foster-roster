@@ -254,7 +254,7 @@
         // Reset the model to be edited.
         var rs = VaccinationId != 0
             ? await VaccinationRepository.GetByKeyAsync(VaccinationId)
-            : Result.Ok<VaccinationFormDto>(new());
+            : Result.Ok(new VaccinationFormDto());
         if (NavigationManager.VerifyFound(rs))
         {
             _name = rs.Value.IsNew ? $"Create New {EntityName}" : rs.Value.VaccineName;

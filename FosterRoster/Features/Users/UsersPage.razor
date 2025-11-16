@@ -229,7 +229,7 @@
     {
         // Reset the model being edited
         var rs = UserId == 0
-            ? Result.Ok<UserFormDto>(new())
+            ? Result.Ok(new UserFormDto())
             : await UserRepository.GetByKeyAsync(UserId);
         if (rs.IsFailed)
         {

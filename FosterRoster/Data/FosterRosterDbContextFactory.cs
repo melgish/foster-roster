@@ -21,6 +21,6 @@ public sealed class FosterRosterDbContextFactory
 
         var optionsBuilder = new DbContextOptionsBuilder<FosterRosterDbContext>();
         optionsBuilder.UseNpgsql(cfg.GetConnectionString("Default") ?? DefaultConnectionString);
-        return new(optionsBuilder.Options);
+        return new FosterRosterDbContext(optionsBuilder.Options);
     }
 }

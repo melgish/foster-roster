@@ -43,7 +43,7 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
             PhoneNumber = dto.PhoneNumber.TrimToNull(),
             Fosterers = await dbContext.Fosterers.Where(f => dto.Fosterers.Contains(f.Id)).ToListAsync(),
             UserRoles = await roleManager.FindByNameAsync(dto.Role) is { } role
-                ? [new ApplicationUserRole() { Role = role }] : []
+                ? [new ApplicationUserRole { Role = role }] : []
         };
 
         var rs = Map(await userManager.CreateAsync(user, dto.Password));

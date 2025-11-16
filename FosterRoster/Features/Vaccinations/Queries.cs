@@ -15,17 +15,17 @@ public static class Queries
                 ManufacturerName = e.ManufacturerName,
                 SerialNumber = e.SerialNumber,
                 VaccinationDate = e.VaccinationDate,
-                VaccineName = e.VaccineName,
+                VaccineName = e.VaccineName
             });
 
         public IQueryable<VaccinationGridDto> SelectToGridDto()
-            => query.Select(e => new VaccinationGridDto()
+            => query.Select(e => new VaccinationGridDto
             {
                 ExpirationDate = e.ExpirationDate,
                 FelineName = e.Feline.Name,
                 Id = e.Id,
                 VaccinationDate = e.VaccinationDate,
-                VaccineName = e.VaccineName,
+                VaccineName = e.VaccineName
             });
 
         public IQueryable<Vaccination> ForFeline(int felineId)
