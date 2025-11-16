@@ -66,14 +66,15 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
     /// <returns></returns>
     public async Task<Result> DeleteByKeyAsync(int userId)
     {
-        await using var scoped = scopeFactory.CreateScopedAsync<UserManager<ApplicationUser>>();
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
         // UserManager will raise a concurrency exception if a proxy user
         // is passed to delete. Load the user from the database in order to 
         // delete it.
-        return await scoped.Instance.FindByIdAsync(userId.ToString()) switch
+        return await userManager.FindByIdAsync(userId.ToString()) switch
         {
-            { } user => Map(await scoped.Instance.DeleteAsync(user)),
+            { } user => Map(await userManager.DeleteAsync(user)),
             null => Result.Fail(new NotFoundError())
         };
     }
@@ -85,9 +86,10 @@ public sealed class UserRepository(IServiceScopeFactory scopeFactory) : IReposit
     /// <returns>Result with Fosterer if successful, or Errors on failure.</returns>
     public async Task<Result<UserFormDto>> GetByKeyAsync(int userId)
     {
-        await using var scoped = scopeFactory.CreateScopedAsync<UserManager<ApplicationUser>>();
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        var dto = await scoped.Instance.Users
+        var dto = await userManager.Users
             .AsNoTracking()
             .SelectToFormDto()
             .FirstOrDefaultAsync(f => f.Id == userId);

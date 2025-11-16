@@ -19,7 +19,8 @@ using System.Text.Json;
 
 internal static class IdentityComponentsEndpointRouteBuilderExtensions
 {
-    // These endpoints are required by the Identity Razor components defined in the /Components/Account/Pages directory of this project.
+    // These endpoints are required by the Identity Razor components defined in
+    // the /Components/Account/Pages directory of this project.
     [UsedImplicitly]
     public static IEndpointConventionBuilder MapAdditionalIdentityEndpoints(this IEndpointRouteBuilder endpoints)
     {

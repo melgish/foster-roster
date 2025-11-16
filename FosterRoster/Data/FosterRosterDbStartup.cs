@@ -1,7 +1,6 @@
 namespace FosterRoster.Data;
 
 using Features.Account;
-using Features.Users;
 using Microsoft.AspNetCore.Identity;
 
 public static class FosterRosterDbStartup
@@ -81,15 +80,17 @@ public static class FosterRosterDbStartup
         return rs.Succeeded;
     }
 
-    /// <summary>
-    /// Make sure that database is up to date and has a user
-    /// </summary>
-    /// <param name="app"></param>
-    /// <returns></returns>
-    public static async Task<bool> CheckDatabaseReadyAsync(this IHost app)
+    extension(IHost app)
     {
-        var cfg = GetSetupConfig(app);
-        var databaseReady = await MigrateDatabaseAsync(app, cfg);
-        return databaseReady && await SeedInitialAdminUser(app, cfg);
+        /// <summary>
+        /// Make sure that database is up to date and has a user
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> CheckDatabaseReadyAsync()
+        {
+            var cfg = GetSetupConfig(app);
+            var databaseReady = await MigrateDatabaseAsync(app, cfg);
+            return databaseReady && await SeedInitialAdminUser(app, cfg);
+        }
     }
 }

@@ -16,19 +16,19 @@ public static class IdOnly
     ///     Result when a single ID cannot be resolved from multiple updates.
     /// </summary>
     public static readonly IdOnlyDto Zero = new(0);
-    
+
     extension(IIdBearer bearer)
     {
         /// <summary>
         ///     Test if entity is new.
         /// </summary>
         public bool IsNew => bearer.Id == 0;
-        
+
         /// <summary>
         ///     Test if entity has been persisted to the database.
         /// </summary>
         public bool IsExisting => bearer.Id != 0;
-        
+
         /// <summary>
         ///     Convert entity to an IdOnlyDto.
         /// </summary>

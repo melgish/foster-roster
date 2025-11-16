@@ -22,9 +22,15 @@ public static class FelineExtensions
         };
     }
 
-    public static string FormatAge(this Feline feline, DateTimeOffset asOfDate)
-        => FormatAge(feline.IntakeAgeInWeeks, feline.IntakeDate, asOfDate);
+    extension(Feline feline)
+    {
+        public string FormatAge(DateTimeOffset asOfDate)
+            => FormatAge(feline.IntakeAgeInWeeks, feline.IntakeDate, asOfDate);
+    }
 
-    public static string FormatAge(this FelineCardDto feline, DateTimeOffset asOfDate)
-        => FormatAge(feline.IntakeAgeInWeeks, feline.IntakeDate, asOfDate);
+    extension(FelineCardDto feline)
+    {
+        public string FormatAge(DateTimeOffset asOfDate)
+            => FormatAge(feline.IntakeAgeInWeeks, feline.IntakeDate, asOfDate);
+    }
 }
