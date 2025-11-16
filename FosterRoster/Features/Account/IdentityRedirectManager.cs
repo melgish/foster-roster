@@ -41,7 +41,7 @@ internal sealed class IdentityRedirectManager(NavigationManager navigationManage
         RedirectTo(uri);
     }
     
-    public void RedirectToCurrentPage() => RedirectTo(CurrentPath);
+    // public void RedirectToCurrentPage() => RedirectTo(CurrentPath);
 
     public void RedirectToCurrentPageWithStatus(string message, HttpContext context)
         => RedirectToWithStatus(CurrentPath, message, context);

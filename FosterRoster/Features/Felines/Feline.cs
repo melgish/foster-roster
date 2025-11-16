@@ -31,7 +31,7 @@ public sealed class Feline : IIdBearer
     public int? IntakeAgeInWeeks { get; set; }
     public DateOnly IntakeDate { get; set; }
     public bool IsInactive { get; init; }
-    public Microchip? Microchip { get; set; }
+    public Microchip? Microchip { get; init; }
     public string Name { get; set; } = string.Empty;
     public DateOnly? RegistrationDate { get; init; }
     public Source? Source { get; init; }

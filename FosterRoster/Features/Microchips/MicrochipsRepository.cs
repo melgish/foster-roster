@@ -25,15 +25,6 @@ public sealed class MicrochipsRepository(
         return Result.Ok(entry.Entity.ToIdOnly());
     }
 
-
-    /// <summary>
-    ///     Captures a new database context and creates a queryable for the Vaccination table.
-    /// </summary>
-    /// <returns></returns>
-    public Task<Query<Microchip>> CreateQueryAsync()
-        => dbContextFactory.CreateQueryAsync(db => db.Microchips.AsNoTracking());
-
-
     /// <summary>
     ///     Deletes an existing Microchip from the database by its ID.
     /// </summary>

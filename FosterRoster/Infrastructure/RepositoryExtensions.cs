@@ -1,11 +1,15 @@
 namespace FosterRoster.Infrastructure;
 
+/// <summary>
+///     Marks a repository for automatic registration.
+/// </summary>
 interface IRepository;
 
 public static class RepositoryExtensions
 {
     extension(IServiceCollection services)
     {
+        // ReSharper disable once UnusedMethodReturnValue.Global
         public IServiceCollection AddRepositoriesFromAssemblyContaining<T>()
         {
             var types = typeof(T)

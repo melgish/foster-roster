@@ -20,11 +20,11 @@
                         Name="@Name"
                         Multiple="true"
                         Placeholder="@Placeholder"
-                        TextProperty="@nameof(ListItemDto<int>.Name)"
+                        TextProperty="@nameof(ListItemDto<>.Name)"
                         Value="@Value"
                         ValueChanged="ValueChanged"
                         ValueExpression="ValueExpression"
-                        ValueProperty="@nameof(ListItemDto<int>.Id)"/>
+                        ValueProperty="@nameof(ListItemDto<>.Id)"/>
     </RadzenFormField>
     <ValidationMessage For="@ValueExpression"/>
 </RadzenStack>

@@ -11,12 +11,12 @@
                         Disabled="@Disabled"
                         Name="@Name"
                         Placeholder="@Placeholder"
-                        TextProperty="@nameof(ListItemDto<TValue>.Name)"
+                        TextProperty="@nameof(ListItemDto<>.Name)"
                         TValue="TValue"
                         Value="@Value"
                         ValueChanged="ValueChanged"
                         ValueExpression="ValueExpression"
-                        ValueProperty="@nameof(ListItemDto<TValue>.Id)"/>
+                        ValueProperty="@nameof(ListItemDto<>.Id)"/>
     </RadzenFormField>
     <ValidationMessage For="ValueExpression" TValue="TValue"/>
 </RadzenStack>
