@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Identity;
-using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace FosterRoster.Features.Account;
 
