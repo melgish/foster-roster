@@ -22,11 +22,6 @@ public sealed class VaccinationFormDto : IIdBearer
     /// <summary>
     ///     Feline that received the vaccination.
     /// </summary>
-    public Feline Feline { get; init; } = null!;
-
-    /// <summary>
-    ///     Feline that received the vaccination.
-    /// </summary>
     public int FelineId { get; set; }
 
     /// <summary>
