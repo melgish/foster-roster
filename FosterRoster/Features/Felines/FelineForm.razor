@@ -86,7 +86,7 @@ else
             {
             <AppFormFooter>
                 <AppBusyCircle IsBusy="_isSaving"/>
-                @if (Feline.Id != 0)
+                @if (Feline.IsExisting)
                 {
                     @if (_model.IsInactive)
                     {

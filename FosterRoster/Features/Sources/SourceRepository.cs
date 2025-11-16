@@ -19,7 +19,7 @@ public sealed class SourceRepository(
             Name = dto.Name.TrimToNull()
         });
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
+        return Result.Ok(entry.Entity.ToIdOnly());
     }
 
     /// <summary>
@@ -73,12 +73,12 @@ public sealed class SourceRepository(
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
 
-        var source = await db.Sources.FindAsync(sourceId);
-        if (source is null) return Result.Fail(new NotFoundError());
+        var existing = await db.Sources.FindAsync(sourceId);
+        if (existing is null) return Result.Fail(new NotFoundError());
 
-        source.Name = dto.Name.TrimToNull();
+        existing.Name = dto.Name.TrimToNull();
 
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(source.Id));
+        return Result.Ok(existing.ToIdOnly());
     }
 }

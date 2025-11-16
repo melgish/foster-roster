@@ -53,7 +53,7 @@ public sealed class FelineRepository(
             Thumbnail = model.Thumbnail
         });
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
+        return Result.Ok(entry.Entity.ToIdOnly());
     }
 
     /// <summary>
@@ -170,6 +170,6 @@ public sealed class FelineRepository(
 
         await db.SaveChangesAsync();
 
-        return Result.Ok(new IdOnlyDto(existing.Id));
+        return Result.Ok(existing.ToIdOnly());
     }
 }

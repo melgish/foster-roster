@@ -63,7 +63,7 @@
                 </AppFormRow>
                 <AppFormFooter>
                     <AppBusyCircle IsBusy="_isSaving"/>
-                    @if (_model.Id != 0)
+                    @if (_model.IsExisting)
                     {
                         <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving"/>
                     }
@@ -237,7 +237,7 @@
             return;
         }
 
-        _name = rs.Value.Id == 0 ? "Create New User" : rs.Value.UserName;
+        _name = rs.Value.IsNew ? "Create New User" : rs.Value.UserName;
         _model = rs.Value;
     }
 
@@ -248,7 +248,7 @@
     private async Task SaveAsync(EditContext editContext)
     {
         var id = _model.Id;
-        var rs = id == 0
+        var rs = _model.IsNew
             ? await UserRepository.AddAsync(_model)
             : await UserRepository.UpdateAsync(_model.Id, _model);
         if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))

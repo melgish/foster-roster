@@ -21,7 +21,7 @@ public class VaccinationRepository(
                 VaccineName = dto.VaccineName.Trim()
             }));
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(0));
+        return Result.Ok(IdOnly.Zero);
     }
 
 
@@ -94,6 +94,6 @@ public class VaccinationRepository(
 
         await db.SaveChangesAsync();
 
-        return Result.Ok(new IdOnlyDto(existing.Id));
+        return Result.Ok(existing.ToIdOnly());
     }
 }

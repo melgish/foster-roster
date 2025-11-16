@@ -48,7 +48,7 @@
                 </AppFormRow>
                 <AppFormFooter>
                     <AppBusyCircle IsBusy="_isSaving"/>
-                    @if (_model.Id != 0)
+                    @if (_model.IsExisting)
                     {
                         <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving"/>
                     }
@@ -212,7 +212,7 @@
             : Result.Ok<FostererFormDto>(new());
         if (NavigationManager.VerifyFound(rs))
         {
-            _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
+            _name = rs.Value.IsNew ? $"Create New {EntityName}" : rs.Value.Name;
             _model = rs.Value;
         }
     }
@@ -223,7 +223,7 @@
     /// <param name="editContext">Form context</param>
     private async Task SaveAsync(EditContext editContext)
     {
-        var rs = _model.Id == 0
+        var rs = _model.IsNew
             ? await FostererRepository.AddAsync(_model)
             : await FostererRepository.UpdateAsync(_model.Id, _model);
         if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))

@@ -28,7 +28,7 @@
                         </AppTextBox>
                     </AppFormColumn>
                     <AppFormColumn>
-                        @if (_model.Id != 0)
+                        @if (_model.IsExisting)
                         {
                             <FelineSelect
                                 @bind-Value="_model.FelineId"
@@ -66,7 +66,7 @@
                 </AppFormRow>
                 <AppFormFooter>
                     <AppBusyCircle IsBusy="_isSaving"/>
-                    @if (_model.Id != 0)
+                    @if (_model.IsExisting)
                     {
                         <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving"/>
                     }
@@ -159,7 +159,7 @@
 
     private async Task<bool> ConfirmMultiCreateAsync()
     {
-        if (_model.Id != 0 || _model.FelineIds.Count <= 1)
+        if (_model.IsExisting || _model.FelineIds.Count <= 1)
         {
             return true;
         }
@@ -289,7 +289,7 @@
         if (NavigationManager.VerifyFound(rs))
         {
             _model = rs.Value;
-            _name = rs.Value.Id == 0 ? $"Create New {EntityName}" : rs.Value.Name;
+            _name = rs.Value.IsNew ? $"Create New {EntityName}" : rs.Value.Name;
         }
     }
 
@@ -307,7 +307,7 @@
         _isSaving = true;
         try
         {
-            var rs = _model.Id == 0
+            var rs = _model.IsNew
                 ? await ChoreRepository.AddAsync(_model)
                 : await ChoreRepository.UpdateAsync(_model.Id, _model);
             if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))

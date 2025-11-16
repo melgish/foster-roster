@@ -23,7 +23,7 @@ public sealed class ChoreRepository(
                 Name = model.Name.TrimToNull()
             }));
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(0));
+        return Result.Ok(IdOnly.Zero);
     }
 
     /// <summary>
@@ -106,6 +106,6 @@ public sealed class ChoreRepository(
         existing.FelineId = model.FelineId;
 
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(existing.Id));
+        return Result.Ok(existing.ToIdOnly());
     }
 }

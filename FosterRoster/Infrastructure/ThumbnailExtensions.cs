@@ -37,12 +37,15 @@ public static class ThumbnailExtensions
     public static string GetUrl(int felineId, uint? version)
         => version is null ? NoImage : $"thumbnails/{felineId}?v={version}";
 
-    public static string GetUrl(this Thumbnail? thumbnail)
-        => thumbnail switch
-        {
-            { ImageData.Length: 0 } => $"thumbnails/{thumbnail.FelineId}?v={thumbnail.Version}",
-            { ImageData.Length: > 0 } =>
-                $"data:{thumbnail.ContentType};base64,{Convert.ToBase64String(thumbnail.ImageData)}",
-            _ => NoImage
-        };
+    extension(Thumbnail? thumbnail)
+    {
+        public string GetUrl()
+            => thumbnail switch
+            {
+                { ImageData.Length: 0 } => $"thumbnails/{thumbnail.FelineId}?v={thumbnail.Version}",
+                { ImageData.Length: > 0 } =>
+                    $"data:{thumbnail.ContentType};base64,{Convert.ToBase64String(thumbnail.ImageData)}",
+                _ => NoImage
+            };
+    }
 }

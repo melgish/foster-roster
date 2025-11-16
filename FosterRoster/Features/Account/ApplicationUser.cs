@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 public sealed class ApplicationUser : IdentityUser<int>, IIdBearer
 {
     public List<ApplicationUserRole> UserRoles { get; set; } = [];
-    
+
     public List<Fosterer> Fosterers { get; set; } = [];
 }
 

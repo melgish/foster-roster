@@ -66,7 +66,7 @@ public sealed class UserFromDtoValidator : AbstractValidator<UserFormDto>
             .EmailAddress()
             .WithMessage("Email must be a valid email address.");
 
-        When(x => x.Id == 0, () => { RuleFor(x => x.Password).NotEmpty().WithMessage(PasswordErrorMessage); });
+        When(x => x.IsNew, () => { RuleFor(x => x.Password).NotEmpty().WithMessage(PasswordErrorMessage); });
 
         When(x => !string.IsNullOrEmpty(x.Password), () =>
         {

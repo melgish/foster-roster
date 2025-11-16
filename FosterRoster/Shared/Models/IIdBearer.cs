@@ -10,7 +10,29 @@ public interface IIdBearer
 
 public sealed record IdOnlyDto(int Id) : IIdBearer;
 
-public static class IdBearer
+public static class IdOnly
 {
-    public static bool IsNew(this IIdBearer bearer) => bearer.Id == 0;
+    /// <summary>
+    ///     Result when a single ID cannot be resolved from multiple updates.
+    /// </summary>
+    public static readonly IdOnlyDto Zero = new(0);
+
+    extension(IIdBearer bearer)
+    {
+        /// <summary>
+        ///     Test if entity is new.
+        /// </summary>
+        public bool IsNew => bearer.Id == 0;
+
+        /// <summary>
+        ///     Test if entity has been persisted to the database.
+        /// </summary>
+        public bool IsExisting => bearer.Id != 0;
+
+        /// <summary>
+        ///     Convert entity to an IdOnlyDto.
+        /// </summary>
+        /// <returns></returns>
+        public IdOnlyDto ToIdOnly() => new(bearer.Id);
+    }
 }

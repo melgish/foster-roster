@@ -21,7 +21,7 @@ public sealed class FostererRepository(
             Name = model.Name
         });
         await db.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
+        return Result.Ok(entry.Entity.ToIdOnly());
     }
 
     /// <summary>
@@ -84,6 +84,6 @@ public sealed class FostererRepository(
         existing.Name = model.Name.TrimToNull();
         await db.SaveChangesAsync();
 
-        return Result.Ok(new IdOnlyDto(existing.Id));
+        return Result.Ok(existing.ToIdOnly());
     }
 }

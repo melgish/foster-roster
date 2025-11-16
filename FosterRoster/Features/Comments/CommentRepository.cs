@@ -21,7 +21,7 @@ public sealed class CommentRepository(
             TimeStamp = timeProvider.GetUtcNow().UtcDateTime
         });
         await context.SaveChangesAsync();
-        return Result.Ok(new IdOnlyDto(entry.Entity.Id));
+        return Result.Ok(entry.Entity.ToIdOnly());
     }
 
     public async Task<Result<Comment>> GetByKeyAsync(int commentId)
@@ -69,12 +69,12 @@ public sealed class CommentRepository(
 
         // Only update if comment text has actually been changed.
         if (existing.Text.Equals(dto.Text))
-            return Result.Ok(new IdOnlyDto(existing.Id));
+            return Result.Ok(existing.ToIdOnly());
 
         existing.Text = dto.Text;
         existing.Modified = timeProvider.GetUtcNow().UtcDateTime;
         await db.SaveChangesAsync();
 
-        return Result.Ok(new IdOnlyDto(existing.Id));
+        return Result.Ok(existing.ToIdOnly());
     }
 }

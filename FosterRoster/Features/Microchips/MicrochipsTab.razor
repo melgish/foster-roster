@@ -21,7 +21,7 @@ else
                                  Orientation="Orientation.Horizontal"
                                  >
                         <AppBusyCircle IsBusy="_isSaving"/>
-                        @if (!_model.IsNew())
+                        @if (!_model.IsNew)
                         {
                             <AppFormDeleteButton Click="DeleteAsync" Disabled="_isSaving" />
                         }
@@ -112,7 +112,7 @@ else
         _isSaving = true;
         try
         {
-            var rs = _model.IsNew()
+            var rs = _model.IsNew
                 ? await MicrochipsRepository.AddAsync(_model!)
                 : await MicrochipsRepository.UpdateAsync(_model!.Id, _model);
             if (NotificationService.NotifyResult(rs, EntityName, "save", "saved"))
