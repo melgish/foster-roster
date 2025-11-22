@@ -6,7 +6,7 @@
     <IsPublishable>true</IsPublishable>
     <EnableSdkContainerSupport>true</EnableSdkContainerSupport>
     <RuntimeFrameworkVersion>10.0.0</RuntimeFrameworkVersion>
-    <Version>1.7.2</Version>
+    <Version>1.8.0</Version>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
     <!-- Suppress warning about package version conflicts until PostgreSQL 10 is GA -->
     <NoWarn>$(NoWarn);NU1608</NoWarn>  
