@@ -75,7 +75,7 @@
             PagerHorizontalAlign="HorizontalAlign.Center"
             PagerPosition="PagerPosition.Top"
             PageSize="20"
-            PageSizeOptions="@( [10, 20, 50, 100])"
+            PageSizeOptions="@([10, 20, 50, 100])"
             PagingSummaryFormat="Showing {0} to {1} of {2}"
             ShowPagingSummary="true">
             <HeaderTemplate>
@@ -150,7 +150,7 @@
     private bool _showActions;
 
     /// <summary>
-    /// Units to display in the grid
+    ///     Units to display in the grid
     /// </summary>
     public WeightUnit Units { get; set; } = WeightUnit.lbs;
 
@@ -200,20 +200,15 @@
         }
     }
 
-    protected override void OnInitialized()
-    {
-        Reset();
-    }
+    protected override void OnInitialized() => Reset();
 
-    private void Reset()
-    {
+    private void Reset() =>
         // Start a new form, but keep the selected unit type
         _model = new WeightFromDto
-        {
-            DateTime = TimeProvider.GetUtcNow(),
-            Units = _model.Units
-        };
-    }
+    {
+        DateTime = TimeProvider.GetUtcNow(),
+        Units = _model.Units
+    };
 
     private async Task SaveAsync()
     {
@@ -227,5 +222,4 @@
 
         _isSaving = false;
     }
-
 }

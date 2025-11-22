@@ -2,63 +2,63 @@
 
 <AppGridPanel>
     <RadzenDataGrid
-            @ref="_grid"
-            TItem="WeightGridDto"
-            AllowFiltering="true"
-            AllowPaging="true"
-            AllowSorting="true"
-            Count="_count"
-            Data="_data"
-            Density="Density.Compact"
-            FilterMode="FilterMode.Simple"
-            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-            IsLoading="_isLoading"
-            LoadData="LoadDataAsync"
-            PageNumbersCount="1"
-            PagerHorizontalAlign="HorizontalAlign.Center"
-            PagerPosition="PagerPosition.Top"
-            PageSize="20"
-            PageSizeOptions="@( [10, 20, 50, 100])"
-            PagingSummaryFormat="Showing {0} to {1} of {2}"
-            ShowPagingSummary="true">
-            <HeaderTemplate>
-                <AppGridHeader Text="Weights">
-                    <RadzenSelectBar
-                        @bind-Value="Units"
-                        TValue="WeightUnit"
-                        Size="ButtonSize.ExtraSmall">
-                        <Items>
-                            <RadzenSelectBarItem Text="g" Value="WeightUnit.g"/>
-                            <RadzenSelectBarItem Text="kg" Value="WeightUnit.kg"/>
-                            <RadzenSelectBarItem Text="lbs" Value="WeightUnit.lbs"/>
-                            <RadzenSelectBarItem Text="oz" Value="WeightUnit.oz"/>
-                        </Items>
-                    </RadzenSelectBar>
-                </AppGridHeader>
-            </HeaderTemplate>
-            <Columns>
-                <RadzenDataGridColumn
-                    Filterable="false"
-                    Property="@nameof(WeightGridDto.DateTime)"
-                    Title="Date"
-                    Width="13ch">
-                    <Template Context="row">
-                        <AppLocalDateTime Value="row.DateTime"/>
-                    </Template>
-                </RadzenDataGridColumn>
-                <RadzenDataGridColumn
-                    CssClass="rz-py-2"
-                    HeaderCssClass="app-text-right"
-                    Filterable="false"
-                    Property="@nameof(WeightGridDto.Value)"
-                    Sortable="false"
-                    TextAlign="TextAlign.End"
-                    Title="Weight"
-                    Width="9ch">
-                    <Template Context="data">@data.Value.Format(data.Units, Units)</Template>
-                </RadzenDataGridColumn>
-            </Columns>
-        </RadzenDataGrid>
+        @ref="_grid"
+        TItem="WeightGridDto"
+        AllowFiltering="true"
+        AllowPaging="true"
+        AllowSorting="true"
+        Count="_count"
+        Data="_data"
+        Density="Density.Compact"
+        FilterMode="FilterMode.Simple"
+        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+        IsLoading="_isLoading"
+        LoadData="LoadDataAsync"
+        PageNumbersCount="1"
+        PagerHorizontalAlign="HorizontalAlign.Center"
+        PagerPosition="PagerPosition.Top"
+        PageSize="20"
+        PageSizeOptions="@([10, 20, 50, 100])"
+        PagingSummaryFormat="Showing {0} to {1} of {2}"
+        ShowPagingSummary="true">
+        <HeaderTemplate>
+            <AppGridHeader Text="Weights">
+                <RadzenSelectBar
+                    @bind-Value="Units"
+                    TValue="WeightUnit"
+                    Size="ButtonSize.ExtraSmall">
+                    <Items>
+                        <RadzenSelectBarItem Text="g" Value="WeightUnit.g"/>
+                        <RadzenSelectBarItem Text="kg" Value="WeightUnit.kg"/>
+                        <RadzenSelectBarItem Text="lbs" Value="WeightUnit.lbs"/>
+                        <RadzenSelectBarItem Text="oz" Value="WeightUnit.oz"/>
+                    </Items>
+                </RadzenSelectBar>
+            </AppGridHeader>
+        </HeaderTemplate>
+        <Columns>
+            <RadzenDataGridColumn
+                Filterable="false"
+                Property="@nameof(WeightGridDto.DateTime)"
+                Title="Date"
+                Width="13ch">
+                <Template Context="row">
+                    <AppLocalDateTime Value="row.DateTime"/>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn
+                CssClass="rz-py-2"
+                HeaderCssClass="app-text-right"
+                Filterable="false"
+                Property="@nameof(WeightGridDto.Value)"
+                Sortable="false"
+                TextAlign="TextAlign.End"
+                Title="Weight"
+                Width="9ch">
+                <Template Context="data">@data.Value.Format(data.Units, Units)</Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
 </AppGridPanel>
 
 @code {
@@ -66,11 +66,11 @@
     private IEnumerable<WeightGridDto>? _data;
     private RadzenDataGrid<WeightGridDto>? _grid;
     private bool _isLoading;
-    
+
     [EditorRequired] [Parameter] public int FelineId { get; set; }
-    
+
     /// <summary>
-    /// Units to display in the grid
+    ///     Units to display in the grid
     /// </summary>
     public WeightUnit Units { get; set; } = WeightUnit.lbs;
 
@@ -95,5 +95,4 @@
             _isLoading = false;
         }
     }
-   
 }

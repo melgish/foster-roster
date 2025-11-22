@@ -1,6 +1,6 @@
-namespace FosterRoster.Features.Weights;
-
 using System.ComponentModel.DataAnnotations;
+
+namespace FosterRoster.Features.Weights;
 
 public enum WeightUnit
 {

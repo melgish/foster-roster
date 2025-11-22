@@ -1,8 +1,7 @@
-namespace FosterRoster.Features.Weights;
-
-using Felines;
-using Microsoft.EntityFrameworkCore;
+using FosterRoster.Features.Felines;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Features.Weights;
 
 /// <summary>
 ///     A database entity representing a recorded weight for a feline.
@@ -17,7 +16,7 @@ public sealed class Weight
 }
 
 /// <summary>
-///     Database configuration for the <see cref="Weight"/> entity.
+///     Database configuration for the <see cref="Weight" /> entity.
 /// </summary>
 internal class WeightConfiguration : IEntityTypeConfiguration<Weight>
 {

@@ -1,12 +1,11 @@
+using FosterRoster.Data;
 using FosterRoster.Features.Felines;
+using System.Linq.Expressions;
 
 namespace FosterRoster.Features.Weights;
 
-using Infrastructure;
-using System.Linq.Expressions;
-
 public sealed class WeightRepository(
-    IDbContextFactory<Data.FosterRosterDbContext> contextFactory
+    IDbContextFactory<FosterRosterDbContext> contextFactory
 ) : IRepository
 {
     private static readonly Expression<Func<Weight, Weight>> WeightProjection =
@@ -57,10 +56,10 @@ public sealed class WeightRepository(
                 .Weights
                 .Where(e => e.FelineId == felineId && e.DateTime == dateTime)
                 .ExecuteDeleteAsync() switch
-        {
-            0 => Result.Fail(new NotFoundError()),
-            1 => Result.Ok(),
-            _ => Result.Fail(new MultipleChangesError())
-        };
+            {
+                0 => Result.Fail(new NotFoundError()),
+                1 => Result.Ok(),
+                _ => Result.Fail(new MultipleChangesError())
+            };
     }
 }
