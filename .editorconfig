@@ -20,7 +20,7 @@ tab_width = 4
 
 # New line preferences
 end_of_line = crlf
-insert_final_newline = false
+insert_final_newline = true
 
 #### .NET Coding Conventions ####
 [*.{cs,vb}]
@@ -88,9 +88,9 @@ csharp_style_expression_bodied_accessors = true:silent
 csharp_style_expression_bodied_constructors = false:silent
 csharp_style_expression_bodied_indexers = true:silent
 csharp_style_expression_bodied_lambdas = true:suggestion
-csharp_style_expression_bodied_local_functions = false:silent
+csharp_style_expression_bodied_local_functions = true:silent
 csharp_style_expression_bodied_methods = true:silent
-csharp_style_expression_bodied_operators = false:silent
+csharp_style_expression_bodied_operators = true:silent
 csharp_style_expression_bodied_properties = true:silent
 
 # Pattern matching preferences
