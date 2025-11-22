@@ -1,8 +1,7 @@
-﻿namespace FosterRoster.Features.Chores;
-
-using Felines;
-using Microsoft.EntityFrameworkCore;
+﻿using FosterRoster.Features.Felines;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Features.Chores;
 
 /// <summary>
 ///     Database entity representing a task to be performed for a feline.
@@ -36,18 +35,18 @@ public sealed class Chore : IIdBearer
     public Feline? Feline { get; init; }
 
     /// <summary>
-    ///     Unique identifier for the chore.
-    /// </summary>
-    public int Id { get; init; }
-
-    /// <summary>
     ///     Name of chore to display to the user.
     /// </summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     Unique identifier for the chore.
+    /// </summary>
+    public int Id { get; init; }
 }
 
 /// <summary>
-///     Database configuration for <see cref="Chore"/> entity.
+///     Database configuration for <see cref="Chore" /> entity.
 /// </summary>
 internal sealed class ChoresConfiguration : IEntityTypeConfiguration<Chore>
 {

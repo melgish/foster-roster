@@ -1,9 +1,8 @@
 ﻿@page "/tasks"
 @page "/tasks/{choreId:int}"
+@using FosterRoster.Features.Felines
 
 @rendermode @(new InteractiveServerRenderMode(false))
-
-@using FosterRoster.Features.Felines
 
 @inject ChoreRepository ChoreRepository;
 @inject DialogService DialogService
@@ -174,7 +173,7 @@
             switch
             {
                 { Count: > 2 } n => string.Join(", ", n[..^1]) + ", and " + n[^1],
-                { } n => string.Join(" and ", n),
+                {} n => string.Join(" and ", n),
                 _ => string.Empty
             };
 
@@ -321,5 +320,4 @@
             _isSaving = false;
         }
     }
-
 }
