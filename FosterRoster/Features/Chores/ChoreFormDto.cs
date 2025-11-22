@@ -24,11 +24,6 @@ public sealed class ChoreFormDto : IIdBearer
     public int FelineId { get; set; }
 
     /// <summary>
-    ///     Unique identifier for the task.
-    /// </summary>
-    public int Id { get; init; }
-
-    /// <summary>
     ///     Name of task to display to the user.
     /// </summary>
     public string Name { get; set; } = string.Empty;
@@ -38,10 +33,15 @@ public sealed class ChoreFormDto : IIdBearer
     ///     felines that it will be assigned to
     /// </summary>
     public List<int> FelineIds { get; set; } = [];
+
+    /// <summary>
+    ///     Unique identifier for the task.
+    /// </summary>
+    public int Id { get; init; }
 }
 
 /// <summary>
-///     Validator for <see cref="ChoreFormDto"/>.
+///     Validator for <see cref="ChoreFormDto" />.
 /// </summary>
 [UsedImplicitly]
 public sealed class ChoreFormDtoValidator : AbstractValidator<ChoreFormDto>

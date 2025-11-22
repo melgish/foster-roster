@@ -174,7 +174,7 @@
         // Reset the model to be edited.
         var rs = SourceId != 0
             ? await SourceRepository.GetByKeyAsync(SourceId)
-            : Result.Ok<SourceFormDto>(new());
+            : Result.Ok(new SourceFormDto());
         if (NavigationManager.VerifyFound(rs))
         {
             _name = rs.Value.IsNew ? $"Create New {EntityName}" : rs.Value.Name;

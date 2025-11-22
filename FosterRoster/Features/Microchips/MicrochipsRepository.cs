@@ -14,25 +14,16 @@ public sealed class MicrochipsRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(MicrochipFormDto dto)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
-        var entry = db.Microchips.Add(new Microchip()
+        var entry = db.Microchips.Add(new Microchip
         {
             Brand = dto.Brand.Trim(),
             Code = dto.Code.Trim(),
             Comment = dto.Comment.TrimToNull(),
-            FelineId = dto.FelineId,
+            FelineId = dto.FelineId
         });
         await db.SaveChangesAsync();
         return Result.Ok(entry.Entity.ToIdOnly());
     }
-
-
-    /// <summary>
-    ///     Captures a new database context and creates a queryable for the Vaccination table.
-    /// </summary>
-    /// <returns></returns>
-    public Task<Query<Microchip>> CreateQueryAsync()
-        => dbContextFactory.CreateQueryAsync(db => db.Microchips.AsNoTracking());
-
 
     /// <summary>
     ///     Deletes an existing Microchip from the database by its ID.

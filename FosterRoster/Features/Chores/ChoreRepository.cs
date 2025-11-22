@@ -1,6 +1,7 @@
-﻿namespace FosterRoster.Features.Chores;
+﻿using FosterRoster.Data;
+using FosterRoster.Features.Comments;
 
-using Data;
+namespace FosterRoster.Features.Chores;
 
 public sealed class ChoreRepository(
     IDbContextFactory<FosterRosterDbContext> factory
@@ -13,7 +14,7 @@ public sealed class ChoreRepository(
     /// <returns>A Result with Chore on Success, otherwise Result with Errors.</returns>
     public async Task<Result<IdOnlyDto>> AddAsync(ChoreFormDto model)
     {
-        await using var db = await factory.CreateDbContextAsync();
+        await using FosterRosterDbContext db = await factory.CreateDbContextAsync();
         db.Chores.AddRange(model.FelineIds
             .Select(felineId => new Chore
             {
@@ -32,9 +33,9 @@ public sealed class ChoreRepository(
     /// <returns></returns>
     public async Task<Query<Chore>> CreateQueryAsync()
     {
-        var context = await factory.CreateDbContextAsync();
-        var queryable = context.Chores;
-        return new(context, queryable);
+        FosterRosterDbContext context = await factory.CreateDbContextAsync();
+        DbSet<Chore> queryable = context.Chores;
+        return new Query<Chore>(context, queryable);
     }
 
     /// <summary>
@@ -44,7 +45,7 @@ public sealed class ChoreRepository(
     /// <returns>A Result instance indicating success or failure.</returns>
     public async Task<Result> DeleteByKeyAsync(int choreId)
     {
-        await using var db = await factory.CreateDbContextAsync();
+        await using FosterRosterDbContext db = await factory.CreateDbContextAsync();
         return await db.Chores.Where(e => e.Id == choreId).ExecuteDeleteAsync() switch
         {
             0 => Result.Fail(new NotFoundError()),
@@ -60,8 +61,8 @@ public sealed class ChoreRepository(
     /// <returns>Result with Fosterer if successful, or Errors on failure.</returns>
     public async Task<Result<ChoreFormDto>> GetByKeyAsync(int choreId)
     {
-        await using var db = await factory.CreateDbContextAsync();
-        var dto = await db
+        await using FosterRosterDbContext db = await factory.CreateDbContextAsync();
+        ChoreFormDto? dto = await db
             .Chores
             .Where(e => e.Id == choreId)
             .SelectToFormDto()
@@ -71,17 +72,18 @@ public sealed class ChoreRepository(
 
     public async Task<Result> LogChoreCompletedAsync(int choreId, ChoreCompletionFormDto dto)
     {
-        await using var db = await factory.CreateDbContextAsync();
-        var chore = await db.Chores.FindAsync(choreId);
-        if (chore is null) return Result.Fail(new NotFoundError());
-        if (chore.FelineId is null) return Result.Fail("Task is not assigned to a feline.");
-
-        db.Comments.Add(new()
+        await using FosterRosterDbContext db = await factory.CreateDbContextAsync();
+        Chore? chore = await db.Chores.FindAsync(choreId);
+        if (chore is null)
         {
-            FelineId = chore.FelineId.GetValueOrDefault(),
-            Text = string.IsNullOrEmpty(dto.LogText) ? chore.Name : dto.LogText,
-            TimeStamp = dto.LogDate!.Value.UtcDateTime,
-        });
+            return Result.Fail(new NotFoundError());
+        }
+        if (chore.FelineId is null)
+        {
+            return Result.Fail("Task is not assigned to a feline.");
+        }
+
+        db.Comments.Add(new Comment { FelineId = chore.FelineId.GetValueOrDefault(), Text = string.IsNullOrEmpty(dto.LogText) ? chore.Name : dto.LogText, TimeStamp = dto.LogDate!.Value.UtcDateTime });
 
         db.Chores.Remove(chore);
         await db.SaveChangesAsync();
@@ -96,9 +98,12 @@ public sealed class ChoreRepository(
     /// <returns>Result with updated Chore if found, or Errors on failure.</returns>
     public async Task<Result<IdOnlyDto>> UpdateAsync(int choreId, ChoreFormDto model)
     {
-        await using var db = await factory.CreateDbContextAsync();
-        var existing = await db.Chores.FindAsync(choreId);
-        if (existing is null) return Result.Fail(new NotFoundError());
+        await using FosterRosterDbContext db = await factory.CreateDbContextAsync();
+        Chore? existing = await db.Chores.FindAsync(choreId);
+        if (existing is null)
+        {
+            return Result.Fail(new NotFoundError());
+        }
 
         existing.Description = model.Description;
         existing.DueDate = model.DueDate?.UtcDateTime;

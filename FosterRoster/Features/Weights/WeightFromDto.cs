@@ -21,7 +21,7 @@ public sealed class WeightFromDto
 }
 
 /// <summary>
-///     Validator for <see cref="WeightFromDto"/>.
+///     Validator for <see cref="WeightFromDto" />.
 /// </summary>
 [UsedImplicitly]
 public sealed class WeightFormDtoValidator : AbstractValidator<WeightFromDto>

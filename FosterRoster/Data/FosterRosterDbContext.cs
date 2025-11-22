@@ -1,6 +1,4 @@
-﻿using FosterRoster.Features.Microchips;
-
-namespace FosterRoster.Data;
+﻿namespace FosterRoster.Data;
 
 using Features.Account;
 using Features.Chores;
@@ -42,9 +40,9 @@ public class FosterRosterDbContext(DbContextOptions<FosterRosterDbContext> optio
     // IDataProtectionKeyContext
     public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(FosterRosterDbContext).Assembly);
+        base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(typeof(FosterRosterDbContext).Assembly);
     }
 }

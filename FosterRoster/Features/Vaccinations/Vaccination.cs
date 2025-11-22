@@ -1,8 +1,7 @@
-namespace FosterRoster.Features.Vaccinations;
-
-using Felines;
-using Microsoft.EntityFrameworkCore;
+using FosterRoster.Features.Felines;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Features.Vaccinations;
 
 /// <summary>
 ///     Database entity representing a vaccination administered to a feline.
@@ -35,11 +34,6 @@ public sealed class Vaccination : IIdBearer
     public int FelineId { get; set; }
 
     /// <summary>
-    ///     Unique identifier for the vaccination.
-    /// </summary>
-    public int Id { get; init; }
-
-    /// <summary>
     ///     Name of the vaccine manufacturer.
     /// </summary>
     public string ManufacturerName { get; set; } = string.Empty;
@@ -58,10 +52,15 @@ public sealed class Vaccination : IIdBearer
     ///     Name of the vaccine administered.
     /// </summary>
     public string VaccineName { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     Identifier for the vaccination.
+    /// </summary>
+    public int Id { get; init; }
 }
 
 /// <summary>
-///     Database configuration for the <see cref="Vaccination"/> entity.
+///     Database configuration for the <see cref="Vaccination" /> entity.
 /// </summary>
 internal sealed class VaccinationConfiguration : IEntityTypeConfiguration<Vaccination>
 {

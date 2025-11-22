@@ -22,7 +22,7 @@
         PagerHorizontalAlign="HorizontalAlign.Center"
         PagerPosition="PagerPosition.Top"
         PageSize="20"
-        PageSizeOptions="@( [10, 20, 50, 100])"
+        PageSizeOptions="@([10, 20, 50, 100])"
         PagingSummaryFormat="Showing {0} to {1} of {2}"
         ShowPagingSummary="true">
         <Columns>
@@ -52,7 +52,6 @@
 
 
 @code {
-
     private int _count;
     private IEnumerable<ChoreGridDto>? _data;
     private RadzenDataGrid<ChoreGridDto>? _grid;

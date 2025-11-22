@@ -23,7 +23,7 @@ public static class Queries
                 DueDate = chore.DueDate,
                 FelineId = chore.FelineId.GetValueOrDefault(),
                 Id = chore.Id,
-                Name = chore.Name,
+                Name = chore.Name
             });
 
         /// <summary>
@@ -37,7 +37,7 @@ public static class Queries
                 DueDate = e.DueDate,
                 FelineName = e.Feline == null ? "Template" : e.Feline.Name,
                 Id = e.Id,
-                Name = e.Name,
+                Name = e.Name
             });
     }
 }

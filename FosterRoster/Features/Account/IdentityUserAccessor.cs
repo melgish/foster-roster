@@ -7,7 +7,7 @@ internal sealed class IdentityUserAccessor(
     IdentityRedirectManager redirectManager
 )
 {
-    public async Task<ApplicationUser> GetRequiredUserAsync(HttpContext context)
+    public async Task<ApplicationUser?> GetRequiredUserAsync(HttpContext context)
     {
         var user = await userManager.GetUserAsync(context.User);
         if (user is null)

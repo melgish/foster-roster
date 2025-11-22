@@ -98,7 +98,7 @@ else
     {
         var rs = await MicrochipsRepository
             .GetByFelineIdAsync(FelineId);
-        _model = rs.IsSuccess ? rs.Value : new MicrochipFormDto() { FelineId = FelineId };
+        _model = rs.IsSuccess ? rs.Value : new MicrochipFormDto { FelineId = FelineId };
 
         await InvokeAsync(StateHasChanged);
     }

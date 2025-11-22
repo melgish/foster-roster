@@ -69,11 +69,10 @@ public static class RadzenExtensions
             queryable = queryable.Where(args);
             var count = await queryable.CountAsync();
             var data = await queryable.OrderBy(args, defaultOrderBy).Skip(args).Take(args).ToListAsync();
-            return new(data, count);
+            return new GridResults<TEntity>(data, count);
         }
     }
 
-    /// <param name="dialogService"></param>
     extension(DialogService dialogService)
     {
         /// <summary>
@@ -89,13 +88,14 @@ public static class RadzenExtensions
             => entityId != 0 && Convert.ToBoolean(
                 await dialogService.OpenAsync<TComponent>(
                     "Confirm Delete",
-                    new() { ["Name"] = name })
+                    new Dictionary<string, object> { ["Name"] = name })
             );
     }
 
     extension<TReason>(IReadOnlyList<TReason> reasons) where TReason : IReason
     {
-        private string FirstReason() => reasons.FirstOrDefault()?.Message ?? string.Empty;
+        private string FirstReason() =>
+            reasons.Count > 0 ? reasons[0].Message : string.Empty;
     }
 
     /// <param name="service"></param>

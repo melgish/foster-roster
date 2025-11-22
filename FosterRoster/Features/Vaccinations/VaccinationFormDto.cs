@@ -1,7 +1,5 @@
 namespace FosterRoster.Features.Vaccinations;
 
-using Felines;
-
 public sealed class VaccinationFormDto : IIdBearer
 {
     /// <summary>
@@ -18,11 +16,6 @@ public sealed class VaccinationFormDto : IIdBearer
     ///     Date the vaccination expires.
     /// </summary>
     public DateOnly? ExpirationDate { get; set; }
-
-    /// <summary>
-    ///     Feline that received the vaccination.
-    /// </summary>
-    public Feline Feline { get; init; } = null!;
 
     /// <summary>
     ///     Feline that received the vaccination.

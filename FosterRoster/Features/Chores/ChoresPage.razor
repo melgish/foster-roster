@@ -1,9 +1,8 @@
 ﻿@page "/tasks"
 @page "/tasks/{choreId:int}"
+@using FosterRoster.Features.Felines
 
 @rendermode @(new InteractiveServerRenderMode(false))
-
-@using FosterRoster.Features.Felines
 
 @inject ChoreRepository ChoreRepository;
 @inject DialogService DialogService
@@ -153,7 +152,7 @@
 
     private async Task AddAsync()
     {
-        _model = new();
+        _model = new ChoreFormDto();
         await EditAsync(0);
     }
 
@@ -174,11 +173,11 @@
             switch
             {
                 { Count: > 2 } n => string.Join(", ", n[..^1]) + ", and " + n[^1],
-                { } n => string.Join(" and ", n),
+                {} n => string.Join(" and ", n),
                 _ => string.Empty
             };
 
-        return (bool)await DialogService.OpenAsync<ConfirmMultiTaskCreate>("Confirm Create", new()
+        return (bool)await DialogService.OpenAsync<ConfirmMultiTaskCreate>("Confirm Create", new Dictionary<string, object>
         {
             ["Count"] = _model.FelineIds.Count,
             ["Names"] = names
@@ -278,7 +277,7 @@
     {
         // Reset the model to be edited.
         var rs = ChoreId == 0
-            ? Result.Ok<ChoreFormDto>(new()
+            ? Result.Ok(new ChoreFormDto
             {
                 Description = _model.Description,
                 FelineId = _model.FelineId,
@@ -321,5 +320,4 @@
             _isSaving = false;
         }
     }
-
 }

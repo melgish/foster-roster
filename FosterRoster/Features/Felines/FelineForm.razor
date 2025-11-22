@@ -195,10 +195,7 @@ else
 
     private async Task OnFilesChangedAsync(InputFileChangeEventArgs args)
     {
-        if (_model is not null)
-        {
-            _model.Thumbnail = await args.File.ToThumbnailAsync(_model.Id);
-        }
+        _model?.Thumbnail = await args.File.ToThumbnailAsync(_model.Id);
     }
 
     private async Task PrintAsync()
@@ -213,7 +210,7 @@ else
 
     private Task ResetAsync()
     {
-        _model = new()
+        _model = new FelineFormDto
         {
             AnimalId = Feline.AnimalId,
             Breed = Feline.Breed,

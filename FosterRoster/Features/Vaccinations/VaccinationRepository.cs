@@ -1,6 +1,7 @@
+using FosterRoster.Data;
+
 namespace FosterRoster.Features.Vaccinations;
 
-using Data;
 public class VaccinationRepository(
     IDbContextFactory<FosterRosterDbContext> dbContextFactory
 ) : IRepository
@@ -9,7 +10,7 @@ public class VaccinationRepository(
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
         db.Vaccinations.AddRange(
-            dto.FelineIds.Select(felineId => new Vaccination()
+            dto.FelineIds.Select(felineId => new Vaccination
             {
                 AdministeredBy = dto.AdministeredBy.Trim(),
                 Comments = dto.Comments?.TrimToNull(),
@@ -24,14 +25,12 @@ public class VaccinationRepository(
         return Result.Ok(IdOnly.Zero);
     }
 
-
     /// <summary>
     ///     Captures a new database context and creates a queryable for the Vaccination table.
     /// </summary>
     /// <returns></returns>
     public Task<Query<Vaccination>> CreateQueryAsync()
         => dbContextFactory.CreateQueryAsync(db => db.Vaccinations.AsNoTracking());
-
 
     /// <summary>
     ///     Deletes an existing Vaccination from the database by its ID.
@@ -52,7 +51,6 @@ public class VaccinationRepository(
         };
     }
 
-
     /// <summary>
     ///     Gets an existing Vaccinations from the database by its ID.
     /// </summary>
@@ -67,7 +65,6 @@ public class VaccinationRepository(
             .FirstOrDefaultAsync(e => e.Id == vaccinationId);
         return model is null ? Result.Fail(new NotFoundError()) : Result.Ok(model);
     }
-
 
     /// <summary>
     ///     Updates an existing Vaccinations in the database.

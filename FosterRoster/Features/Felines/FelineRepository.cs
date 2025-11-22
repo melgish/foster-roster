@@ -1,3 +1,5 @@
+using FosterRoster.Features.Thumbnails;
+
 namespace FosterRoster.Features.Felines;
 
 public sealed class FelineRepository(
@@ -35,7 +37,7 @@ public sealed class FelineRepository(
     public async Task<Result<IdOnlyDto>> AddAsync(FelineFormDto model)
     {
         await using var db = await dbContextFactory.CreateDbContextAsync();
-        var entry = db.Felines.Add(new()
+        var entry = db.Felines.Add(new Feline
         {
             AnimalId = model.AnimalId,
             Breed = model.Breed,
@@ -161,7 +163,7 @@ public sealed class FelineRepository(
         }
         else if (model.Thumbnail?.ImageData.Length > 0)
         {
-            existing.Thumbnail ??= new() { FelineId = existing.Id };
+            existing.Thumbnail ??= new Thumbnail { FelineId = existing.Id };
             existing.Thumbnail.ImageData = model.Thumbnail.ImageData;
             existing.Thumbnail.ContentType = model.Thumbnail.ContentType;
         }

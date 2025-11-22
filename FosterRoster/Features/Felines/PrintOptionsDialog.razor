@@ -61,11 +61,12 @@
         try
         {
             var rs = await LocalStorage.GetAsync<PrintOptions>(nameof(PrintOptions));
-            _model = rs.Value ?? new();
+            _model = rs.Value ?? new PrintOptions();
         }
         catch
         {
-            _model = new();
+            // Any attempt to deserialize fails, just use defaults.
+            _model = new PrintOptions();
         }
     }
 

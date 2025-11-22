@@ -2,7 +2,6 @@
 
 using FosterRoster.Data;
 using FosterRoster.Features.Account;
-using FosterRoster.Features.Weights;
 using FosterRoster.Shared;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.DataProtection;

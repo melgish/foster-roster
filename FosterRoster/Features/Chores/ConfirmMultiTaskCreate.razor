@@ -16,7 +16,8 @@
 </RadzenStack>
 
 @code {
-    [Parameter] public int Count { get; set; } = 0;
+    [Parameter] public int Count { get; set; }
+
     [Parameter] public string Names { get; set; } = string.Empty;
 
     void Cancel() => DialogService.Close(false);

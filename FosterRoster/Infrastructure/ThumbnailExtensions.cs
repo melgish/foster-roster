@@ -26,7 +26,7 @@ public static class ThumbnailExtensions
         await using var stream = image.OpenReadStream();
         await stream.CopyToAsync(memory);
 
-        return new()
+        return new Thumbnail
         {
             FelineId = felineId,
             ImageData = memory.ToArray(),

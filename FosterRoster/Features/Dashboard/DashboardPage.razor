@@ -1,11 +1,9 @@
 ﻿@page "/"
 @using System.Security.Claims
 @using FosterRoster.Data
-@using FosterRoster.Features.Users
 @attribute [AllowAnonymous]
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IDbContextFactory<FosterRosterDbContext> DbContextFactory
-@inject UserRepository userRepository
 
 <PageTitle>Dashboard</PageTitle>
 <div class="deck">
@@ -33,7 +31,7 @@
         }
         else if (state.User.IsInRole(Roles.User))
         {
-            _ = int.TryParse(state.User.FindFirstValue(ClaimTypes.NameIdentifier), out int userId);
+            _ = int.TryParse(state.User.FindFirstValue(ClaimTypes.NameIdentifier), out var userId);
             var uf = dbContext
                 .Users
                 .Where(u => u.Id == userId)
@@ -74,5 +72,4 @@
         await LoadFelinesAsync();
         await base.OnInitializedAsync();
     }
-
 }

@@ -10,7 +10,7 @@
     private void Cancel() => DialogService.Close();
 
     protected override void OnInitialized()
-        => _model = new(TimeProvider.GetLocalNow());
+        => _model = new InactivateModel(TimeProvider.GetLocalNow());
 
     private void Submit() => DialogService.Close(_model.Value);
 

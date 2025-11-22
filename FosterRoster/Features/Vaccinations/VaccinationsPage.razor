@@ -1,17 +1,13 @@
 @page "/vaccinations"
 @page "/vaccinations/{VaccinationId:int}"
-
-@rendermode @(new InteractiveServerRenderMode(false))
-
 @using FosterRoster.Features.Chores
 @using FosterRoster.Features.Felines
+
+@rendermode @(new InteractiveServerRenderMode(false))
 @inject DialogService DialogService
-@inject TimeProvider TimeProvider;
 @inject NavigationManager NavigationManager;
 @inject NotificationService NotificationService;
-@inject VaccinationRepository  VaccinationRepository;
-
-
+@inject VaccinationRepository VaccinationRepository;
 
 <PageTitle>Vaccinations</PageTitle>
 <RadzenStack>
@@ -77,7 +73,7 @@
                         <AppTextBox @bind-Value="@_model.SerialNumber" Text="Serial Number"/>
                     </AppFormColumn>
                     <AppFormColumn>
-                        <AppDateOnly @bind-Value="_model.ExpirationDate" AllowClear="true" Text="Expiration Date" />
+                        <AppDateOnly @bind-Value="_model.ExpirationDate" AllowClear="true" Text="Expiration Date"/>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormRow>
@@ -88,11 +84,11 @@
                             </Helper>
                         </AppTextBox>
                     </AppFormColumn>
-                    
+
                 </AppFormRow>
                 <AppFormRow>
                     <AppFormColumn SizeSM="12">
-                        <AppTextArea @bind-Value="@_model.Comments" Rows="2" Text="Comments" />
+                        <AppTextArea @bind-Value="@_model.Comments" Rows="2" Text="Comments"/>
                     </AppFormColumn>
                 </AppFormRow>
                 <AppFormFooter>
@@ -128,32 +124,32 @@
             PageSizeOptions="Grid.PageSizeOptions"
             PagingSummaryFormat="@Grid.PagingSummaryFormat"
             ShowPagingSummary="true">
-        <HeaderTemplate>
-            <AppGridHeader Text="Vaccinations">
-                <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
-            </AppGridHeader>
-        </HeaderTemplate>        
-        <Columns>
-            <RadzenDataGridColumn Width="6ch">
-                <Template Context="data">
-                    <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
-                                   Text="Edit"/>
-                </Template>
-            </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="@nameof(VaccinationGridDto.FelineName)" Title="Feline" Width="20ch" />
-            <RadzenDataGridColumn
-                Filterable="false"
-                Property="@nameof(VaccinationGridDto.VaccinationDate)"
-                SortOrder="SortOrder.Descending"
-                Title="Vaccination Date"
-                Width="18ch"/>
-            <RadzenDataGridColumn Property="@nameof(VaccinationGridDto.VaccineName)" Title="Vaccine"/>
-            <RadzenDataGridColumn
-                Filterable="false"
-                Property="@nameof(VaccinationGridDto.ExpirationDate)"
-                Title="Expires"
-                Width="18ch"/>
-        </Columns>
+            <HeaderTemplate>
+                <AppGridHeader Text="Vaccinations">
+                    <AppGridButton Click="@(() => EditAsync(0))" Text="Add"/>
+                </AppGridHeader>
+            </HeaderTemplate>
+            <Columns>
+                <RadzenDataGridColumn Width="6ch">
+                    <Template Context="data">
+                        <AppGridButton ButtonStyle="ButtonStyle.Secondary" Click="@(() => EditAsync(data.Id))"
+                                       Text="Edit"/>
+                    </Template>
+                </RadzenDataGridColumn>
+                <RadzenDataGridColumn Property="@nameof(VaccinationGridDto.FelineName)" Title="Feline" Width="20ch"/>
+                <RadzenDataGridColumn
+                    Filterable="false"
+                    Property="@nameof(VaccinationGridDto.VaccinationDate)"
+                    SortOrder="SortOrder.Descending"
+                    Title="Vaccination Date"
+                    Width="18ch"/>
+                <RadzenDataGridColumn Property="@nameof(VaccinationGridDto.VaccineName)" Title="Vaccine"/>
+                <RadzenDataGridColumn
+                    Filterable="false"
+                    Property="@nameof(VaccinationGridDto.ExpirationDate)"
+                    Title="Expires"
+                    Width="18ch"/>
+            </Columns>
         </RadzenDataGrid>
     </AppGridPanel>
 </RadzenStack>
@@ -168,11 +164,10 @@
     private bool _isLoading;
     private bool _isSaving;
     private VaccinationFormDto _model = new();
-    
+
     private string _name = $"Create New {EntityName}";
 
-    [Parameter]
-    public int VaccinationId { get; set; }
+    [Parameter] public int VaccinationId { get; set; }
 
     /// <summary>
     ///     Delete the source currently being edited.
@@ -197,7 +192,7 @@
             _isSaving = false;
         }
     }
-    
+
     /// <summary>
     ///     Edit the specified entity.
     /// </summary>
@@ -212,7 +207,7 @@
 
         NavigationManager.NavigateTo(entityId == 0 ? PageRoute : $"{PageRoute}/{entityId}");
     }
-    
+
     /// <summary>
     ///     Loads paged data for the grid.
     /// </summary>
@@ -255,7 +250,7 @@
         // Reset the model to be edited.
         var rs = VaccinationId != 0
             ? await VaccinationRepository.GetByKeyAsync(VaccinationId)
-            : Result.Ok<VaccinationFormDto>(new());
+            : Result.Ok(new VaccinationFormDto());
         if (NavigationManager.VerifyFound(rs))
         {
             _name = rs.Value.IsNew ? $"Create New {EntityName}" : rs.Value.VaccineName;

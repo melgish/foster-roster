@@ -16,7 +16,7 @@
 
     protected override void OnInitialized()
     {
-        _feline = new()
+        _feline = new FelineFormDto
         {
             IntakeDate = DateOnly.FromDateTime(TimeProvider.GetLocalNow().DateTime),
             Category = Category.Kitten,

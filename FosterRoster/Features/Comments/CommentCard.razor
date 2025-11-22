@@ -49,7 +49,7 @@ else
 
     private Task EditAsync()
     {
-        _model = new()
+        _model = new CommentFormDto
         {
             Id = Comment.Id,
             FelineId = Comment.FelineId,
@@ -63,7 +63,7 @@ else
 
     protected override void OnParametersSet()
     {
-        _html = new(Comment.Text);
+        _html = new MarkupString(Comment.Text);
         _model = null;
     }
 
