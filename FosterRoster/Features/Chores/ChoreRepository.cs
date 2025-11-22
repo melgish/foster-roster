@@ -18,9 +18,9 @@ public sealed class ChoreRepository(
         db.Chores.AddRange(model.FelineIds
             .Select(felineId => new Chore
             {
-                Description = model.Description.TrimToNull(), 
-                DueDate = model.DueDate?.UtcDateTime, 
-                FelineId = felineId.ZeroToNull(), 
+                Description = model.Description.TrimToNull(),
+                DueDate = model.DueDate?.UtcDateTime,
+                FelineId = felineId.ZeroToNull(),
                 Name = model.Name.TrimToNull()
             }));
         await db.SaveChangesAsync();
