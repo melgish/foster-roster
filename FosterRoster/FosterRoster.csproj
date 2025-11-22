@@ -8,6 +8,8 @@
     <RuntimeFrameworkVersion>10.0.0</RuntimeFrameworkVersion>
     <Version>1.7.2</Version>
     <BlazorDisableThrowNavigationException>true</BlazorDisableThrowNavigationException>
+    <!-- Suppress warning about package version conflicts until PostgreSQL 10 is GA -->
+    <NoWarn>$(NoWarn);NU1608</NoWarn>  
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Blazored.FluentValidation" Version="2.2.0" />
@@ -38,4 +40,5 @@
     <Content Remove="Features/Account/Pages/RegisterConfirmation.razor" />
     <Content Remove="Features/Account/Pages/Manage/ExternalLogins.razor" />
   </ItemGroup>
+  
 </Project>
