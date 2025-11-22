@@ -1,7 +1,6 @@
-﻿namespace FosterRoster.Shared.Components;
+﻿using System.Linq.Expressions;
 
-using Microsoft.AspNetCore.Components;
-using System.Linq.Expressions;
+namespace FosterRoster.Shared.Components;
 
 /// <summary>
 ///     Base for wrapped components that are used in forms.

@@ -1,9 +1,8 @@
 ﻿using FosterRoster.Features.Fosterers;
-
-namespace FosterRoster.Features.Account;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace FosterRoster.Features.Account;
 
 /// <summary>
 ///     Database entity for application users.

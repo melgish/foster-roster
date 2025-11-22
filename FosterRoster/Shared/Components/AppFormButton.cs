@@ -1,8 +1,7 @@
-﻿namespace FosterRoster.Shared.Components;
-
-using Microsoft.AspNetCore.Components;
-using Radzen;
+﻿using Radzen;
 using Radzen.Blazor;
+
+namespace FosterRoster.Shared.Components;
 
 public class AppFormButton : RadzenButton
 {
