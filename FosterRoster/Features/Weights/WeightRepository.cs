@@ -56,10 +56,10 @@ public sealed class WeightRepository(
                 .Weights
                 .Where(e => e.FelineId == felineId && e.DateTime == dateTime)
                 .ExecuteDeleteAsync() switch
-            {
-                0 => Result.Fail(new NotFoundError()),
-                1 => Result.Ok(),
-                _ => Result.Fail(new MultipleChangesError())
-            };
+        {
+            0 => Result.Fail(new NotFoundError()),
+            1 => Result.Ok(),
+            _ => Result.Fail(new MultipleChangesError())
+        };
     }
 }
