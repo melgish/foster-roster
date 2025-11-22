@@ -18,7 +18,10 @@ public sealed class ChoreRepository(
         db.Chores.AddRange(model.FelineIds
             .Select(felineId => new Chore
             {
-                Description = model.Description.TrimToNull(), DueDate = model.DueDate?.UtcDateTime, FelineId = felineId.ZeroToNull(), Name = model.Name.TrimToNull()
+                Description = model.Description.TrimToNull(), 
+                DueDate = model.DueDate?.UtcDateTime, 
+                FelineId = felineId.ZeroToNull(), 
+                Name = model.Name.TrimToNull()
             }));
         await db.SaveChangesAsync();
         return Result.Ok(IdOnly.Zero);
@@ -80,10 +83,7 @@ public sealed class ChoreRepository(
             return Result.Fail("Task is not assigned to a feline.");
         }
 
-        db.Comments.Add(new Comment
-        {
-            FelineId = chore.FelineId.GetValueOrDefault(), Text = string.IsNullOrEmpty(dto.LogText) ? chore.Name : dto.LogText, TimeStamp = dto.LogDate!.Value.UtcDateTime
-        });
+        db.Comments.Add(new Comment { FelineId = chore.FelineId.GetValueOrDefault(), Text = string.IsNullOrEmpty(dto.LogText) ? chore.Name : dto.LogText, TimeStamp = dto.LogDate!.Value.UtcDateTime });
 
         db.Chores.Remove(chore);
         await db.SaveChangesAsync();

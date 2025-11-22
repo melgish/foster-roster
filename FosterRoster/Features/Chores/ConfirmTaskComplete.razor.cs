@@ -35,7 +35,8 @@ public sealed partial class ConfirmTaskComplete(DialogService dialogService)
         {
             ["Model"] = new ChoreCompletionFormDto
             {
-                LogDate = timeProvider.GetLocalNow(), LogText = choreGridDto.Description
+                LogDate = timeProvider.GetLocalNow(),
+                LogText = choreGridDto.Description
             }
         });
         if (logEntry == null)
